@@ -17,9 +17,9 @@
     }
   }
 
-  .action-button-container {
+  .button-container {
     position: absolute;
-    bottom: 90px; // Above the navbar
+    bottom: 90px;
     left: 0;
     width: 100%;
     padding: 0 20px;
@@ -27,7 +27,7 @@
     justify-content: center;
     z-index: 50;
 
-    .btn-walk {
+    .walk-btn {
       width: 100%;
       background-color: #3b82f6;
       color: white;
