@@ -1,0 +1,368 @@
+/* ========================================
+   BOTTOM NAVIGATION (Mobile Style)
+   ======================================== */
+.bottom-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 1rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+  position: relative;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.bottom-nav-item:hover {
+  background: rgba(163, 181, 217, 0.08);
+  transform: translateY(-2px);
+}
+
+.bottom-nav-item.active {
+  color: var(--primary);
+  background: rgba(163, 181, 217, 0.12);
+}
+
+/* Icône SVG */
+.bottom-nav-icon {
+  width: 26px;
+  height: 26px;
+  stroke: currentColor;
+  transition: all 0.3s ease;
+}
+
+.bottom-nav-item.active .bottom-nav-icon {
+  transform: scale(1.1);
+}
+
+/* Label sous l'icône */
+.bottom-nav-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Indicateur actif (point) au-dessus de l'icône */
+.bottom-nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0.5rem;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #A3B5D9 0%, #B8C6E3 100%);
+  box-shadow: 0 2px 8px rgba(163, 181, 217, 0.5);
+}
+
+/* ========================================
+   AVATAR - Photo de profil
+   ======================================== */
+.nav-avatar {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--primary);
+  box-shadow: 0 4px 12px rgba(163, 181, 217, 0.3);
+  transition: all 0.3s ease;
+}
+
+.nav-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(163, 181, 217, 0.5);
+}
+
+.nav-avatar-sm {
+  width: 28px;
+  height: 28px;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Badge de notification sur l'avatar */
+.avatar-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+}
+
+/* ========================================
+   NAVBAR COMPACT - Variante 2
+   ======================================== */
+.bottom-nav-compact {
+  padding: 0.75rem 1rem;
+  gap: 0.5rem;
+}
+
+.bottom-nav-compact .bottom-nav-item {
+  padding: 0.5rem 0.75rem;
+}
+
+.bottom-nav-compact .bottom-nav-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.bottom-nav-compact .bottom-nav-label {
+  font-size: 0.7rem;
+}
+
+/* ========================================
+   CURVED BOTTOM NAVIGATION - Variante 3
+   ========================================
+
+   EFFET COMPLEXE : Encoche centrale pour FAB
+
+   COMMENT ÇA MARCHE ?
+   Cette technique utilise 2 pseudo-éléments pour créer
+   une illusion d'encoche :
+
+   1. ::before = Cercle de la couleur du fond de page
+      → Crée un "trou" visuel en se superposant
+      → Position : au-dessus de la navbar (-30px)
+
+   2. ::after = Demi-cercle blanc (couleur navbar)
+      → Cache la partie inférieure du ::before
+      → Crée l'effet de courbe lisse
+
+   3. FAB (z-index: 10) = Au-dessus de tout
+
+   Résultat : Une navbar qui semble "coupée" au centre
+   ======================================== */
+.bottom-nav-curved {
+  position: relative;
+  padding: 0;
+  overflow: visible;  /* Permet au FAB de dépasser */
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Container avec la courbe */
+.nav-curved-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: var(--surface);
+  padding: 1rem 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Courbe centrale - ÉTAPE 1 : Cercle de fond
+   ========================================
+   Crée un cercle de la couleur du fond de page.
+   Ce cercle "cache" visuellement une partie de la navbar.
+   ======================================== */
+.nav-curved-container::before {
+  content: '';
+  position: absolute;
+  top: -30px;              /* Au-dessus de la navbar */
+  left: 50%;
+  transform: translateX(-50%);  /* Centre parfaitement */
+  width: 80px;             /* Taille de l'encoche */
+  height: 80px;
+  background: var(--bg-page);   /* Couleur du fond de page */
+  border-radius: 50%;      /* Cercle parfait */
+  z-index: 1;              /* Au-dessus de la navbar */
+}
+
+/* Courbe centrale - ÉTAPE 2 : Demi-cercle de remplissage
+   ========================================
+   Crée un demi-cercle blanc qui cache la moitié inférieure
+   du cercle ::before, créant l'effet de courbe lisse.
+   ======================================== */
+.nav-curved-container::after {
+  content: '';
+  position: absolute;
+  top: 0;                  /* Aligné avec le haut de la navbar */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;             /* Légèrement plus large que ::before */
+  height: 50px;            /* Seulement la moitié supérieure */
+  background: var(--surface);   /* Couleur de la navbar */
+  border-radius: 50% 50% 0 0;   /* Arrondi seulement en haut */
+  z-index: 2;              /* Au-dessus du ::before */
+}
+
+/* Espace vide au centre pour le FAB
+   ========================================
+   Réserve de l'espace dans le flexbox pour éviter que
+   les icônes ne se chevauchent avec le FAB central
+   ======================================== */
+.nav-curved-spacer {
+  width: 80px;  /* Même largeur que l'encoche */
+}
+
+/* FAB (Floating Action Button) central */
+.nav-curved-fab {
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 50%;
+  box-shadow: 0 8px 30px rgba(163, 181, 217, 0.5);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.nav-curved-fab:hover {
+  transform: translateX(-50%) translateY(-5px);
+  box-shadow: 0 12px 40px rgba(163, 181, 217, 0.7);
+}
+
+.nav-curved-fab:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+/* Avatar dans le FAB */
+.nav-avatar-fab {
+  width: 60px;
+  height: 60px;
+  border: 4px solid white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.nav-avatar-fab .avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Animation de pulsation pour le FAB actif
+   ========================================
+   Attire l'attention sur le profil de l'utilisateur
+   ======================================== */
+.nav-curved-fab.active {
+  animation: fab-pulse 2s ease-in-out infinite;
+}
+
+/* Animation : Pulsation avec anneau
+   ========================================
+   COMMENT ÇA MARCHE ?
+   - 0% et 100% : État normal (ombre simple)
+   - 50% : État "pulsé"
+     • Première box-shadow : Ombre plus grande et intense
+     • Deuxième box-shadow : Anneau transparent qui s'étend (8px)
+       → Crée l'effet de "propagation" visuelle
+
+   Durée : 2s en boucle infinie
+   Easing : ease-in-out pour une animation naturelle
+   ======================================== */
+@keyframes fab-pulse {
+  0%, 100% {
+    box-shadow: 0 8px 30px rgba(163, 181, 217, 0.5);
+  }
+  50% {
+    /* Deux ombres superposées :
+       1. Ombre principale (grande et intense)
+       2. Anneau de propagation (8px, transparent) */
+    box-shadow: 0 12px 40px rgba(163, 181, 217, 0.8), 0 0 0 8px rgba(163, 181, 217, 0.2);
+  }
+}
+
+/* Masquer le point indicateur pour la navbar curved */
+.bottom-nav-curved .bottom-nav-item.active::before {
+  display: none;
+}
+
+/* Items de la navbar curved */
+.bottom-nav-curved .bottom-nav-item {
+  z-index: 3;
+  position: relative;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .bottom-nav {
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .bottom-nav-item {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .bottom-nav-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .bottom-nav-label {
+    font-size: 0.7rem;
+  }
+
+  .nav-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Curved navbar responsive */
+  .nav-curved-container {
+    border-radius: 0;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .nav-curved-fab {
+    width: 60px;
+    height: 60px;
+    top: -30px;
+  }
+
+  .nav-avatar-fab {
+    width: 52px;
+    height: 52px;
+    border: 3px solid white;
+  }
+
+  .nav-curved-container::before {
+    width: 70px;
+    height: 70px;
+    top: -25px;
+  }
+
+  .nav-curved-container::after {
+    width: 80px;
+    height: 45px;
+  }
+
+  .nav-curved-spacer {
+    width: 70px;
+  }
+}
