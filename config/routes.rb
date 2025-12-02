@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get 'walkings/index'
+  get 'walkings/new'
+  get 'walkings/show'
   get 'dogs/new'
   devise_for :users
   root to: "pages#home"
