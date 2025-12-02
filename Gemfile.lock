@@ -208,7 +208,6 @@ GEM
     pg (1.6.2-x86_64-darwin)
     pg (1.6.2-x86_64-linux)
     pg (1.6.2-x86_64-linux-musl)
-    popper_js (2.11.8)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -346,7 +345,6 @@ DEPENDENCIES
   jbuilder
   ostruct
   pg (~> 1.1)
-  popper_js (~> 2.11.8)
   puma (>= 5.0)
   rails (~> 7.1.6)
   sassc-rails
