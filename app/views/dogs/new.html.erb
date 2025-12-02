@@ -1,2 +1,39 @@
-<h1>Dogs#new</h1>
-<p>Find me in app/views/dogs/new.html.erb</p>
+<div class="container">
+
+  <%= simple_form_for @dog do |f| %>
+    <div class="profile-photo-field">
+      <%= f.label :avatar, class:"photo-field" %><br>
+      <%= f.file_field :avatar, accept: "image/*" %>
+    </div>
+
+    <div class="profile-form">
+      <%= f.input :name %>
+      <%= f.input :age %>
+      <%= f.input :race,
+        collection: Dog::BREEDS,
+        prompt: "Sélectionner une race",
+        include_blank: false %>
+    </div>
+  <% end %>
+
+  <div class="dog-size">
+    <h2>Taille</h2>
+
+      <div class="size-options-small">
+        <p>Petit</p>
+      </div>
+
+      <div class="size-option-medium">
+        <p>Moyen</p>
+      </div>
+
+      <div class="size-option-large">
+        <p>Grand</p>
+      </div>
+  </div>
+
+  <div class="dog-tags">
+    <h2>Personnalité</h2>
+  </div>
+
+</div>
