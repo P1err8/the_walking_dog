@@ -1,39 +1,63 @@
 <div class="container">
 
   <%= simple_form_for @dog do |f| %>
-    <div class="profile-photo-field">
-      <%= f.label :avatar, class:"photo-field" %><br>
-      <%= f.file_field :avatar, accept: "image/*" %>
+    <div class="profile-header">
+      <div class="profile-photo-field">
+       <img src=" " alt="Dog profil picture"/>
+       <%= f.file_field :avatar, accept: "image/*" %>
+      </div>
     </div>
 
-    <div class="profile-form">
-      <%= f.input :name %>
-      <%= f.input :age %>
+    <div class="form-fields">
+      <div class="form-row">
+        <div class="field">
+          <%= f.input :name %>
+        </div>
+        <div class="field">
+          <%= f.input :age %>
+        </div>
+      </div>
+
       <%= f.input :race,
-        collection: Dog::BREEDS,
-        prompt: "Sélectionner une race",
-        include_blank: false %>
+      collection: Dog::BREEDS,
+      prompt: "Sélectionner une race",
+      include_blank: false %>
     </div>
   <% end %>
 
+
   <div class="dog-size">
     <h2>Taille</h2>
+    <div class="size-options" aria-label="Taille du chien">
+      <label class="size-option">
+        <span>Petit</span>
+      </label>
 
-      <div class="size-options-small">
-        <p>Petit</p>
-      </div>
+      <label class="size-option">
+        <span>Moyen</span>
+      </label>
 
-      <div class="size-option-medium">
-        <p>Moyen</p>
-      </div>
-
-      <div class="size-option-large">
-        <p>Grand</p>
-      </div>
+      <label class="size-option">
+        <span>Grand</span>
+      </label>
+    </div>
   </div>
+
 
   <div class="dog-tags">
     <h2>Personnalité</h2>
-  </div>
+    <div class="tag-options" aria-label="Personnalité du chien">
+      <label class="tag-option">
+        <span>Tag 1</span>
+      </label>
 
+      <label class="tag-option">
+        <span>Tag 2</span>
+      </label>
+
+      <label class="tag-option">
+        <span>Tag 3</span>
+      </label>
+    </div>
+  </div>
 </div>

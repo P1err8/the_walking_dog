@@ -1,10 +1,171 @@
 .container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
   display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.photo-field {
-  border: 1px solid red;
-  width: 100px;
-  height: 100px;
+.profile-header {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  align-items: center;
+  width: 100%;
+}
+
+.profile-photo-field {
+  display: flex;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
+  overflow: hidden;
+  flex: 0 0 150px;
+  background: #f5f5f5;
+  align-items: center;
+  border: 2px solid #e0e0e0;
+}
+
+.form-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.form-row .field {
+  flex: 1;
+}
+
+input[type="text"],
+input[type="number"],
+.select,
+.simple_form input,
+.simple_form select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.dog-size-form {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.dog-size {
+  text-align: center;
+
+  h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+  }
+}
+
+.size-options {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+  position: relative;
+  display: inline-block;
+}
+
+.size-option span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid #d0d6db;
+  background: #fff;
+  color: #222;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.size-option span:hover {
+  transform: translateY(-2px);
+}
+
+
+.dog-tags-form {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.dog-tags {
+  text-align: center;
+
+  h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+  }
+}
+
+.tag-options {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+  position: relative;
+  display: inline-block;
+}
+
+.tag-option span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid #d0d6db;
+  background: #fff;
+  color: #222;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.tag-option span:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 640px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .profile-photo-field {
+    width: 120px;
+    height: 120px;
+    flex: 0 0 120px;
+  }
+
+  .size-options {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .size-option span {
+    min-width: 76px;
+    padding: 8px 12px;
+  }
 }
