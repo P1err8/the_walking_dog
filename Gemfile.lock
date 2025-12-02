@@ -167,8 +167,6 @@ GEM
       net-imap
       net-pop
       net-smtp
-    mapbox-gl-rails (3.15.0)
-      railties (>= 3.2)
     marcel (1.1.0)
     matrix (0.4.3)
     mini_mime (1.1.5)
@@ -345,7 +343,6 @@ DEPENDENCIES
   font-awesome-sass (~> 6.1)
   importmap-rails
   jbuilder
-  mapbox-gl-rails
   ostruct
   pg (~> 1.1)
   puma (>= 5.0)
