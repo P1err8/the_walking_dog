@@ -1,8 +1,11 @@
 <div class="homepage">
   <div class="map-container">
-    <img src="/assets/map.jpeg" alt="geomap" class="map-image">
+    <div style="width: 100%; height: 100%;"
+         data-controller="map"
+         data-map-api-key-value="<%= ENV.fetch('MAPBOX_API_KEY') %>">
+    </div>
   </div>
-  <div class="button-container">
-    <%= link_to "SE BALADER", "#", class: "walk-btn" %>
+  <div class="action-button-container">
+    <%= link_to "SE BALADER", "#", class: "btn-walk" %>
   </div>
 </div>
