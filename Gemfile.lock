@@ -99,8 +99,6 @@ GEM
     bindex (0.8.1)
     bootsnap (1.19.0)
       msgpack (~> 1.2)
-    bootstrap (5.3.5)
-      popper_js (>= 2.11.8, < 3)
     builder (3.3.0)
     capybara (3.40.0)
       addressable
@@ -202,6 +200,7 @@ GEM
     nokogiri (1.18.10-x86_64-linux-musl)
       racc (~> 1.4)
     orm_adapter (0.5.0)
+    ostruct (0.6.3)
     pg (1.6.2)
     pg (1.6.2-aarch64-linux)
     pg (1.6.2-aarch64-linux-musl)
@@ -209,7 +208,6 @@ GEM
     pg (1.6.2-x86_64-darwin)
     pg (1.6.2-x86_64-linux)
     pg (1.6.2-x86_64-linux-musl)
-    popper_js (2.11.8)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -338,7 +336,6 @@ PLATFORMS
 DEPENDENCIES
   autoprefixer-rails
   bootsnap
-  bootstrap (~> 5.3)
   capybara
   debug
   devise
@@ -346,6 +343,7 @@ DEPENDENCIES
   font-awesome-sass (~> 6.1)
   importmap-rails
   jbuilder
+  ostruct
   pg (~> 1.1)
   puma (>= 5.0)
   rails (~> 7.1.6)

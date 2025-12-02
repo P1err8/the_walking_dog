@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# These defaults are defined and maintained by the community at
-# https://github.com/heartcombo/simple_form-bootstrap
-# Please submit feedback, changes and tests only there.
 
 # Uncomment this and change the path if necessary to include your own
 # components.
@@ -289,7 +286,6 @@ SimpleForm.setup do |config|
   end
 
 
-  # bootstrap custom forms
   #
   # custom input switch for boolean
   config.wrappers :custom_boolean_switch, class: 'mb-3' do |b|
@@ -305,7 +301,6 @@ SimpleForm.setup do |config|
 
 
   # Input Group - custom component
-  # see example app and config at https://github.com/heartcombo/simple_form-bootstrap
   config.wrappers :input_group, class: 'mb-3' do |b|
     b.use :html5
     b.use :placeholder
