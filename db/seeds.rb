@@ -4,11 +4,7 @@ puts ""
 User.destroy_all
 puts "Done."
 puts ""
-
 puts "Creating seed user..."
-puts ""
-puts ""
-
 
 user1 = User.create!(
   email: "user1@demo.com",
@@ -21,12 +17,8 @@ user2 = User.create!(
 )
 
 puts "the user with the #{user1.email} has been created!"
-puts " "
-puts " "
-
 puts "the user with the #{user2.email} has been created!"
-puts " "
-puts " "
+
 
 dogs_tags = ["friendly", "calm", "playful", "energetic", "protective", "shy"]
 
@@ -36,21 +28,18 @@ tags = dogs_tags.map do |tag_name|
 end
 
 puts "All tags have been created!"
-puts " "
-puts " "
 
 croket = Dog.create!(
   name: "Croket",
   size: "small",
   age: 3,
   race: "chihuahua",
-  url_picture: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.trupanion.com%2Fen-ca%2Fpet-blog%2Farticle%2Fchihuahua&psig=AOvVaw3NMGD_uY9DEXh2-JH0PJGA&ust=1764776956061000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCMDF7tCgn5EDFQAAAAAdAAAAABAE",
+  url_picture: "https://www.trupanion.com/images/trupanionwebsitelibraries/bg/black-chihuahua-yellow-background.jpg?sfvrsn=9d296e93_6",
   user: user1
 )
 
 puts "#{croket.name} has been created!"
-puts " "
-puts " "
+
 
 rex = Dog.create!(
   name: "Rex",
@@ -62,8 +51,7 @@ rex = Dog.create!(
 )
 
 puts "#{rex.name} has been created!"
-puts " "
-puts " "
+
 puts "Associating tags to dogs..."
 
 croket.tags << tags[0]  # friendly
@@ -72,8 +60,6 @@ rex.tags << tags[1]     # calm
 rex.tags << tags[3]     # energetic
 
 puts "Tags have been associated!"
-puts " "
-puts " "
 
 puts "Creating walkings..."
 
@@ -107,8 +93,5 @@ user2circuit = Circuit.create!(
 
 puts "Walkings and circuits have been created!"
 puts " "
-puts " "
-
-
 puts "All done! #{User.all.count} users have been created."
 puts "#{Dog.all.count} dogs have been created."
