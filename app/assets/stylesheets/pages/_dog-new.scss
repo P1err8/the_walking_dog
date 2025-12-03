@@ -38,11 +38,11 @@
 
 
 .form-fields {
+  position: relative;
   width: 100%;
   padding: 1rem 1.25rem;
   font-family: inherit;
   font-size: 1rem;
-  border: 2px solid var(--border);
   border-radius: 16px;
   background: white;
   color: var(--text-main);
@@ -59,7 +59,6 @@
   padding: 1rem 1.25rem;
   font-family: inherit;
   font-size: 1rem;
-  border: 2px solid var(--border);
   border-radius: 16px;
   background: white;
   color: var(--text-main);
@@ -170,7 +169,7 @@ input[type="number"],
   align-items: center;
   justify-content: center;
   min-width: 90px;
-  padding: 10px 18px;
+  padding: 20px 28px;
   border-radius: 999px;
   border: 1px solid #d0d6db;
   background:  rgb(232, 221, 211);
@@ -179,6 +178,7 @@ input[type="number"],
   transition: all 0.12s ease;
   user-select: none;
 }
+
 
 .tag-option span:hover {
   background: white;
@@ -225,16 +225,19 @@ input[type="number"],
 
   .size-option span {
     min-width: 76px;
-    padding: 8px 12px;
+    padding: 8px 16px;
   }
 }
 
 .breed-list {
   position: absolute;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   max-height: 150px;
   overflow-y: auto;
+  background-color: #eae6e6;
+  border-radius: 10px;
 }
 
 .breed-suggestion {
@@ -243,4 +246,12 @@ input[type="number"],
   &.selected {
     background-color: #e0e0e0;
   }
+}
+
+input[type="radio"]:checked + .size-option,
+input[type="checkbox"]:checked + .tag-option span {
+  background-color: var(--primary, #A3B5D9);
+  color: white;
+  border-color: var(--primary, #A3B5D9);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
