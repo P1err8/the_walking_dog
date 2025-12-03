@@ -80,13 +80,13 @@ user2walking = Walking.create!(
 puts "Creating circuits..."
 user1circuit = Circuit.create!(
   duration: 45,
-  coordinates: "[[48.8566, 2.3522], [48.8570, 2.3530], [48.8580, 2.3540]]",
+  coordinates: [[48.8566, 2.3522], [48.8570, 2.3530], [48.8580, 2.3540]],
   walking: user1walking,
   user: user1
 )
 user2circuit = Circuit.create!(
   duration: 15,
-  coordinates: "[[48.8566, 2.3522], [48.8575, 2.3535], [48.8585, 2.3545]]",
+  coordinates: [[48.8566, 2.3522], [48.8575, 2.3535], [48.8585, 2.3545]],
   walking: user2walking,
   user: user2
 )
