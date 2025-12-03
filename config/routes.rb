@@ -6,4 +6,11 @@ Rails.application.routes.draw do
 
   resources :dogs, only: %i[index show new create]
 
+  # ==============================================================================
+  # STYLEGUIDE - Charte graphique (ajouté par Julien)
+  # ==============================================================================
+  # Route pour accéder au styleguide à : http://localhost:3000/styleguide
+  # ⚠️ NE PAS SUPPRIMER - Utilisé par toute l'équipe pour voir les composants CSS/JS
+  get "styleguide", to: "styleguide#index"
+
 end

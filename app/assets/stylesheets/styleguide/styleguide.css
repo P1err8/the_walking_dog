@@ -1,0 +1,24 @@
+/* ==============================================================================
+   STYLEGUIDE - THE WALKING DOG
+   ==============================================================================
+   Fichier principal d'importation des styles du styleguide.
+   L'ordre des imports est important pour la cascade CSS.
+
+   Pour utiliser ce styleguide dans Rails :
+   Ajoutez <%= stylesheet_link_tag "styleguide/styleguide" %> dans votre layout.
+   ============================================================================== */
+
+/* 1. Base & Variables */
+@import 'base.css';
+
+/* 2. Layout (Structure de la page) */
+@import 'layout.css';
+
+/* 3. Composants */
+@import 'components/typography.css';
+@import 'components/buttons.css';
+@import 'components/forms.css';
+@import 'components/navigation.css';
+
+/* 4. Utilitaires & Helpers */
+@import 'utils.css';

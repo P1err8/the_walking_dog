@@ -1,0 +1,70 @@
+/* ========================================
+   VARIABLES - Charte The Walking Dog
+   Palette Azure Elegance
+   ======================================== */
+:root {
+  /* Couleurs principales */
+  --primary: #A3B5D9;        /* Bleu pervenche */
+  --primary-hover: #8B9EC5;  /* Bleu pervenche foncé */
+  --secondary: #C9B5A0;      /* Beige rosé */
+  --accent-taupe: #8B8377;   /* Gris taupe */
+  --accent-navy: #1E3A5F;    /* Bleu marine */
+  --danger: #DC2626;         /* Rouge */
+
+  /* Neutres */
+  --bg-page: #E8DDD3;        /* Beige clair */
+  --surface: #FFFFFF;        /* Blanc */
+  --border: #C9B5A0;         /* Beige rosé */
+  --text-main: #1E3A5F;      /* Bleu marine */
+  --text-muted: #8B8377;     /* Gris taupe */
+
+  /* Effets */
+  --radius: 20px;
+  --radius-pill: 999px;
+  --shadow: 0 4px 20px rgba(163, 181, 217, 0.2);
+  --shadow-lg: 0 10px 40px rgba(163, 181, 217, 0.3);
+}
+
+/* ========================================
+   BASE
+   ======================================== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Bitter', Georgia, serif;
+  background: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.6;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Cercles décoratifs en arrière-plan */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::before {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(163, 181, 217, 0.25), transparent);
+  top: -100px;
+  left: -100px;
+}
+
+body::after {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(201, 181, 160, 0.2), transparent);
+  bottom: -150px;
+  right: -150px;
+}
