@@ -1,0 +1,148 @@
+/* ========================================
+   LIGNE DE BOUTONS
+   ======================================== */
+.sg-button-row {
+  display: flex;
+  flex-wrap: wrap; /* Les boutons passent à la ligne sur petits écrans */
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* ========================================
+   BOUTONS - Style Pet Store
+   ========================================
+
+   CHOIX DE DESIGN :
+   - inline-flex : Permet d'aligner icônes et texte facilement
+   - border-radius pill : Aspect moderne et doux (thème pet-friendly)
+   - Transitions : Feedback visuel pour une meilleure UX
+   - box-shadow : Donne de la profondeur (style Material Design)
+   ======================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;      /* Centre verticalement le contenu */
+  justify-content: center;  /* Centre horizontalement le contenu */
+  gap: 0.5rem;              /* Espace entre icône et texte */
+  padding: 0.875rem 2rem;
+  font-family: inherit;     /* Hérite de la police Bitter du body */
+  font-size: 1rem;
+  font-weight: 600;         /* Texte semi-gras pour lisibilité */
+  border-radius: var(--radius-pill); /* Boutons arrondis (999px) */
+  border: none;             /* Supprime la bordure par défaut */
+  cursor: pointer;
+  transition: all 0.3s ease; /* Animation douce sur tous les changements */
+  text-decoration: none;    /* Permet d'utiliser <a> comme bouton */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombre subtile */
+}
+
+/* Effet de "pression" au clic (feedback tactile) */
+.btn:active:not(:disabled) {
+  transform: scale(0.98); /* Réduit légèrement la taille */
+}
+
+/* Tailles */
+.btn-sm {
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+.btn-lg {
+  padding: 1.125rem 2.5rem;
+  font-size: 1.1rem;
+}
+
+/* Variante Primary (Bleu pervenche)
+   ========================================
+   Utilisé pour les actions principales (CTAs).
+
+   POURQUOI UN GRADIENT ?
+   - Donne du relief et de la modernité au bouton
+   - Angle 135deg : diagonal naturel pour l'œil
+   - Dégradé subtil (A3B5D9 → B8C6E3) pour rester élégant
+   ======================================== */
+.btn-primary {
+  background: linear-gradient(135deg, #A3B5D9 0%, #B8C6E3 100%);
+  color: white;
+  box-shadow: 0 8px 25px rgba(163, 181, 217, 0.4); /* Ombre colorée = cohérence */
+}
+
+.btn-primary:hover:not(:disabled) {
+  /* Gradient inversé = effet de "lumière qui bouge" */
+  background: linear-gradient(135deg, #8B9EC5 0%, #A3B5D9 100%);
+  transform: translateY(-3px);  /* Lève le bouton (effet 3D) */
+  box-shadow: 0 12px 35px rgba(163, 181, 217, 0.5); /* Ombre plus grande */
+}
+
+/* Variante Secondary (Beige rosé)
+   ========================================
+   Pour actions secondaires (moins prioritaires que Primary)
+   ======================================== */
+.btn-secondary {
+  background: linear-gradient(135deg, #C9B5A0 0%, #D8C8B6 100%);
+  color: white;
+  box-shadow: 0 8px 25px rgba(201, 181, 160, 0.3);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #B8A490 0%, #C9B5A0 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(201, 181, 160, 0.4);
+}
+
+/* Variante Outline (Transparent)
+   ========================================
+   Bouton "fantôme" pour actions tertiaires.
+
+   POURQUOI CETTE VARIANTE ?
+   - Moins intrusif visuellement (hiérarchie visuelle)
+   - Effet "fill" au hover = feedback satisfaisant
+   - border: 2px pour visibilité suffisante
+   ======================================== */
+.btn-outline {
+  background: white;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  box-shadow: 0 4px 15px rgba(163, 181, 217, 0.15); /* Ombre légère */
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--primary);  /* Remplissage au hover */
+  color: white;                /* Inversion des couleurs */
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(163, 181, 217, 0.4);
+}
+
+/* Variante Danger (Rouge)
+   ========================================
+   Pour actions destructives (supprimer, annuler, etc.)
+
+   POURQUOI ROUGE ?
+   - Convention universelle pour danger/suppression
+   - Attire l'attention de l'utilisateur
+   - Évite les erreurs par confirmation visuelle
+   ======================================== */
+.btn-danger {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  color: white;
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(239, 68, 68, 0.5);
+}
+
+/* État Disabled
+   ========================================
+   POURQUOI CES RÈGLES ?
+   - opacity 0.5 : Indication visuelle claire de désactivation
+   - cursor: not-allowed : Feedback à l'utilisateur
+   - !important : Empêche les effets hover/active de s'appliquer
+   ======================================== */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;         /* Bloque toutes transformations */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* Ombre plate */
+}
