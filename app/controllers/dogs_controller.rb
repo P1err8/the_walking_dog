@@ -1,5 +1,9 @@
 class DogsController < ApplicationController
 
+  def show
+    @dog = Dog.find(current_user.dogs.first.id)
+  end
+
   def new
     @dog = Dog.new
   end
