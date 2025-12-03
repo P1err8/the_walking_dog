@@ -1,0 +1,205 @@
+/* ========================================
+   WALKING NEW PAGE
+   ======================================== */
+
+/* Variables (Copied from styleguide/base.css) */
+:root {
+  --primary: #A3B5D9;        /* Bleu pervenche */
+  --primary-hover: #8B9EC5;  /* Bleu pervenche foncé */
+  --secondary: #C9B5A0;      /* Beige rosé */
+  --accent-taupe: #8B8377;   /* Gris taupe */
+  --accent-navy: #1E3A5F;    /* Bleu marine */
+  --danger: #DC2626;         /* Rouge */
+  --bg-page: #E8DDD3;        /* Beige clair */
+  --surface: #FFFFFF;        /* Blanc */
+  --border: #C9B5A0;         /* Beige rosé */
+  --text-main: #1E3A5F;      /* Bleu marine */
+  --text-muted: #8B8377;     /* Gris taupe */
+
+  --radius: 20px;
+  --radius-pill: 16px;
+  --shadow: 0 4px 20px rgba(163, 181, 217, 0.2);
+  --shadow-lg: 0 10px 40px rgba(163, 181, 217, 0.3);
+}
+
+.walking-new-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px 100px;
+  background-color: var(--bg-page);
+
+  .walking-form-card {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+}
+
+.walk-form {
+  width: 100%;
+  padding: 2rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  border: none;
+
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-main);
+      font-size: 0.95rem;
+    }
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-family: inherit;
+    font-size: 1rem;
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    background: var(--bg-page);
+    color: var(--text-main);
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(163, 181, 217, 0.1);
+    }
+  }
+
+  .slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+
+    .slider-value {
+      font-weight: 700;
+      color: var(--text-main);
+      text-align: center;
+      border: 2px solid var(--border);
+      background-color: var(--bg-page);
+      border-radius: 16px;
+      padding: 0.8rem;
+      width: 100%;
+    }
+  }
+
+  .form-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: var(--border);
+    border-radius: 5px;
+    outline: none;
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .btn-toggle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+
+    svg {
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+
+    &.active {
+      border-color: var(--primary);
+      background: rgba(163, 181, 217, 0.1);
+      color: var(--primary);
+
+      svg {
+        color: var(--primary);
+      }
+    }
+
+    &:hover:not(.active) {
+      border-color: var(--primary-hover);
+    }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    text-decoration: none;
+
+    &.btn-primary {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 15px rgba(163, 181, 217, 0.4);
+
+      &:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(163, 181, 217, 0.5);
+      }
+    }
+
+    &.w-full {
+      width: 100%;
+    }
+
+    &.btn-lg {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+    }
+  }
+}
