@@ -1,5 +1,12 @@
 class DogsController < ApplicationController
 
+
+  # def index
+  #   @dogs = Dog.all
+  #   if params[:query].present?
+  #     @dogs = @dogs.where(breed: params[:query])
+  #   end
+  # end
   def show
     @dog = Dog.find(current_user.dogs.first.id)
   end
@@ -9,6 +16,7 @@ class DogsController < ApplicationController
   end
 
   def create
+    raise
     @dog = Dog.new(dog_params)
     if @dog.save
       redirect_to @dog

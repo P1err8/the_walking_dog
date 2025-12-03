@@ -68,3 +68,7 @@ body::after {
   bottom: -150px;
   right: -150px;
 }
+
+.d-none {
+  display: none;
+}
