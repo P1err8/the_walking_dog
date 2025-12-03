@@ -1,10 +1,19 @@
 class DogsController < ApplicationController
 
+
+  # def index
+  #   @dogs = Dog.all
+  #   if params[:query].present?
+  #     @dogs = @dogs.where(breed: params[:query])
+  #   end
+  # end
+
   def new
     @dog = Dog.new
   end
 
   def create
+    raise
     @dog = Dog.new(dog_params)
     if @dog.save
       redirect_to @dog

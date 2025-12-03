@@ -3,25 +3,35 @@
   <%= simple_form_for @dog do |f| %>
     <div class="profile-header">
       <div class="profile-photo-field">
-       <img src=" " alt="Dog profil picture"/>
-       <%= f.file_field :avatar, accept: "image/*" %>
+        <%= f.file_field :avatar, accept: "image/*" %>
+        <img id="profile-preview" class="profile-preview-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Aperçu">
       </div>
     </div>
 
     <div class="form-fields">
       <div class="form-row">
         <div class="field">
-          <%= f.input :name %>
+          <%= f.input :name, label: "Nom du chien", placeholder: "ex: Buddy" %>
         </div>
         <div class="field">
-          <%= f.input :age %>
+          <%= f.input :age, label: "Âge du chien (ans)", placeholder: "ex:3" %>
+        </div>
+
+        <div class="field">
+          <%= f.label "Race du chien" %>
+          <div data-controller="breed-list" >
+            <input type="hidden" name="dog[race]" id="dog_breed" data-breed-list-target="hiddenInput" />
+            <div>
+              <input type="text" data-action="input->breed-list#filter focus->breed-list#showList" data-breed-list-target="queryInput" id="breed-input" placeholder="Race du chien" autocomplete="off" />
+            </div>
+            <div class="breed-list d-none" data-breed-list-target="list">
+              <% Dog::BREEDS.each do |breed| %>
+                <a class="breed-suggestion" data-action="click->breed-list#select" data-breed="<%= breed %>"><%= breed %></a>
+              <% end %>
+            </div>
+          </div>
         </div>
       </div>
-
-      <%= f.input :race,
-      collection: Dog::BREEDS,
-      prompt: "Sélectionner une race",
-      include_blank: false %>
     </div>
   <% end %>
 
@@ -47,17 +57,19 @@
   <div class="dog-tags">
     <h2>Personnalité</h2>
     <div class="tag-options" aria-label="Personnalité du chien">
-      <label class="tag-option">
-        <span>Tag 1</span>
-      </label>
-
-      <label class="tag-option">
-        <span>Tag 2</span>
-      </label>
-
-      <label class="tag-option">
-        <span>Tag 3</span>
-      </label>
+      <% Tag.all.each do |tag| %>
+        <label class="tag-option">
+          <span><%= tag.name %></span>
+        </label>
+      <% end %>
     </div>
   </div>
+
+  <button
+    type="submit"
+    class="btn-primary"
+    style="width: 100%; margin-top: 1rem;"
+    >
+     Créer le profil
+  </button>
 </div>
