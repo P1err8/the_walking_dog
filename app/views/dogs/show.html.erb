@@ -1,0 +1,40 @@
+<div class="dog-show-container">
+  <div class="dog-card">
+    <div class="dog-profile-header">
+      <div class="dog-profile-image-wrapper">
+        <% if @dog.url_picture.present? %>
+          <%= image_tag @dog.url_picture, class: "dog-profile-image", alt: @dog.name %>
+        <% else %>
+          <img src="https://i.pravatar.cc/150?img=12" alt="Default Dog" class="dog-profile-image">
+        <% end %>
+      </div>
+    </div>
+    <div class="dog-info-group">
+      <span class="dog-info-label">My dog</span>
+      <div class="dog-info-value"><%= @dog.name %></div>
+    </div>
+    <div class="dog-info-group">
+      <span class="dog-info-label">Âge</span>
+      <div class="dog-info-value"><%= @dog.age %> ans</div>
+    </div>
+    <div class="dog-info-group">
+      <span class="dog-info-label">Race</span>
+      <div class="dog-info-value"><%= @dog.race.capitalize %></div>
+    </div>
+    <div class="dog-info-group">
+      <span class="dog-info-label">Taille</span>
+      <div class="dog-info-value"><%= @dog.size.capitalize %></div>
+    </div>
+    <div class="dog-info-group">
+      <span class="dog-info-label">Personnalité & Traits</span>
+      <div class="dog-tags-container">
+        <% @dog.tags.each do |tag| %>
+          <span class="dog-tag"><%= tag.name.capitalize %></span>
+        <% end %>
+        <% if @dog.tags.empty? %>
+          <span style="color: var(--text-muted); font-style: italic;">Aucun trait de personnalité ajouté.</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
