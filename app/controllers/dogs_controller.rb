@@ -1,12 +1,4 @@
 class DogsController < ApplicationController
-
-
-  # def index
-  #   @dogs = Dog.all
-  #   if params[:query].present?
-  #     @dogs = @dogs.where(breed: params[:query])
-  #   end
-  # end
   def show
     @dog = Dog.find(current_user.dogs.first.id)
   end
