@@ -8,27 +8,33 @@ class WalkingsController < ApplicationController
 
   def create
     @walking = Walking.new(walking_params)
-    
-    # need to generate les coordinates here
-    coordinates = [
-      "4.832319,45.756727",
-      "4.830339,45.759858",
-      "4.832083,45.763224",
-      "4.835149,45.762943",
-      "4.835395,45.757722",
-      "4.832319,45.756727"
-    ] # placeholder for actual coordinates generation logic
 
-    @circuit = Circuit.new(duration: @walking.wanted_duration, coordinates: coordinates, user: current_user)
-    raise
     if @walking.save
-      redirect_to walkings_path(@walkings), notice: 'Walking was successfully created.'
+      # Array of arrays [lng, lat] - Perfect for Mapbox
+      coordinates = [
+        [4.834887,45.769481],
+        [4.832574,45.768988],
+        [4.833372,45.770550],
+        [4.834836,45.771505],
+        [4.835833,45.770623],
+        [4.834887,45.769481]
+      ]
+
+      @circuit = Circuit.new(duration: @walking.wanted_duration, coordinates: coordinates, user: current_user, walking: @walking)
+
+      if @circuit.save
+        redirect_to walking_path(@walking), notice: 'Walking was successfully created.'
+      else
+        @walking.destroy # Rollback walking creation if circuit fails
+        render :new, status: :unprocessable_entity
+      end
     else
       render :new, status: :unprocessable_entity
     end
   end
 
   def show
+    @walking = Walking.find(params[:id])
   end
 
   private
