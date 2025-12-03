@@ -33,43 +33,46 @@
         </div>
       </div>
     </div>
-  <% end %>
 
 
-  <div class="dog-size">
-    <h2>Taille</h2>
-    <div class="size-options" aria-label="Taille du chien">
-      <label class="size-option">
-        <span>Petit</span>
-      </label>
+    <div class="dog-size">
+      <h2>Taille</h2>
+      <div class="size-options" role="radiogroup" aria-label="Taille du chien">
+        <%= f.collection_radio_buttons :size, [["Petit","Petit"], ["Moyen","Moyen"], ["Grand","Grand"]], :last, :first do |b| %>
+          <label class="size-option">
+            <%= b.radio_button(class: "d-none") %>
+            <span><%= b.text %></span>
+          </label>
+        <% end %>
 
-      <label class="size-option">
-        <span>Moyen</span>
-      </label>
-
-      <label class="size-option">
-        <span>Grand</span>
-      </label>
-    </div>
-  </div>
-
-
-  <div class="dog-tags">
-    <h2>Personnalité</h2>
-    <div class="tag-options" aria-label="Personnalité du chien">
-      <% Tag.all.each do |tag| %>
-        <label class="tag-option">
-          <span><%= tag.name %></span>
+      <%# <div class="size-options" aria-label="Taille du chien">
+        <label class="size-option">
+          <span>Petit</span>
         </label>
-      <% end %>
-    </div>
-  </div>
 
-  <button
-    type="submit"
-    class="btn-primary"
-    style="width: 100%; margin-top: 1rem;"
-    >
-     Créer le profil
-  </button>
+        <label class="size-option">
+          <span>Moyen</span>
+        </label>
+
+        <label class="size-option">
+          <span>Grand</span>
+        </label> %>
+      </div>
+    </div>
+
+
+    <div class="dog-tags">
+      <h2>Personnalité</h2>
+      <div class="tag-options" aria-label="Personnalité du chien">
+      <%= f.collection_check_boxes :dogs_tags, Tag.all, :id, :name do |b|  %>
+        <%= b.check_box(class: "d-none")  %>
+         <%= b.label(class: "tag-option") do %>
+            <span><%= tag.name %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+  <%= f.submit "Valider", class: "btn-primary" %>
+  <% end %>
 </div>
