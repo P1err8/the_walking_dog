@@ -15,16 +15,28 @@
            data-address-autocomplete-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>"
            style="position: relative;">
         <%= f.label :address, "Point de départ" %>
+
+        <!-- Bouton de géolocalisation -->
+        <button type="button"
+                class="btn btn-secondary btn-sm"
+                style="margin-bottom: 0.5rem; width: 100%;"
+                data-action="click->address-autocomplete#geolocate">
+          📍 Me géolocaliser automatiquement
+        </button>
+
         <div class="autocomplete-wrapper">
           <%= f.text_field :address,
               class: "form-input",
-              placeholder: "Entrez une adresse...",
+              placeholder: "Ou entrez une adresse en France...",
               data: { address_autocomplete_target: "address" },
               autocomplete: "off"
           %>
           <%= f.hidden_field :latitude, data: { address_autocomplete_target: "latitude" } %>
           <%= f.hidden_field :longitude, data: { address_autocomplete_target: "longitude" } %>
         </div>
+
+        <div id="geolocation-status" style="margin-top: 0.5rem; font-size: 0.875rem; color: #64748B;"></div>
+
         <div class="autocomplete-results"
              data-address-autocomplete-target="results"
              style="position: absolute; z-index: 1000; width: 100%; border: 1px solid #ddd; border-radius: 4px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">

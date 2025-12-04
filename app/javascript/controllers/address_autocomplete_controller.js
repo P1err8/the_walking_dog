@@ -66,4 +66,73 @@ export default class extends Controller {
     this.longitudeTarget.value = feature.center[0]
     this.resultsTarget.innerHTML = "" // Clear results
   }
+
+  async geolocate() {
+    const statusDiv = document.getElementById('geolocation-status')
+
+    if (!navigator.geolocation) {
+      statusDiv.textContent = '❌ Geolocalisation non supportee'
+      statusDiv.style.color = '#dc2626'
+      return
+    }
+
+    statusDiv.textContent = '📍 Recuperation de votre position...'
+    statusDiv.style.color = '#3b82f6'
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude
+        const lng = position.coords.longitude
+
+        // Reverse geocoding to get address
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${this.apiKeyValue}&types=address&limit=1`
+
+        try {
+          const response = await fetch(url)
+          const data = await response.json()
+
+          if (data.features && data.features.length > 0) {
+            const feature = data.features[0]
+            this.addressTarget.value = feature.place_name
+            this.latitudeTarget.value = lat
+            this.longitudeTarget.value = lng
+
+            statusDiv.textContent = `✅ Position trouvee : ${feature.place_name}`
+            statusDiv.style.color = '#22c55e'
+          } else {
+            this.latitudeTarget.value = lat
+            this.longitudeTarget.value = lng
+            this.addressTarget.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+
+            statusDiv.textContent = '✅ Position trouvee (coordonnees GPS)'
+            statusDiv.style.color = '#22c55e'
+          }
+        } catch (error) {
+          console.error('Geocoding error:', error)
+          // Still set coordinates even if reverse geocoding fails
+          this.latitudeTarget.value = lat
+          this.longitudeTarget.value = lng
+          this.addressTarget.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+
+          statusDiv.textContent = '⚠️ Position trouvee (impossible de recuperer l\'adresse)'
+          statusDiv.style.color = '#f59e0b'
+        }
+      },
+      (error) => {
+        let message = '❌ Impossible de vous geolocaliser'
+        if (error.code === 1) message = '❌ Acces a la localisation refuse'
+        if (error.code === 2) message = '❌ Position indisponible'
+        if (error.code === 3) message = '❌ Delai depasse'
+
+        console.error('Geolocation error:', error)
+        statusDiv.textContent = message
+        statusDiv.style.color = '#dc2626'
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    )
+  }
 }

@@ -12,5 +12,7 @@
 // ⚠️ NE PAS REMETTRE link_directory sinon le styleguide ne marchera plus !
 //= link_tree ../stylesheets .css
 
+//= link application.js
 //= link_tree ../../javascript .js
 //= link_tree ../../../vendor/javascript .js
+//= link_tree ../../../vendor/assets/stylesheets .css

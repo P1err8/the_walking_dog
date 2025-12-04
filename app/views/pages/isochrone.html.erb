@@ -101,7 +101,7 @@
 <div id="map"></div>
 
 <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoiZHVrZWNhYm9vdW0iLCJhIjoiY21pb2V0dDJwMDE5NDNkczVkZThwdDkydCJ9.HIxlecS9JmujCeUqkxVWKw';
+    mapboxgl.accessToken = '<%= ENV['MAPBOX_API_KEY'] %>';
 
     const map = new mapboxgl.Map({
         container: 'map',

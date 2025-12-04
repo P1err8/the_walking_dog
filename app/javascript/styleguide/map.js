@@ -3,9 +3,7 @@
 // ==============================================================================
 import mapboxgl from 'mapbox-gl';
 
-// IMPORTANT : Remplacez 'VOTRE_TOKEN_MAPBOX' par votre vrai token Mapbox
-// Obtenez-le gratuitement sur https://account.mapbox.com/
-mapboxgl.accessToken = 'pk.eyJ1IjoiZHVrZWNhYm9vdW0iLCJhIjoiY21pb2V0dDJwMDE5NDNkczVkZThwdDkydCJ9.HIxlecS9JmujCeUqkxVWKw';
+// NOTE: mapboxgl.accessToken est défini dans la vue HTML via ENV['MAPBOX_API_KEY']
 
 // Configuration de l'API LLM (OpenAI ou compatible)
 // IMPORTANT : Remplacez par votre clé API OpenAI

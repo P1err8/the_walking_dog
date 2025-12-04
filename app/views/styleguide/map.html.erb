@@ -586,6 +586,10 @@
 </div>
 
 <script type="module">
+  // Définir la clé API Mapbox depuis ENV
+  import mapboxgl from 'mapbox-gl';
+  mapboxgl.accessToken = '<%= ENV['MAPBOX_API_KEY'] %>';
+
   // Import du module JavaScript de la carte Mapbox
   import "styleguide/map";
 </script>

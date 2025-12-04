@@ -1,0 +1,353 @@
+// Styles pour la page de visualisation d'une balade (walkings/show)
+// Affiche la carte, les infos, et le systeme de navigation GPS
+
+.walking-show-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// ============================================================================
+// EN-TETE
+// ============================================================================
+
+.walking-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent-navy) 100%);
+  color: white;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.walking-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.walking-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+}
+
+.walking-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+// ============================================================================
+// LISTE DES POI
+// ============================================================================
+
+.poi-list {
+  background: white;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 0 0 1rem 0;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-size: 0.875rem;
+
+    &::before {
+      content: "\1F4CD"; /* Pin emoji */
+      font-size: 1rem;
+    }
+  }
+}
+
+// ============================================================================
+// CARTE
+// ============================================================================
+
+.map-container {
+  position: relative;
+  flex: 1;
+  min-height: 500px;
+  width: 100%;
+}
+
+// ============================================================================
+// BOUTON FLOTTANT NAVIGATION
+// ============================================================================
+
+.fab-nav-button {
+  position: fixed;
+  bottom: 100px;
+  right: 2rem;
+  z-index: 150;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: 4px solid white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  font-size: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: var(--accent-navy);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// ============================================================================
+// ACTIONS D'EXPORT
+// ============================================================================
+
+.export-actions {
+  background: white;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 0 0 1rem 0;
+  }
+}
+
+.export-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+// ============================================================================
+// PANEL DE NAVIGATION GPS
+// ============================================================================
+
+.navigation-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 300;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  max-height: 50vh;
+  overflow-y: auto;
+
+  &.active {
+    transform: translateY(0);
+  }
+}
+
+.nav-header {
+  padding: 1rem 1.5rem;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  strong {
+    font-size: 1.125rem;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .nav-subtitle {
+    font-size: 0.875rem;
+    opacity: 0.9;
+  }
+}
+
+.nav-instruction {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.nav-instruction-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.nav-instruction-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.nav-distance {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.nav-progress {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-around;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.nav-stat {
+  text-align: center;
+}
+
+.nav-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.nav-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nav-actions {
+  padding: 1rem 1.5rem;
+  padding-bottom: 2rem; // Extra padding pour mobile
+  display: flex;
+  gap: 0.75rem;
+
+  button {
+    flex: 1;
+  }
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+
+@media (max-width: 768px) {
+  .walking-header {
+    padding: 1rem;
+  }
+
+  .walking-title {
+    font-size: 1.5rem;
+  }
+
+  .walking-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .poi-list {
+    padding: 1rem;
+
+    ul {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .fab-nav-button {
+    bottom: 80px;
+    right: 1rem;
+    width: 56px;
+    height: 56px;
+    font-size: 1.75rem;
+  }
+
+  .export-actions {
+    padding: 1rem;
+  }
+
+  .export-buttons {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+    }
+  }
+
+  .navigation-panel {
+    max-height: 60vh;
+  }
+
+  .nav-header {
+    padding: 0.75rem 1rem;
+
+    strong {
+      font-size: 1rem;
+    }
+  }
+
+  .nav-instruction {
+    padding: 1rem;
+  }
+
+  .nav-instruction-icon {
+    font-size: 2.5rem;
+  }
+
+  .nav-instruction-text {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .walking-stats {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .stat-item {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .nav-progress {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
