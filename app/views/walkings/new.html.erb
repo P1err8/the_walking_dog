@@ -5,12 +5,33 @@
 - Gérer le nombre X de POIs en fonction du temps input
 %>
 
-
-
 <div class="walking-new-container">
   <div class="walking-form-card">
     <h2 class="page-title">Nouvelle balade</h2>
     <%= form_with model: @walking, local: true, class: "walk-form" do |f| %>
+
+      <div class="form-group"
+           data-controller="address-autocomplete"
+           data-address-autocomplete-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>"
+           style="position: relative;">
+        <%= f.label :address, "Point de départ" %>
+        <div class="autocomplete-wrapper">
+          <%= f.text_field :address,
+              class: "form-input",
+              placeholder: "Entrez une adresse...",
+              data: { address_autocomplete_target: "address" },
+              autocomplete: "off"
+          %>
+          <%= f.hidden_field :latitude, data: { address_autocomplete_target: "latitude" } %>
+          <%= f.hidden_field :longitude, data: { address_autocomplete_target: "longitude" } %>
+        </div>
+        <div class="autocomplete-results"
+             data-address-autocomplete-target="results"
+             style="position: absolute; z-index: 1000; width: 100%; border: 1px solid #ddd; border-radius: 4px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        </div>
+      </div>
+
+      
       <div class="form-group" data-controller="slider">
         <%= f.label :wanted_duration, "Durée de la balade" %>
         <div class="slider-container">
