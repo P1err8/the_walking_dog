@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Isochrone Séquentiel Guidé & Itinéraire en Boucle Parfaite</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css" rel="stylesheet">
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+        #controls label, #controls input, #controls button {
+            display: block;
+            margin-bottom: 8px;
+        }
+        #controls input[type="text"], #controls input[type="number"] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            width: 250px;
+        }
+        #controls button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        #controls button:hover {
+            background-color: #45a049;
+        }
+        #create-poi {
+            background-color: #007bff;
+        }
+        #create-poi:hover {
+            background-color: #0056b3;
+        }
+        #calculate-route {
+            background-color: #f39c12;
+        }
+        #calculate-route:hover {
+            background-color: #e67e22;
+        }
+        #isochrone-time-display {
+            font-weight: bold;
+            color: #cc0000;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #cc0000;
+            border-radius: 3px;
+            background-color: #fffafa;
+        }
+        .mapboxgl-popup-content {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+<div id="controls">
+    <h3>Planificateur de Promenade Séquentiel Guidé (Boucle)</h3>
+    <label for="coordinates">Point de départ (lng,lat) :</label>
+    <input type="text" id="coordinates" value="4.831946,45.75762" placeholder="lng,lat">
+
+    <label for="duration-minutes">Durée Totale de la Promenade (en minutes):</label>
+    <input type="number" id="duration-minutes" value="60" min="1" max="180" placeholder="Durée Totale">
+
+    <label for="poi-target">Nombre de POI Max. (N côtés/Étapes Intermédiaires) :</label>
+    <input type="number" id="poi-target" value="4" min="3" max="10" placeholder="Nombre de POI cible (N)">
+
+    <button id="calculate-isochrone">1. Initialiser la Promenade</button>
+
+    <p id="isochrone-time-display">Durée de l'isochrone : Non calculée</p>
+
+    <button id="create-poi" disabled>2. Générer POI 1 & Isochrone</button>
+
+    <button id="calculate-route" disabled>3. Calculer l'Itinéraire Final (Boucle)</button>
+</div>
+
+<div id="map"></div>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZHVrZWNhYm9vdW0iLCJhIjoiY21pb2V0dDJwMDE5NDNkczVkZThwdDkydCJ9.HIxlecS9JmujCeUqkxVWKw';
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [4.831946, 45.75762],
+        zoom: 12
+    });
+
+    let lastIsochrone = null;
+    let poiMarkers = [];
+    let maxPoiCount = 0;
+    let currentPoiCount = 0;
+    let isochroneDuration = 0;
+
+    let initialStartCoords = null;
+    let currentStartCoords = null;
+
+    let isochroneLayers = [];
+
+    let rotationAngle = 0;
+    let currentBearing = Math.random() * 360;
+
+    const timeDisplay = document.getElementById('isochrone-time-display');
+    const poiButton = document.getElementById('create-poi');
+    const routeButton = document.getElementById('calculate-route');
+
+    const ISOCHRONE_COLORS = [
+        '#00BFFF', '#3CB371', '#FF6347', '#9370DB', '#FFD700', '#00CED1'
+    ];
+
+    const ROUTE_SOURCE_ID = 'route-source';
+    const ROUTE_LAYER_ID = 'route-layer';
+
+    function clearAllIsochrones() {
+        isochroneLayers.forEach(id => {
+            if (map.getLayer(id)) { map.removeLayer(id); }
+            if (map.getSource(id)) { map.removeSource(id); }
+        });
+        isochroneLayers = [];
+
+        if (map.getLayer(ROUTE_LAYER_ID)) { map.removeLayer(ROUTE_LAYER_ID); }
+        if (map.getSource(ROUTE_SOURCE_ID)) { map.removeSource(ROUTE_SOURCE_ID); }
+    }
+
+    async function verifyPoiLocation(coords) {
+        const [lon, lat] = coords;
+        const geocodeUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?types=poi,address,place,locality&access_token=${mapboxgl.accessToken}`;
+
+        try {
+            const response = await fetch(geocodeUrl);
+            const data = await response.json();
+
+            if (data.features && data.features.length > 0) {
+                 const isLand = data.features.some(feature =>
+                     feature.place_type.some(type =>
+                         ['address', 'poi', 'place', 'locality'].includes(type)
+                     )
+                 );
+                 return isLand;
+            }
+            return false;
+
+        } catch (error) {
+            console.error('Erreur de géocodage pour vérification:', error);
+            return false;
+        }
+    }
+
+    async function findValidPoiOnBoundary(bearing) {
+        const isochronePolygon = lastIsochrone.features[0];
+        const centerPoint = turf.centerOfMass(isochronePolygon);
+
+        const isochroneBbox = turf.bbox(isochronePolygon);
+        const maxDistance = turf.distance(centerPoint, turf.point([isochroneBbox[0], isochroneBbox[1]]), {units: 'kilometers'});
+
+        const MAX_ATTEMPTS = 15;
+
+        for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+
+            let currentBearing = bearing;
+            let currentPoiCoords;
+
+            if (attempt > 0) {
+                currentBearing += (Math.random() * 40 - 20);
+            }
+
+            const theoreticalPoint = turf.destination(centerPoint, maxDistance * 1.5, currentBearing, {units: 'kilometers'});
+
+            const line = turf.polygonToLine(isochronePolygon);
+            const nearestPoint = turf.nearestPointOnLine(line, theoreticalPoint);
+            currentPoiCoords = nearestPoint.geometry.coordinates;
+
+            if (await verifyPoiLocation(currentPoiCoords)) {
+                return currentPoiCoords;
+            }
+        }
+
+        console.warn(`Échec de la génération d'un POI valide après ${MAX_ATTEMPTS} tentatives de projection.`);
+        return null;
+    }
+
+
+    function calculateAndDisplayIsochrone(coords, stepNumber) {
+        if (isochroneDuration <= 0) {
+            return Promise.reject(new Error("Durée non valide."));
+        }
+
+        const [lon, lat] = coords;
+        const isochroneUrl = `https://api.mapbox.com/isochrone/v1/mapbox/walking/${lon},${lat}?contours_minutes=${isochroneDuration}&polygons=true&access_token=${mapboxgl.accessToken}`;
+        const sourceId = `isochrone-source-${stepNumber}`;
+        const layerId = `isochrone-layer-${stepNumber}`;
+
+        return fetch(isochroneUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la récupération de l\'isochrone: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                lastIsochrone = data;
+
+                const colorIndex = stepNumber % ISOCHRONE_COLORS.length;
+                const fillColor = ISOCHRONE_COLORS[colorIndex];
+                const fillOpacity = 0.15;
+
+                map.addSource(sourceId, { type: 'geojson', data: data });
+
+                map.addLayer({
+                    'id': layerId,
+                    'type': 'fill',
+                    'source': sourceId,
+                    'layout': {},
+                    'paint': {
+                        'fill-color': fillColor,
+                        'fill-opacity': fillOpacity,
+                        'fill-outline-color': fillColor
+                    }
+                });
+
+                isochroneLayers.push(sourceId, layerId);
+
+                map.flyTo({ center: coords, zoom: 13 });
+
+                if (stepNumber === 0) {
+                    if (window.marker) { window.marker.remove(); }
+                    window.marker = new mapboxgl.Marker({ color: 'green' }).setLngLat(coords).setPopup(new mapboxgl.Popup().setText("Point de Départ et d'Arrivée")).addTo(map);
+                }
+
+                return data;
+            });
+    }
+
+    // --- LOGIQUE BOUTON 3 : Calcul de l'Itinéraire Final (Boucle) ---
+    document.getElementById('calculate-route').addEventListener('click', async () => {
+        routeButton.disabled = true;
+        routeButton.textContent = "Calcul de l'itinéraire...";
+
+        if (!initialStartCoords || poiMarkers.length === 0) {
+            alert("Veuillez d'abord générer des POI (Boutons 1 & 2).");
+            routeButton.textContent = "3. Calculer l'Itinéraire Final (Boucle)";
+            routeButton.disabled = (currentPoiCount !== maxPoiCount);
+            return;
+        }
+
+        // 1. Collecter les waypoints (START -> POI 1 -> ... -> POI N -> START)
+        const waypoints = [];
+
+        // Point de départ initial (START/Origine)
+        waypoints.push(initialStartCoords);
+
+        // Coordonnées de tous les POI intermédiaires
+        poiMarkers.forEach(marker => {
+            const coords = marker.getLngLat().toArray();
+            waypoints.push(coords);
+        });
+
+        // Point d'arrivée (revenir au START initial)
+        waypoints.push(initialStartCoords);
+
+        if (waypoints.length < 2) {
+            alert("Erreur: pas assez de points pour un itinéraire.");
+            routeButton.textContent = "3. Calculer l'Itinéraire Final (Boucle)";
+            routeButton.disabled = false;
+            return;
+        }
+
+        const waypointsString = waypoints.map(coords => coords.join(',')).join(';');
+
+        if (map.getLayer(ROUTE_LAYER_ID)) { map.removeLayer(ROUTE_LAYER_ID); }
+        if (map.getSource(ROUTE_SOURCE_ID)) { map.removeSource(ROUTE_SOURCE_ID); }
+
+        const routeUrl = `https://api.mapbox.com/directions/v5/mapbox/walking/${waypointsString}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+
+        try {
+            const response = await fetch(routeUrl);
+            const data = await response.json();
+
+            if (data.routes && data.routes.length > 0) {
+                const route = data.routes[0];
+                const routeGeoJSON = route.geometry;
+
+                map.addSource(ROUTE_SOURCE_ID, {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: routeGeoJSON
+                    }
+                });
+
+                map.addLayer({
+                    id: ROUTE_LAYER_ID,
+                    type: 'line',
+                    source: ROUTE_SOURCE_ID,
+                    layout: {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    paint: {
+                        'line-color': '#3498db',
+                        'line-width': 6,
+                        'line-opacity': 0.8
+                    }
+                });
+
+                const durationMinutes = (route.duration / 60).toFixed(0);
+                const distanceKm = (route.distance / 1000).toFixed(1);
+
+                alert(`Itinéraire en boucle calculé: ${distanceKm} km en ${durationMinutes} minutes.`);
+
+            } else {
+                alert("Impossible de calculer l'itinéraire entre les POI et le retour au point de départ.");
+            }
+        } catch (error) {
+            console.error('Erreur lors du calcul de l\'itinéraire:', error);
+            alert("Une erreur est survenue lors du calcul de l'itinéraire.");
+        } finally {
+            routeButton.textContent = "3. Calculer l'Itinéraire Final (Boucle)";
+            routeButton.disabled = (currentPoiCount !== maxPoiCount);
+        }
+    });
+
+    // --- LOGIQUE BOUTON 1 : Initialiser la Promenade ---
+    document.getElementById('calculate-isochrone').addEventListener('click', () => {
+        const coordsInput = document.getElementById('coordinates').value;
+        const walkDurationInput = document.getElementById('duration-minutes').value;
+        const poiTargetInput = document.getElementById('poi-target').value;
+
+        const coordsArray = coordsInput.split(',').map(c => c.trim());
+        const lon = parseFloat(coordsArray[0]);
+        const lat = parseFloat(coordsArray[1]);
+        const walkDuration = parseInt(walkDurationInput);
+        const poiTarget = parseInt(poiTargetInput);
+
+        if (coordsArray.length !== 2 || isNaN(lon) || isNaN(lat)) {
+            alert('Veuillez entrer les coordonnées au format "lng,lat".');
+            return;
+        }
+        if (isNaN(walkDuration) || walkDuration <= 0 || isNaN(poiTarget) || poiTarget < 3) {
+            alert('Veuillez entrer une durée et un nombre de POI valides. Le nombre de POI (N) doit être >= 3.');
+            return;
+        }
+
+        isochroneDuration = Math.max(1, Math.floor(walkDuration / (poiTarget + 1)));
+        maxPoiCount = poiTarget;
+        currentPoiCount = 0;
+
+        initialStartCoords = [lon, lat];
+        currentStartCoords = [lon, lat];
+
+        // ⭐ MISE À JOUR CRITIQUE POUR LA BOUCLE :
+        // Le nombre total de côtés pour un polygone fermé avec N POI intermédiaires est N + 1.
+        const totalSides = poiTarget + 1;
+        rotationAngle = 360 / totalSides; // Exemple: N=4 POI -> 5 côtés -> Angle = 72°
+        currentBearing = Math.random() * 360;
+
+        timeDisplay.innerHTML = `Durée de l'isochrone (par étape) : <strong>${isochroneDuration} minutes</strong><br>Angle de rotation cible (Polygone à ${totalSides} côtés) : <strong>${rotationAngle.toFixed(1)}°</strong>`;
+        poiButton.textContent = `2. Générer POI 1/${maxPoiCount} (Direction: ${currentBearing.toFixed(1)}°)`;
+        poiButton.disabled = true;
+        routeButton.disabled = true;
+
+        poiMarkers.forEach(marker => marker.remove());
+        poiMarkers = [];
+        clearAllIsochrones();
+
+        calculateAndDisplayIsochrone(currentStartCoords, 0)
+            .then(() => {
+                poiButton.disabled = false;
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                timeDisplay.innerHTML = `Durée de l'isochrone : <span style="color: red;">Échec du calcul</span>`;
+                poiButton.disabled = true;
+            });
+    });
+
+    // --- LOGIQUE BOUTON 2 : Créer POI Guidé ---
+    poiButton.addEventListener('click', async () => {
+        if (!lastIsochrone || lastIsochrone.features.length === 0) {
+            alert('Veuillez d\'abord initialiser la promenade (Bouton 1).');
+            return;
+        }
+
+        if (currentPoiCount >= maxPoiCount) {
+            poiButton.disabled = true;
+            routeButton.disabled = false;
+            return;
+        }
+
+        poiButton.disabled = true;
+        routeButton.disabled = true;
+        poiButton.textContent = "Recherche de POI valide guidé...";
+
+        // Application de l'angle de rotation calculé
+        if (currentPoiCount > 0) {
+            currentBearing = (currentBearing + rotationAngle) % 360;
+        }
+
+        const poiCoords = await findValidPoiOnBoundary(currentBearing);
+
+        if (!poiCoords) {
+            alert("Échec de la génération d'un POI sur la terre ferme. Veuillez ajuster les paramètres.");
+            poiButton.textContent = `Génération ÉCHOUÉE. Réessayer ?`;
+            poiButton.disabled = false;
+            return;
+        }
+
+        const newMarker = new mapboxgl.Marker({color: '#FF4500'})
+            .setLngLat(poiCoords)
+            .setPopup(new mapboxgl.Popup().setHTML(`
+                <strong>POI Étape n°${currentPoiCount + 1}</strong><br>
+                Direction: ${currentBearing.toFixed(1)}°<br>
+                Statut: Terre Ferme OK
+            `))
+            .addTo(map);
+
+        poiMarkers.push(newMarker);
+        newMarker.togglePopup();
+
+        currentPoiCount++;
+        currentStartCoords = poiCoords;
+
+        if (currentPoiCount < maxPoiCount) {
+            poiButton.textContent = `Calcul Isochrone...`;
+            await calculateAndDisplayIsochrone(currentStartCoords, currentPoiCount);
+
+            let nextBearing = (currentBearing + rotationAngle) % 360;
+
+            poiButton.textContent = `2. Générer POI ${currentPoiCount + 1}/${maxPoiCount} (Direction: ${nextBearing.toFixed(1)}°)`;
+            poiButton.disabled = false;
+
+        } else {
+            poiButton.disabled = true;
+            poiButton.textContent = `Promenade terminée (${maxPoiCount} POI créés)`;
+            routeButton.disabled = false;
+            alert(`Limite de ${maxPoiCount} POI atteinte. Le polygone est complété. Vous pouvez calculer l'itinéraire final en boucle.`);
+        }
+    });
+</script>
+
+</body>
+</html>
