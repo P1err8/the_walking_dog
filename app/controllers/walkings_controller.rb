@@ -50,6 +50,7 @@ class WalkingsController < ApplicationController
 
   def show
     @walking = Walking.find(params[:id])
+    @dog = current_user.dogs.first if current_user # Récupérer le premier chien de l'utilisateur
 
     respond_to do |format|
       format.html

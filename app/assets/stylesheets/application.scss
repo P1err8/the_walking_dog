@@ -18,9 +18,20 @@ body {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   background-color:white;
   color: #333;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+
+  // Layout flex par défaut (sauf pour les pages fullscreen)
+  &:not(.fullscreen-map) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  // Pour les pages fullscreen (walking show)
+  &.fullscreen-map {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
 }
 
 .d-none {

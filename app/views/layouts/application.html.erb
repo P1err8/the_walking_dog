@@ -9,8 +9,8 @@
     <%= stylesheet_link_tag "mapbox-gl", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
-  <body>
+  <body class="<%= 'fullscreen-map' if controller_name == 'walkings' && action_name == 'show' %>">
     <%= yield %>
-    <%= render "layouts/navbar" %>
+    <%= render "layouts/navbar" unless controller_name == "walkings" && action_name == "show" %>
   </body>
 </html>

@@ -10,13 +10,14 @@ import mapboxgl from 'mapbox-gl'
 export default class extends Controller {
   static values = {
     apiKey: String,
-    coordinates: Object
+    coordinates: Object,
+    walkingId: Number
   }
 
-  static targets = ["startNavButton", "navigationPanel"]
+  static targets = ["mapContainer", "infoPopup", "navigationPanel"]
 
   connect() {
-    console.log('🗺️ Walking Map Controller connected')
+    console.log('🗺️ Walking Map Controller connected (Fullscreen Mode)')
     console.log('📍 Coordinates:', this.coordinatesValue)
 
     mapboxgl.accessToken = this.apiKeyValue
@@ -49,9 +50,9 @@ export default class extends Controller {
 
     const startCoords = startFeature.geometry.coordinates
 
-    // Créer la carte
+    // Créer la carte dans le mapContainer target
     this.map = new mapboxgl.Map({
-      container: this.element,
+      container: this.mapContainerTarget,
       style: 'mapbox://styles/mapbox/streets-v12',
       center: startCoords,
       zoom: 13
@@ -60,8 +61,13 @@ export default class extends Controller {
     this.map.on('load', () => {
       console.log('✅ Carte chargée')
 
+      // Forcer le redimensionnement de la carte
+      setTimeout(() => {
+        this.map.resize()
+      }, 100)
+
       // Ajouter les contrôles de navigation
-      this.map.addControl(new mapboxgl.NavigationControl())
+      this.map.addControl(new mapboxgl.NavigationControl(), 'top-right')
 
       // Ajouter le contrôle de géolocalisation
       this.geolocateControl = new mapboxgl.GeolocateControl({
@@ -72,10 +78,15 @@ export default class extends Controller {
         showUserHeading: true,
         showAccuracyCircle: true
       })
-      this.map.addControl(this.geolocateControl)
+      this.map.addControl(this.geolocateControl, 'top-right')
 
       // Dessiner l'itinéraire une fois la carte chargée
       this.drawRoute()
+
+      // Activer automatiquement la géolocalisation après un court délai
+      setTimeout(() => {
+        this.geolocateControl.trigger()
+      }, 1000)
     })
   }
 
@@ -116,11 +127,8 @@ export default class extends Controller {
           steps: this.navigationInstructions.length
         })
 
-        // Afficher l'itinéraire sur la carte
+        // Afficher l'itinéraire sur la carte (sans marqueurs)
         this.displayRouteOnMap(route.geometry)
-
-        // Ajouter les marqueurs
-        this.addMarkers()
 
         // Ajuster la vue pour montrer tout l'itinéraire
         this.fitMapToBounds()
@@ -198,48 +206,24 @@ export default class extends Controller {
     })
   }
 
-  // Ajoute les marqueurs (départ, waypoints, arrivée)
-  addMarkers() {
-    // Marqueur de départ (vert)
-    const startFeature = this.coordinatesValue.features.find(
-      f => f.properties.type === 'start'
-    )
-    if (startFeature) {
-      new mapboxgl.Marker({ color: '#22c55e' })
-        .setLngLat(startFeature.geometry.coordinates)
-        .setPopup(new mapboxgl.Popup({ offset: 25 })
-          .setHTML('<h3>🏁 Point de départ</h3>'))
-        .addTo(this.map)
+  // ============================================================================
+  // GESTION DE LA POP-IN D'INFORMATION
+  // ============================================================================
+
+  closeInfoPopup() {
+    if (this.hasInfoPopupTarget) {
+      this.infoPopupTarget.classList.add('hidden')
     }
+  }
 
-    // Marqueurs des waypoints (bleu)
-    const waypoints = this.coordinatesValue.features
-      .filter(f => f.properties.type === 'waypoint')
-      .sort((a, b) => a.properties.order - b.properties.order)
+  startNavigationFromPopup() {
+    console.log('🚀 startNavigationFromPopup appelé !')
 
-    waypoints.forEach(wp => {
-      new mapboxgl.Marker({ color: '#A3B5D9' })
-        .setLngLat(wp.geometry.coordinates)
-        .setPopup(new mapboxgl.Popup({ offset: 25 })
-          .setHTML(`
-            <h3>📍 Point ${wp.properties.order}</h3>
-            <p>${wp.properties.poi_name || wp.properties.description}</p>
-            ${wp.properties.address ? `<p style="font-size: 0.8rem; color: #64748B;">${wp.properties.address}</p>` : ''}
-          `))
-        .addTo(this.map)
-    })
+    // Fermer la pop-in
+    this.closeInfoPopup()
 
-    // Marqueur d'arrivée (rouge)
-    const endFeature = this.coordinatesValue.features.find(
-      f => f.properties.type === 'end'
-    )
-    if (endFeature) {
-      new mapboxgl.Marker({ color: '#DC2626' })
-        .setLngLat(endFeature.geometry.coordinates)
-        .setPopup(new mapboxgl.Popup({ offset: 25 })
-          .setHTML('<h3>🏁 Arrivée</h3>'))
-        .addTo(this.map)
-    }
+    // Démarrer la navigation
+    this.startNavigation()
   }
 
   // Ajuste la vue pour montrer tout l'itinéraire
@@ -325,9 +309,9 @@ export default class extends Controller {
       this.navigationPanelTarget.classList.remove('active')
     }
 
-    // Réafficher le bouton
-    if (this.hasStartNavButtonTarget) {
-      this.startNavButtonTarget.style.display = 'flex'
+    // Réafficher la pop-in d'info
+    if (this.hasInfoPopupTarget) {
+      this.infoPopupTarget.classList.remove('hidden')
     }
   }
 
