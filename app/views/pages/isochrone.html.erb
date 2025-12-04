@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Isochrone Séquentiel Guidé & Itinéraire en Boucle Parfaite</title>
+    <title>Isochrone Séquentiel Guidé & POI Automatisé</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css" rel="stylesheet">
@@ -29,6 +29,12 @@
             border: 1px solid #ccc;
             border-radius: 3px;
             width: 250px;
+        }
+        /* Style pour indiquer que le champ est calculé */
+        #poi-target[readonly] {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+            font-weight: bold;
         }
         #controls button {
             padding: 10px 15px;
@@ -73,15 +79,15 @@
 <body>
 
 <div id="controls">
-    <h3>Planificateur de Promenade Séquentiel Guidé (Boucle)</h3>
+    <h3>Planificateur de Promenade Séquentiel Guidé</h3>
     <label for="coordinates">Point de départ (lng,lat) :</label>
     <input type="text" id="coordinates" value="4.831946,45.75762" placeholder="lng,lat">
 
     <label for="duration-minutes">Durée Totale de la Promenade (en minutes):</label>
-    <input type="number" id="duration-minutes" value="60" min="1" max="180" placeholder="Durée Totale">
+    <input type="number" id="duration-minutes" value="35" min="1" max="180" placeholder="Durée Totale">
 
-    <label for="poi-target">Nombre de POI Max. (N côtés/Étapes Intermédiaires) :</label>
-    <input type="number" id="poi-target" value="4" min="3" max="10" placeholder="Nombre de POI cible (N)">
+    <label for="poi-target">Nombre de POI (Calculé) :</label>
+    <input type="number" id="poi-target" value="4" readonly title="Le nombre de POI est déterminé automatiquement par la Durée Totale." disabled>
 
     <button id="calculate-isochrone">1. Initialiser la Promenade</button>
 
@@ -121,6 +127,7 @@
     const timeDisplay = document.getElementById('isochrone-time-display');
     const poiButton = document.getElementById('create-poi');
     const routeButton = document.getElementById('calculate-route');
+    const poiTargetInput = document.getElementById('poi-target'); // Référence à l'input POI
 
     const ISOCHRONE_COLORS = [
         '#00BFFF', '#3CB371', '#FF6347', '#9370DB', '#FFD700', '#00CED1'
@@ -249,6 +256,152 @@
             });
     }
 
+
+
+    /**
+     * Détermine le nombre de POI basés sur la durée de la promenade.
+     * @param {number} duration - Durée totale de la promenade en minutes.
+     * @returns {number} - Nombre de POI (3, 4, ou 5).
+     */
+    function calculatePoiCountByDuration(duration) {
+        if (duration < 30) {
+            return 3;
+        } else if (duration < 40) {
+            return 4;
+        } else {
+            return 5;
+        }
+    }
+
+    // --- LOGIQUE BOUTON 1 : Initialiser la Promenade ---
+    document.getElementById('calculate-isochrone').addEventListener('click', () => {
+        const coordsInput = document.getElementById('coordinates').value;
+        const walkDurationInput = document.getElementById('duration-minutes').value;
+
+        const coordsArray = coordsInput.split(',').map(c => c.trim());
+        const lon = parseFloat(coordsArray[0]);
+        const lat = parseFloat(coordsArray[1]);
+        const walkDuration = parseInt(walkDurationInput);
+
+        // 1. Validation des coordonnées et de la durée
+        if (coordsArray.length !== 2 || isNaN(lon) || isNaN(lat)) {
+            alert('Veuillez entrer les coordonnées au format "lng,lat".');
+            return;
+        }
+        if (isNaN(walkDuration) || walkDuration <= 0) {
+            alert('Veuillez entrer une durée totale de promenade valide (> 0).');
+            return;
+        }
+
+        // 2. DÉTERMINATION AUTOMATIQUE DU NOMBRE DE POI
+        const poiTarget = calculatePoiCountByDuration(walkDuration);
+
+        // Mise à jour du champ de l'interface utilisateur
+        poiTargetInput.value = poiTarget;
+
+        // 3. Initialisation des variables de contrôle
+        maxPoiCount = poiTarget;
+        currentPoiCount = 0;
+
+        // La contrainte N >= 3 est assurée par la fonction calculatePoiCountByDuration
+        if (maxPoiCount < 3) {
+             // Sécurité supplémentaire, bien que la fonction garantisse 3 minimum
+             alert('Le nombre de POI calculé est trop faible pour une boucle guidée.');
+             return;
+        }
+
+        initialStartCoords = [lon, lat];
+        currentStartCoords = [lon, lat];
+
+        // 4. Calcul des angles et durées pour la boucle parfaite
+        isochroneDuration = Math.max(1, Math.floor(walkDuration / (maxPoiCount + 1)));
+        const totalSides = maxPoiCount + 1;
+        rotationAngle = 360 / totalSides;
+        currentBearing = Math.random() * 360;
+
+        timeDisplay.innerHTML = `Durée de l'isochrone (par étape) : <strong>${isochroneDuration} minutes</strong><br>Angle de rotation cible (Polygone à ${totalSides} côtés) : <strong>${rotationAngle.toFixed(1)}°</strong>`;
+        poiButton.textContent = `2. Générer POI 1/${maxPoiCount} (Direction: ${currentBearing.toFixed(1)}°)`;
+        poiButton.disabled = true;
+        routeButton.disabled = true;
+
+        poiMarkers.forEach(marker => marker.remove());
+        poiMarkers = [];
+        clearAllIsochrones();
+
+        // 5. Lancement du premier isochrone
+        calculateAndDisplayIsochrone(currentStartCoords, 0)
+            .then(() => {
+                poiButton.disabled = false;
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                timeDisplay.innerHTML = `Durée de l'isochrone : <span style="color: red;">Échec du calcul</span>`;
+                poiButton.disabled = true;
+            });
+    });
+
+    // --- LOGIQUE BOUTON 2 : Créer POI Guidé ---
+    poiButton.addEventListener('click', async () => {
+        if (!lastIsochrone || lastIsochrone.features.length === 0) {
+            alert('Veuillez d\'abord initialiser la promenade (Bouton 1).');
+            return;
+        }
+
+        if (currentPoiCount >= maxPoiCount) {
+            poiButton.disabled = true;
+            routeButton.disabled = false;
+            return;
+        }
+
+        poiButton.disabled = true;
+        routeButton.disabled = true;
+        poiButton.textContent = "Recherche de POI valide guidé...";
+
+        if (currentPoiCount > 0) {
+            currentBearing = (currentBearing + rotationAngle) % 360;
+        }
+
+        const poiCoords = await findValidPoiOnBoundary(currentBearing);
+
+        if (!poiCoords) {
+            alert("Échec de la génération d'un POI sur la terre ferme dans la direction guidée. L'isochrone pourrait être sur une grande zone d'eau. Veuillez ajuster les paramètres.");
+            poiButton.textContent = `Génération ÉCHOUÉE. Réessayer ?`;
+            poiButton.disabled = false;
+            return;
+        }
+
+        const newMarker = new mapboxgl.Marker({color: '#FF4500'})
+            .setLngLat(poiCoords)
+            .setPopup(new mapboxgl.Popup().setHTML(`
+                <strong>POI Étape n°${currentPoiCount + 1}</strong><br>
+                Direction: ${currentBearing.toFixed(1)}°<br>
+                Statut: Terre Ferme OK
+            `))
+            .addTo(map);
+
+        poiMarkers.push(newMarker);
+        newMarker.togglePopup();
+
+        currentPoiCount++;
+        currentStartCoords = poiCoords;
+
+        if (currentPoiCount < maxPoiCount) {
+            poiButton.textContent = `Calcul Isochrone...`;
+            await calculateAndDisplayIsochrone(currentStartCoords, currentPoiCount);
+
+            let nextBearing = (currentBearing + rotationAngle) % 360;
+
+            poiButton.textContent = `2. Générer POI ${currentPoiCount + 1}/${maxPoiCount} (Direction: ${nextBearing.toFixed(1)}°)`;
+            poiButton.disabled = false;
+
+        } else {
+            poiButton.disabled = true;
+            poiButton.textContent = `Promenade terminée (${maxPoiCount} POI créés)`;
+            routeButton.disabled = false;
+            alert(`Limite de ${maxPoiCount} POI atteinte. Le polygone est complété. Vous pouvez calculer l'itinéraire final en boucle.`);
+        }
+    });
+
     // --- LOGIQUE BOUTON 3 : Calcul de l'Itinéraire Final (Boucle) ---
     document.getElementById('calculate-route').addEventListener('click', async () => {
         routeButton.disabled = true;
@@ -261,19 +414,15 @@
             return;
         }
 
-        // 1. Collecter les waypoints (START -> POI 1 -> ... -> POI N -> START)
         const waypoints = [];
 
-        // Point de départ initial (START/Origine)
         waypoints.push(initialStartCoords);
 
-        // Coordonnées de tous les POI intermédiaires
         poiMarkers.forEach(marker => {
             const coords = marker.getLngLat().toArray();
             waypoints.push(coords);
         });
 
-        // Point d'arrivée (revenir au START initial)
         waypoints.push(initialStartCoords);
 
         if (waypoints.length < 2) {
@@ -336,123 +485,6 @@
         } finally {
             routeButton.textContent = "3. Calculer l'Itinéraire Final (Boucle)";
             routeButton.disabled = (currentPoiCount !== maxPoiCount);
-        }
-    });
-
-    // --- LOGIQUE BOUTON 1 : Initialiser la Promenade ---
-    document.getElementById('calculate-isochrone').addEventListener('click', () => {
-        const coordsInput = document.getElementById('coordinates').value;
-        const walkDurationInput = document.getElementById('duration-minutes').value;
-        const poiTargetInput = document.getElementById('poi-target').value;
-
-        const coordsArray = coordsInput.split(',').map(c => c.trim());
-        const lon = parseFloat(coordsArray[0]);
-        const lat = parseFloat(coordsArray[1]);
-        const walkDuration = parseInt(walkDurationInput);
-        const poiTarget = parseInt(poiTargetInput);
-
-        if (coordsArray.length !== 2 || isNaN(lon) || isNaN(lat)) {
-            alert('Veuillez entrer les coordonnées au format "lng,lat".');
-            return;
-        }
-        if (isNaN(walkDuration) || walkDuration <= 0 || isNaN(poiTarget) || poiTarget < 3) {
-            alert('Veuillez entrer une durée et un nombre de POI valides. Le nombre de POI (N) doit être >= 3.');
-            return;
-        }
-
-        isochroneDuration = Math.max(1, Math.floor(walkDuration / (poiTarget + 1)));
-        maxPoiCount = poiTarget;
-        currentPoiCount = 0;
-
-        initialStartCoords = [lon, lat];
-        currentStartCoords = [lon, lat];
-
-        // ⭐ MISE À JOUR CRITIQUE POUR LA BOUCLE :
-        // Le nombre total de côtés pour un polygone fermé avec N POI intermédiaires est N + 1.
-        const totalSides = poiTarget + 1;
-        rotationAngle = 360 / totalSides; // Exemple: N=4 POI -> 5 côtés -> Angle = 72°
-        currentBearing = Math.random() * 360;
-
-        timeDisplay.innerHTML = `Durée de l'isochrone (par étape) : <strong>${isochroneDuration} minutes</strong><br>Angle de rotation cible (Polygone à ${totalSides} côtés) : <strong>${rotationAngle.toFixed(1)}°</strong>`;
-        poiButton.textContent = `2. Générer POI 1/${maxPoiCount} (Direction: ${currentBearing.toFixed(1)}°)`;
-        poiButton.disabled = true;
-        routeButton.disabled = true;
-
-        poiMarkers.forEach(marker => marker.remove());
-        poiMarkers = [];
-        clearAllIsochrones();
-
-        calculateAndDisplayIsochrone(currentStartCoords, 0)
-            .then(() => {
-                poiButton.disabled = false;
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                timeDisplay.innerHTML = `Durée de l'isochrone : <span style="color: red;">Échec du calcul</span>`;
-                poiButton.disabled = true;
-            });
-    });
-
-    // --- LOGIQUE BOUTON 2 : Créer POI Guidé ---
-    poiButton.addEventListener('click', async () => {
-        if (!lastIsochrone || lastIsochrone.features.length === 0) {
-            alert('Veuillez d\'abord initialiser la promenade (Bouton 1).');
-            return;
-        }
-
-        if (currentPoiCount >= maxPoiCount) {
-            poiButton.disabled = true;
-            routeButton.disabled = false;
-            return;
-        }
-
-        poiButton.disabled = true;
-        routeButton.disabled = true;
-        poiButton.textContent = "Recherche de POI valide guidé...";
-
-        // Application de l'angle de rotation calculé
-        if (currentPoiCount > 0) {
-            currentBearing = (currentBearing + rotationAngle) % 360;
-        }
-
-        const poiCoords = await findValidPoiOnBoundary(currentBearing);
-
-        if (!poiCoords) {
-            alert("Échec de la génération d'un POI sur la terre ferme. Veuillez ajuster les paramètres.");
-            poiButton.textContent = `Génération ÉCHOUÉE. Réessayer ?`;
-            poiButton.disabled = false;
-            return;
-        }
-
-        const newMarker = new mapboxgl.Marker({color: '#FF4500'})
-            .setLngLat(poiCoords)
-            .setPopup(new mapboxgl.Popup().setHTML(`
-                <strong>POI Étape n°${currentPoiCount + 1}</strong><br>
-                Direction: ${currentBearing.toFixed(1)}°<br>
-                Statut: Terre Ferme OK
-            `))
-            .addTo(map);
-
-        poiMarkers.push(newMarker);
-        newMarker.togglePopup();
-
-        currentPoiCount++;
-        currentStartCoords = poiCoords;
-
-        if (currentPoiCount < maxPoiCount) {
-            poiButton.textContent = `Calcul Isochrone...`;
-            await calculateAndDisplayIsochrone(currentStartCoords, currentPoiCount);
-
-            let nextBearing = (currentBearing + rotationAngle) % 360;
-
-            poiButton.textContent = `2. Générer POI ${currentPoiCount + 1}/${maxPoiCount} (Direction: ${nextBearing.toFixed(1)}°)`;
-            poiButton.disabled = false;
-
-        } else {
-            poiButton.disabled = true;
-            poiButton.textContent = `Promenade terminée (${maxPoiCount} POI créés)`;
-            routeButton.disabled = false;
-            alert(`Limite de ${maxPoiCount} POI atteinte. Le polygone est complété. Vous pouvez calculer l'itinéraire final en boucle.`);
         }
     });
 </script>
