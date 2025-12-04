@@ -10,7 +10,7 @@ class WalkingsController < ApplicationController
 
   def create
     @walking = Walking.new(walking_params)
-    raise
+    #here can be found the longitude and latitude from the form in the params
     if @walking.save
       # Array of arrays [lng, lat] - Perfect for Mapbox
       coordinates = [
