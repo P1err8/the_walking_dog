@@ -19,4 +19,12 @@ class StyleguideController < ApplicationController
   def index
     # Rien à faire, la vue affiche le styleguide statique
   end
+
+  def map
+    # Affiche la carte interactive avec Mapbox
+    # Récupérer le nom du premier chien de l'utilisateur connecté
+    if user_signed_in?
+      @default_dog_name = current_user.dogs.first&.name || current_user.email.split('@').first
+    end
+  end
 end

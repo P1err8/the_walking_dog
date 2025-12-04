@@ -1,0 +1,591 @@
+<!-- Mapbox GL CSS -->
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
+
+<style>
+  /* LAYOUT FULLSCREEN POUR WEBAPP MOBILE */
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .sg-page {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Carte en plein écran */
+  .map-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 0;
+  }
+
+  #map {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Bouton flottant central dans la nav bar */
+  .fab-button {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 150;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--secondary);
+    color: var(--accent);
+    border: 4px solid rgba(255, 255, 255, 0.98);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fab-button:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    background: #B8A591;
+  }
+
+  .fab-button:active {
+    transform: translateX(-50%) scale(0.95);
+  }
+
+  .map-controls {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* Modal formulaire (slide depuis le bas) */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 200;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-content {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    max-height: 65vh;
+    overflow-y: auto;
+    z-index: 201;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .modal-overlay.active .modal-content {
+    transform: translateY(0);
+  }
+
+  .modal-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 0.75rem 1.25rem 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    z-index: 1;
+  }
+
+  .modal-handle {
+    width: 36px;
+    height: 3px;
+    background: #d1d5db;
+    border-radius: 2px;
+    margin: 0 auto 0.5rem;
+  }
+
+  .modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 0.2rem 0;
+  }
+
+  .modal-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .modal-body {
+    padding: 0.75rem 1.25rem 1.25rem;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #64748B;
+  }
+
+  .modal-close:hover {
+    background: #e5e7eb;
+  }
+
+  /* Bouton flottant pour démarrer la navigation */
+  .start-nav-button {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: none;
+  }
+
+  .start-nav-button.visible {
+    display: block;
+  }
+
+  .start-nav-button:hover {
+    background: #8fa3c9;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    transform: translateX(-50%) translateY(-2px);
+  }
+
+  .start-nav-button:active {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Masquer les anciennes sections */
+  .sg-header {
+    display: none;
+  }
+
+  .map-info {
+    display: none;
+  }
+
+  /* Adapter la bottom navigation pour le mode fullscreen - Design moderne curved */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    z-index: 90;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 1rem;
+  }
+
+  /* Effet curved au centre pour le bouton FAB */
+  .bottom-nav::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 80px;
+    background: transparent;
+    border-radius: 50%;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    pointer-events: none;
+  }
+
+  .bottom-nav::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-radius: 40px 40px 0 0;
+    pointer-events: none;
+  }
+
+  /* Ajuster les items de navigation */
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    text-decoration: none;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    min-width: 60px;
+  }
+
+  .bottom-nav-item.active {
+    color: var(--accent);
+  }
+
+  .bottom-nav-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+
+  .bottom-nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .nav-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Styles pour les marqueurs personnalisés */
+  .custom-marker {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .custom-marker:hover {
+    transform: scale(1.1);
+  }
+
+  /* Styles pour les popups */
+  .mapboxgl-popup-content {
+    font-family: 'Bitter', Georgia, serif;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .mapboxgl-popup-content h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--accent);
+    font-size: 1.125rem;
+  }
+
+  .mapboxgl-popup-content p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  /* Styles pour l'interface de navigation GPS */
+  .navigation-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 300;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  .navigation-panel.active {
+    transform: translateY(0);
+  }
+
+  .nav-header {
+    padding: 1rem;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-instruction {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .nav-instruction-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-instruction-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-distance {
+    font-size: 1rem;
+    color: var(--text-muted);
+  }
+
+  .nav-progress {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-around;
+    background: #f9fafb;
+  }
+
+  .nav-stat {
+    text-align: center;
+  }
+
+  .nav-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .nav-stat-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .nav-actions {
+    padding: 1rem;
+    padding-bottom: 80px;
+    display: flex;
+    gap: 0.5rem;
+  }
+</style>
+
+<div class="sg-page">
+  <!-- Carte en plein écran -->
+  <div class="map-container">
+    <div id="map"></div>
+  </div>
+
+  <!-- Bouton flottant pour ouvrir le formulaire -->
+  <button class="fab-button" onclick="openWalkModal()" title="Nouvelle balade">
+    +
+  </button>
+
+  <!-- Bouton pour démarrer la navigation (apparaît après génération) -->
+  <button id="start-nav-button" class="start-nav-button" onclick="startNavigation()" title="Démarrer la navigation">
+    🧭 Démarrer la navigation
+  </button>
+
+  <!-- Modal formulaire (slide depuis le bas) -->
+  <div class="modal-overlay" id="walk-modal" onclick="closeWalkModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-handle"></div>
+        <button class="modal-close" onclick="closeWalkModal()">✕</button>
+        <h2 class="modal-title">Nouvelle balade</h2>
+        <p class="modal-subtitle">Générez un itinéraire personnalisé pour votre chien</p>
+      </div>
+
+      <div class="modal-body">
+        <form class="walk-form">
+      <div class="form-group">
+        <label for="dog-name">Nom du chien</label>
+        <input type="text" id="dog-name" class="form-input" placeholder="Rex" value="<%= @default_dog_name %>" autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label for="walk-duration">Durée de la balade</label>
+        <div class="slider-container">
+          <input type="range" id="walk-duration" class="form-slider" min="5" max="120" value="30" step="5" autocomplete="off">
+          <div class="slider-value">
+            <span id="duration-display">30</span> minutes
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Type de balade</label>
+        <div class="button-group">
+          <button type="button" class="btn btn-toggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 14l9-5-9-5-9 5 9 5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Balade privée
+          </button>
+          <button type="button" class="btn btn-toggle active">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Balade publique
+          </button>
+        </div>
+      </div>
+
+          <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+            🐕 Générer la balade
+          </button>
+        </form>
+
+        <!-- Bouton de navigation (apparaît après génération) -->
+        <div id="navigation-section" style="display: none;">
+          <div style="padding: 0.6rem; background: #dcfce7; border-radius: 6px; border: 1px solid #22c55e; margin-bottom: 0.6rem;">
+            <p style="margin: 0 0 0.2rem 0; font-weight: 600; color: #166534; font-size: 0.9rem;">
+              ✅ Itinéraire prêt !
+            </p>
+            <p style="margin: 0; font-size: 0.75rem; color: #15803d;">
+              Démarrez la navigation ou modifiez les points
+            </p>
+          </div>
+          <button type="button" class="btn btn-primary btn-lg" onclick="startNavigationAndCloseModal()" style="width: 100%; margin-bottom: 0.4rem;">
+            🧭 Démarrer la navigation GPS
+          </button>
+          <button type="button" class="btn btn-secondary btn-lg" onclick="editWaypoints()" style="width: 100%;">
+            ✏️ Modifier les points
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <a href="#" class="bottom-nav-item">
+      <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="bottom-nav-label">Réglages</span>
+    </a>
+
+    <a href="#" class="bottom-nav-item">
+      <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 21C3.82843 19.1652 5.02816 17.5986 6.48426 16.4635C7.94036 15.3283 9.67392 14.6667 11.4286 14.5556" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16 21V15M13 18H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="bottom-nav-label">Stats</span>
+    </a>
+
+    <!-- Espace vide pour le bouton FAB central -->
+    <div style="width: 60px;"></div>
+
+    <%= link_to styleguide_map_path, class: "bottom-nav-item active" do %>
+      <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" stroke-width="2" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"/>
+      </svg>
+      <span class="bottom-nav-label">Carte</span>
+    <% end %>
+
+    <%= link_to styleguide_path, class: "bottom-nav-item" do %>
+      <div class="nav-avatar">
+        <img src="https://i.pravatar.cc/150?img=12" alt="Profil" class="avatar-img">
+      </div>
+      <span class="bottom-nav-label">Profil</span>
+    <% end %>
+  </nav>
+</div>
+
+<!-- Panneau de navigation GPS -->
+<div id="navigation-panel" class="navigation-panel">
+  <div class="nav-header">
+    <div>
+      <strong id="nav-dog-name">Navigation</strong>
+      <div style="font-size: 0.875rem; opacity: 0.9;" id="nav-route-info">Chargement...</div>
+    </div>
+    <button class="btn btn-danger btn-sm" onclick="stopNavigation()">
+      ❌ Arrêter
+    </button>
+  </div>
+
+  <div class="nav-instruction">
+    <div class="nav-instruction-icon" id="nav-icon">🧭</div>
+    <div class="nav-instruction-text" id="nav-instruction">Démarrage de la navigation...</div>
+    <div class="nav-distance" id="nav-distance">Calcul en cours...</div>
+  </div>
+
+  <div class="nav-progress">
+    <div class="nav-stat">
+      <div class="nav-stat-value" id="nav-distance-total">-</div>
+      <div class="nav-stat-label">Distance totale</div>
+    </div>
+    <div class="nav-stat">
+      <div class="nav-stat-value" id="nav-duration">-</div>
+      <div class="nav-stat-label">Temps restant</div>
+    </div>
+    <div class="nav-stat">
+      <div class="nav-stat-value" id="nav-step">-</div>
+      <div class="nav-stat-label">Étape</div>
+    </div>
+  </div>
+
+  <div class="nav-actions">
+    <button class="btn btn-secondary" onclick="toggleVoiceGuidance()" style="flex: 1;">
+      <span id="voice-icon">🔇</span> Instructions vocales
+    </button>
+    <button class="btn btn-outline" onclick="centerOnUser()" style="flex: 1;">
+      🎯 Me recentrer
+    </button>
+  </div>
+</div>
+
+<script type="module">
+  // Import du module JavaScript de la carte Mapbox
+  import "styleguide/map";
+</script>

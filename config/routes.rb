@@ -11,5 +11,6 @@ Rails.application.routes.draw do
   # Route pour accéder au styleguide à : http://localhost:3000/styleguide
   # ⚠️ NE PAS SUPPRIMER - Utilisé par toute l'équipe pour voir les composants CSS/JS
   get "styleguide", to: "styleguide#index"
+  get "styleguide/map", to: "styleguide#map"
 
 end
