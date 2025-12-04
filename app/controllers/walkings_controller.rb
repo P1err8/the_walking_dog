@@ -10,7 +10,7 @@ class WalkingsController < ApplicationController
 
   def create
     @walking = Walking.new(walking_params)
-
+    raise
     if @walking.save
       # Array of arrays [lng, lat] - Perfect for Mapbox
       coordinates = [
@@ -42,6 +42,6 @@ class WalkingsController < ApplicationController
   private
 
   def walking_params
-    params.require(:walking).permit(:wanted_duration, :sociable)
+    params.require(:walking).permit(:wanted_duration, :sociable, :address, :latitude, :longitude)
   end
 end
