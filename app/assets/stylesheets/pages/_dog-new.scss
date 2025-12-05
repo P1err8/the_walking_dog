@@ -17,6 +17,7 @@
 }
 
 .profile-photo-field {
+  position: relative;
   display: flex;
   justify-content: center;
   width: 150px;
@@ -29,6 +30,14 @@
   border: 2px solid #e0e0e0;
 }
 
+.avatar-label {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  cursor: pointer;
+}
+
 .profile-preview-img {
   width: 100%;
   height: 100%;
@@ -36,6 +45,42 @@
   display: block;
 }
 
+.avatar-input {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.avatar-add-icon {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #d0d6db;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #222;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  pointer-events: none;
+}
+
+.avatar-label:hover .avatar-add-icon,
+.avatar-input:focus + .avatar-add-icon {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
 
 .form-fields {
   position: relative;
@@ -123,7 +168,7 @@ input[type="number"],
   align-items: center;
   justify-content: center;
   min-width: 90px;
-  padding: 10px 18px;
+  padding: 20px 28px;
   border-radius: 999px;
   border: 1px solid #d0d6db;
   background:  rgb(232, 221, 211);
@@ -178,7 +223,6 @@ input[type="number"],
   transition: all 0.12s ease;
   user-select: none;
 }
-
 
 .tag-option span:hover {
   background: white;
@@ -248,7 +292,37 @@ input[type="number"],
   }
 }
 
-input[type="radio"]:checked + .size-option,
+.size-option input.size-radio,
+.size-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  pointer-events: auto;
+}
+
+.size-option input.size-radio:checked + span,
+.size-option input[type="radio"]:checked + span {
+  background: #A3B5D9;
+  color: #fff;
+  border-color: #A3B5D9;
+  box-shadow: 0 6px 18px rgba(13,110,253,0.12);
+}
+
+.size-option input.size-radio:focus + span,
+.size-option input[type="radio"]:focus + span {
+  outline: 3px solid rgba(13,110,253,0.18);
+  outline-offset: 3px;
+}
+// input[type="radio"]:checked + .size-option span {
+//   background-color: var(--primary, #A3B5D9);
+//   color: white;
+//   border-color: var(--primary, #A3B5D9);
+//   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+// }
+
 input[type="checkbox"]:checked + .tag-option span {
   background-color: var(--primary, #A3B5D9);
   color: white;
