@@ -101,7 +101,8 @@
 <div id="map"></div>
 
 <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoiZHVrZWNhYm9vdW0iLCJhIjoiY21pb2V0dDJwMDE5NDNkczVkZThwdDkydCJ9.HIxlecS9JmujCeUqkxVWKw';
+    const mapboxToken = document.querySelector('meta[name="mapbox-api-key"]')?.content;
+    mapboxgl.accessToken = mapboxToken;
 
     const map = new mapboxgl.Map({
         container: 'map',
@@ -474,7 +475,21 @@
                 const durationMinutes = (route.duration / 60).toFixed(0);
                 const distanceKm = (route.distance / 1000).toFixed(1);
 
-                alert(`Itinéraire en boucle calculé: ${distanceKm} km en ${durationMinutes} minutes.`);
+                alert(`Itinéraire en boucle calculé: ${distanceKm} km en ${durationMinutes} minutes.\n\nCliquez sur OK pour nettoyer les allers-retours.`);
+
+                // Nettoyer les allers-retours automatiquement après le calcul
+                if (window.cleanMapData) {
+                    console.log("🧹 Nettoyage des allers-retours...");
+
+                    // Créer les données de route pour le nettoyage
+                    const routeDataForCleaning = {
+                        routes: [data],
+                        waypoints: waypoints
+                    };
+
+                    const result = window.cleanMapData(routeDataForCleaning, 20);
+                    console.log("✅ Nettoyage terminé", result.stats);
+                }
 
             } else {
                 alert("Impossible de calculer l'itinéraire entre les POI et le retour au point de départ.");

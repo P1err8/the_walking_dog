@@ -13,4 +13,5 @@ Rails.application.routes.draw do
   get "styleguide", to: "styleguide#index"
   get "styleguide/map", to: "styleguide#map"
 
+  get '/isochrone', to: 'pages#isochrone'
 end
