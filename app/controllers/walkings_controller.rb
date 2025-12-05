@@ -12,16 +12,20 @@ class WalkingsController < ApplicationController
     @walking = Walking.new(walking_params)
     #here can be found the longitude and latitude from the form in the params
     if @walking.save
-      # Array of arrays [lng, lat] - Perfect for Mapbox
-      coordinates = [
-        [4.834887,45.769481],
-        [4.832574,45.768988],
-        [4.833372,45.770550],
-        [4.834836,45.771505],
-        [4.835833,45.770623],
-        [4.834887,45.769481]
-      ]
-
+      # Get coordinates from the hidden field if available, otherwise fallback to default
+      coordinates = if params[:circuit_coordinates].present?
+                      JSON.parse(params[:circuit_coordinates])
+                    else
+                      # Array of arrays [lng, lat] - Perfect for Mapbox
+                      [
+                        [4.834887,45.769481],
+                        [4.832574,45.768988],
+                        [4.833372,45.770550],
+                        [4.834836,45.771505],
+                        [4.835833,45.770623],
+                        [4.834887,45.769481]
+                      ]
+                    end
       @circuit = Circuit.new(duration: @walking.wanted_duration, coordinates: coordinates, user: current_user, walking: @walking)
 
       if @circuit.save
@@ -42,6 +46,6 @@ class WalkingsController < ApplicationController
   private
 
   def walking_params
-    params.require(:walking).permit(:wanted_duration, :sociable, :address, :latitude, :longitude)
+    params.require(:walking).permit(:wanted_duration, :sociable, :address, :latitude, :longitude, :circuit_coordinates)
   end
 end
