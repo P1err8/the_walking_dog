@@ -263,7 +263,7 @@ export default class extends Controller {
     if (this.map.getLayer(this.ROUTE_LAYER_ID)) { this.map.removeLayer(this.ROUTE_LAYER_ID) }
     if (this.map.getSource(this.ROUTE_SOURCE_ID)) { this.map.removeSource(this.ROUTE_SOURCE_ID) }
 
-    const routeUrl = `https://api.mapbox.com/directions/v5/mapbox/walking/${waypointsString}?geometries=geojson&access_token=${mapboxgl.accessToken}`
+    const routeUrl = `https://api.mapbox.com/directions/v5/mapbox/walking/${waypointsString}?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`
 
     try {
       const response = await fetch(routeUrl)
@@ -304,8 +304,8 @@ export default class extends Controller {
 
         // Store the coordinates in the hidden field
         if (this.hasCircuitCoordinatesTarget) {
-          // this.circuitCoordinatesTarget.value = JSON.stringify(routeGeoJSON.coordinates)
-          this.circuitCoordinatesTarget.value = JSON.stringify(waypoints)
+          this.circuitCoordinatesTarget.value = JSON.stringify(routeGeoJSON.coordinates)
+          // this.circuitCoordinatesTarget.value = JSON.stringify(waypoints)
         }
 
         // Show the submit button
