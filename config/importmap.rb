@@ -6,6 +6,8 @@ pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "mapbox-gl", to: "mapbox-gl.js" # @3.16.0
+pin "@turf/turf", to: "https://esm.sh/@turf/turf@6.5.0"
+
 
 # ==============================================================================
 # STYLEGUIDE MODULES (ajouté par Julien)
