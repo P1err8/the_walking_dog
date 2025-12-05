@@ -5,6 +5,7 @@ class WalkingsController < ApplicationController
   end
 
   def new
+    return redirect_to new_dog_path if current_user.dogs.empty?
     @walking = Walking.new
   end
 
