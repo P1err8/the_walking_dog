@@ -19,8 +19,10 @@ user2 = User.create!(
 puts "the user with the #{user1.email} has been created!"
 puts "the user with the #{user2.email} has been created!"
 
+Tag.destroy_all
+puts "Creating tags for dogs' personalities..."
 
-dogs_tags = ["friendly", "calm", "playful", "energetic", "protective", "shy"]
+dogs_tags = ["Amical", "calme", "Joueur", "Energique", "Protecteur", "Timide"]
 
 puts "Creating tags..."
 tags = dogs_tags.map do |tag_name|

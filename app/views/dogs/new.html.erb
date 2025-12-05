@@ -1,10 +1,16 @@
 <div class="container">
 
-  <%= simple_form_for @dog do |f| %>
+  <%#= simple_form_for @dog do |f| %>
+  <%= simple_form_for @dog, html: { multipart: true } do |f| %>
     <div class="profile-header">
       <div class="profile-photo-field">
-        <%= f.file_field :avatar, accept: "image/*" %>
-        <img id="profile-preview" class="profile-preview-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Aperçu">
+        <%= f.label :photo, class: "avatar-label" do %>
++          <img id="profile-preview" class="profile-preview-img" src="" alt="">
++          <%= f.file_field :photo, accept: "image/*", class: "avatar-input" %>
++          <span class="avatar-add-icon" aria-hidden="true">+</span>
++        <% end %>
+        <%#= f.file_field :photo, accept: "image/*" %>
+        <%# <img id="profile-preview" class="profile-preview-img" src="" alt=""> %>
       </div>
     </div>
 
@@ -40,23 +46,11 @@
       <div class="size-options" role="radiogroup" aria-label="Taille du chien">
         <%= f.collection_radio_buttons :size, [["Petit","Petit"], ["Moyen","Moyen"], ["Grand","Grand"]], :last, :first do |b| %>
           <label class="size-option">
-            <%= b.radio_button(class: "d-none") %>
+            <%#= b.radio_button(class: "d-none") %>
+            <%= b.radio_button(class: "size-radio") %>
             <span><%= b.text %></span>
           </label>
         <% end %>
-
-      <%# <div class="size-options" aria-label="Taille du chien">
-        <label class="size-option">
-          <span>Petit</span>
-        </label>
-
-        <label class="size-option">
-          <span>Moyen</span>
-        </label>
-
-        <label class="size-option">
-          <span>Grand</span>
-        </label> %>
       </div>
     </div>
 
@@ -64,10 +58,10 @@
     <div class="dog-tags">
       <h2>Personnalité</h2>
       <div class="tag-options" aria-label="Personnalité du chien">
-      <%= f.collection_check_boxes :dogs_tags, Tag.all, :id, :name do |b|  %>
-        <%= b.check_box(class: "d-none")  %>
-         <%= b.label(class: "tag-option") do %>
-            <span><%= tag.name %></span>
+        <%= f.collection_check_boxes :tag_ids, Tag.all, :id, :name do |b|  %>
+          <%= b.check_box(class: "d-none") %>
+          <%= b.label(class: "tag-option") do %>
+            <span><%= b.object.name %></span>
           <% end %>
         <% end %>
       </div>
