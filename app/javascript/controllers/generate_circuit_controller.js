@@ -301,6 +301,9 @@ export default class extends Controller {
 
         console.log(`Itinéraire en boucle calculé: ${distanceKm} km en ${durationMinutes} minutes.`)
 
+        // Adapter le zoom pour voir tout l'itinéraire
+        this.fitMapToRoute(routeGeoJSON.coordinates)
+
         // Store the coordinates in the hidden field
         if (this.hasCircuitCoordinatesTarget) {
           this.circuitCoordinatesTarget.value = JSON.stringify(routeGeoJSON.coordinates)
@@ -318,5 +321,20 @@ export default class extends Controller {
     } catch (error) {
       console.error('Erreur lors du calcul de l\'itinéraire:', error)
     }
+  }
+
+  // Adapter le zoom de la carte pour voir tout l'itinéraire
+  fitMapToRoute(coordinates) {
+    if (!coordinates || coordinates.length === 0) return
+
+    const bounds = new mapboxgl.LngLatBounds()
+    coordinates.forEach(coord => bounds.extend(coord))
+
+    // Ajuster la carte avec un padding pour ne pas que l'itinéraire soit collé aux bords
+    this.map.fitBounds(bounds, {
+      padding: 80,
+      maxZoom: 15,
+      duration: 1000
+    })
   }
 }

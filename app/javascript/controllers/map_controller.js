@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
+import mapboxgl from "mapbox-gl"
 
 export default class extends Controller {
-  static targets = []
+  static targets = ["map"]
   static values = {
     apiKey: String,
     coordinates: Array
@@ -11,7 +12,7 @@ export default class extends Controller {
     // console.log("Map controller connected")
     mapboxgl.accessToken = this.apiKeyValue
 
-    // Get map container - could be a target or the element itself
+    // Get map container - prefer target if present
     const mapContainer = this.hasMapTarget ? this.mapTarget : this.element
 
     this.map = new mapboxgl.Map({
@@ -21,12 +22,27 @@ export default class extends Controller {
       zoom: 12
     })
 
+    // Ensure the map matches the container size immediately
+    this.map.resize()
+
+    // Resize on window events to keep full-screen layout consistent
+    this.handleResize = () => {
+      if (this.map) this.map.resize()
+    }
+    window.addEventListener("resize", this.handleResize)
+
     this.map.on("load", () => {
+      this.map.resize()
       if (this.coordinatesValue && this.coordinatesValue.length > 0) {
         this.addRoute()
         this.fitMapToRoute()
       }
     })
+  }
+
+  disconnect() {
+    window.removeEventListener("resize", this.handleResize)
+    if (this.map) this.map.remove()
   }
 
   async addRoute() {
