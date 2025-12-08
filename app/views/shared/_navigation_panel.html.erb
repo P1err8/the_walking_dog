@@ -1,49 +1,40 @@
 <div class="navigation-panel"
 		 data-controller="navigation draggable-panel"
-		 data-navigation-coordinates-value="<%= @walking.coordinates.to_json %>"
-		 style="position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: #fff; z-index: 950; padding: 1.75rem 1.25rem 1.25rem; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); animation: slideUp 0.25s ease-out; max-height: 50vh;">
+		 data-navigation-coordinates-value="<%= @walking.coordinates.to_json %>">
 
 	<!-- Drag handle for the bottom sheet -->
-	<div class="drag-handle"
+	<div class="navigation-panel__handle-wrapper drag-handle"
 			 data-draggable-panel-target="handle"
-			 data-action="mousedown->draggable-panel#startDrag touchstart->draggable-panel#startDrag mousemove@window->draggable-panel#drag touchmove@window->draggable-panel#drag mouseup@window->draggable-panel#endDrag touchend@window->draggable-panel#endDrag"
-			 style="display: flex; justify-content: center; margin-bottom: 1rem;">
-		<div style="width: 40px; height: 4px; background: #ccc; border-radius: 999px;"></div>
+			 data-action="mousedown->draggable-panel#startDrag touchstart->draggable-panel#startDrag mousemove@window->draggable-panel#drag touchmove@window->draggable-panel#drag mouseup@window->draggable-panel#endDrag touchend@window->draggable-panel#endDrag">
+		<div class="navigation-panel__handle"></div>
 	</div>
 
 	<!-- Heading and instruction -->
-	<div style="display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1.25rem;">
-		<h3 style="margin: 0; font-size: 1.3rem; font-weight: 700; color: #1E3A5F;">Navigation</h3>
-		<p data-navigation-target="instruction" style="margin: 0; color: #8B8377; font-size: 0.95rem;">
+	<div class="navigation-panel__header">
+		<h3 class="navigation-panel__title">Navigation</h3>
+		<p class="navigation-panel__instruction" data-navigation-target="instruction">
 			Préparez-vous à partir
 		</p>
 	</div>
 
 	<!-- Stats -->
-	<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.25rem;">
-		<div style="padding: 1rem; background: #F5F5F5; border-radius: 12px; text-align: center;">
-			<div data-navigation-target="distance" style="font-size: 1.4rem; font-weight: 700; color: #1E3A5F;">-- km</div>
-			<div style="font-size: 0.85rem; color: #8B8377;">Distance restante</div>
+	<div class="navigation-panel__stats">
+		<div class="navigation-panel__stat-card">
+			<div class="navigation-panel__stat-value" data-navigation-target="distance">-- km</div>
+			<div class="navigation-panel__stat-label">Distance restante</div>
 		</div>
-		<div style="padding: 1rem; background: #F5F5F5; border-radius: 12px; text-align: center;">
-			<div data-navigation-target="duration" style="font-size: 1.4rem; font-weight: 700; color: #1E3A5F;">-- min</div>
-			<div style="font-size: 0.85rem; color: #8B8377;">Durée estimée</div>
+		<div class="navigation-panel__stat-card">
+			<div class="navigation-panel__stat-value" data-navigation-target="duration">-- min</div>
+			<div class="navigation-panel__stat-label">Durée estimée</div>
 		</div>
 	</div>
 
 	<!-- Actions -->
-	<div style="display: flex; gap: 1rem;">
+	<div class="navigation-panel__actions">
 		<button type="button"
 						data-action="click->navigation#recenter"
-						style="flex: 1; background: #A3B5D9; color: white; border: none; padding: 1rem; border-radius: 12px; font-weight: 700; cursor: pointer;">
+					class="navigation-panel__recenter-btn">
 			Me recentrer
 		</button>
 	</div>
 </div>
-
-<style>
-	@keyframes slideUp {
-		from { transform: translateY(20%); opacity: 0; }
-		to { transform: translateY(0); opacity: 1; }
-	}
-</style>

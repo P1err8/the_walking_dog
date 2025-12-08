@@ -22,6 +22,15 @@ export default class extends Controller {
       zoom: 12
     })
 
+    // Geolocate user whenever the map is active
+    this.geolocateControl = new mapboxgl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true },
+      trackUserLocation: true,
+      showUserHeading: true,
+      showAccuracyCircle: false
+    })
+    this.map.addControl(this.geolocateControl, 'top-left')
+
     // Ensure the map matches the container size immediately
     this.map.resize()
 
@@ -33,6 +42,9 @@ export default class extends Controller {
 
     this.map.on("load", () => {
       this.map.resize()
+      if (this.geolocateControl) {
+        this.geolocateControl.trigger()
+      }
       if (this.coordinatesValue && this.coordinatesValue.length > 0) {
         this.addRoute()
         this.fitMapToRoute()

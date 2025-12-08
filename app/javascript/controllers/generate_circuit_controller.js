@@ -47,6 +47,50 @@ export default class extends Controller {
     this.ROUTE_LAYER_ID = 'route-layer'
   }
 
+  // Ensure we have start coordinates; retry geolocation then fallback to map center
+  async ensureStartCoordinates() {
+    const lat = parseFloat(this.latitudeTarget.value)
+    const lon = parseFloat(this.longitudeTarget.value)
+
+    if (!isNaN(lat) && !isNaN(lon)) {
+      return { lat, lon }
+    }
+
+    const fallbackFromMap = () => {
+      if (!this.map) return null
+      const center = this.map.getCenter()
+      this.latitudeTarget.value = center.lat
+      this.longitudeTarget.value = center.lng
+      return { lat: center.lat, lon: center.lng }
+    }
+
+    if (!navigator.geolocation) {
+      return fallbackFromMap()
+    }
+
+    const getPosition = (options) => new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve(pos.coords),
+        (err) => {
+          console.warn('Geolocation error:', err)
+          resolve(null)
+        },
+        options
+      )
+    })
+
+    const primary = await getPosition({ enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
+    const coords = primary || await getPosition({ enableHighAccuracy: false, timeout: 3000, maximumAge: 60000 })
+
+    if (coords) {
+      this.latitudeTarget.value = coords.latitude
+      this.longitudeTarget.value = coords.longitude
+      return { lat: coords.latitude, lon: coords.longitude }
+    }
+
+    return fallbackFromMap()
+  }
+
   clearAllIsochrones() {
     this.isochroneLayers.forEach(id => {
       if (this.map.getLayer(id)) { this.map.removeLayer(id) }
@@ -155,10 +199,15 @@ export default class extends Controller {
     }
   }
 
-  initializeWalk() {
+  async initializeWalk() {
     console.log("Initializing walk...")
-    const lat = parseFloat(this.latitudeTarget.value)
-    const lon = parseFloat(this.longitudeTarget.value)
+    const startCoords = await this.ensureStartCoordinates()
+    if (!startCoords) {
+      alert('Impossible de récupérer votre position. Activez la localisation ou renseignez une adresse.')
+      return
+    }
+
+    const { lat, lon } = startCoords
     const walkDurationInput = this.durationTarget.value
     const walkDuration = parseInt(walkDurationInput)
 

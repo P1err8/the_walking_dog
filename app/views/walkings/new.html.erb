@@ -1,6 +1,6 @@
-<turbo-frame id="modal" class="modal-frame">
-  <div class="homepage">
-    <div class="map-container">
+<turbo-frame id="modal" class="modal-frame" style="position: fixed; inset: 0; width: 100vw; height: 100vh; background: #fff; z-index: 1200;">
+  <div class="homepage" style="width: 100%; height: 100%; position: relative;">
+    <div class="map-container" style="width: 100%; height: 100%; position: absolute; inset: 0;">
       <div style="width: 100%; height: 100%;"
            data-controller="map"
            data-map-api-key-value="<%= ENV.fetch('MAPBOX_API_KEY') %>">
