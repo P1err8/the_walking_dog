@@ -10,20 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_03_144743) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_08_103019) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "circuits", force: :cascade do |t|
-    t.float "duration"
-    t.jsonb "coordinates"
-    t.bigint "walking_id", null: false
-    t.bigint "user_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_circuits_on_user_id"
-    t.index ["walking_id"], name: "index_circuits_on_walking_id"
-  end
 
   create_table "dogs", force: :cascade do |t|
     t.string "name"
@@ -46,6 +35,31 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_03_144743) do
     t.index ["tag_id"], name: "index_dogs_tags_on_tag_id"
   end
 
+  create_table "meet_ups", force: :cascade do |t|
+    t.bigint "point_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["point_id"], name: "index_meet_ups_on_point_id"
+  end
+
+  create_table "participations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "meet_up_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["meet_up_id"], name: "index_participations_on_meet_up_id"
+    t.index ["user_id"], name: "index_participations_on_user_id"
+  end
+
+  create_table "points", force: :cascade do |t|
+    t.string "name"
+    t.text "url_picture"
+    t.float "longitude"
+    t.float "latitude"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "tags", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -65,17 +79,20 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_03_144743) do
   end
 
   create_table "walkings", force: :cascade do |t|
-    t.boolean "sociable"
-    t.text "meetup_coordinates"
-    t.float "meetup_duration"
-    t.float "wanted_duration"
+    t.jsonb "coordinates"
+    t.float "distance"
+    t.float "duration"
+    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_walkings_on_user_id"
   end
 
-  add_foreign_key "circuits", "users"
-  add_foreign_key "circuits", "walkings"
   add_foreign_key "dogs", "users"
   add_foreign_key "dogs_tags", "dogs"
   add_foreign_key "dogs_tags", "tags"
+  add_foreign_key "meet_ups", "points"
+  add_foreign_key "participations", "meet_ups"
+  add_foreign_key "participations", "users"
+  add_foreign_key "walkings", "users"
 end

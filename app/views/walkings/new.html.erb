@@ -24,8 +24,8 @@
           %>
           <%= f.hidden_field :latitude, data: { address_autocomplete_target: "latitude", generate_circuit_target: "latitude" } %>
           <%= f.hidden_field :longitude, data: { address_autocomplete_target: "longitude", generate_circuit_target: "longitude" } %>
-          <%# Hidden field to store the generated circuit coordinates %>
-          <%= hidden_field_tag :circuit_coordinates, params[:circuit_coordinates], data: { generate_circuit_target: "circuitCoordinates" } %>
+          <%# Hidden field to store the generated  coordinates %>
+          <%= hidden_field_tag :coordinates, params[:coordinates], data: { generate_circuit_target: "circuitCoordinates" } %>
         </div>
         <div class="autocomplete-results"
              data-address-autocomplete-target="results"

@@ -1,7 +1,7 @@
 <div class="walkingmap-container"
      data-controller="stepcounter"
      data-stepcounter-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>"
-     data-stepcounter-path-value="<%= @walking.circuit.coordinates.to_json %>">
+     data-stepcounter-path-value="<%= @walking.coordinates.to_json %>">
   <!-- this is the map -->
   <div class="walkingmap" data-stepcounter-target="map"></div>
   <div class="controls">

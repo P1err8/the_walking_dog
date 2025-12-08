@@ -4,6 +4,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
   has_many :dogs, dependent: :destroy
-  has_many :walkings, through: :circuits
-  has_many :circuits, dependent: :destroy
+  has_many :walkings
+  has_many :participations
+  has_many :meet_ups, through: :participations
 end
