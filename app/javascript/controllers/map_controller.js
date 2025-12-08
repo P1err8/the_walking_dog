@@ -5,7 +5,8 @@ export default class extends Controller {
   static targets = ["map"]
   static values = {
     apiKey: String,
-    coordinates: Array
+    coordinates: Array,
+    markers: Array
   }
 
   connect() {
@@ -50,6 +51,38 @@ export default class extends Controller {
         this.fitMapToRoute()
       }
     })
+
+     this.map.on("load", () => {
+      this.addMarkersToMap() // Appel de la fonction
+      this.fitMapToMarkers() // Optionnel : centrer sur les points
+    })
+
+  }
+
+  addMarkersToMap() {
+    if (!this.hasMarkersValue) return
+
+    this.markersValue.forEach((marker) => {
+      // Créer un élément HTML custom si tu as passé marker_html, sinon marker par défaut
+      const popup = new mapboxgl.Popup().setHTML(marker.info_window_html)
+
+      // Si tu as un partial custom pour le marker (marker_html)
+      const customMarker = document.createElement("div")
+      customMarker.innerHTML = marker.marker_html
+
+      new mapboxgl.Marker(marker.marker_html ? customMarker : undefined)
+        .setLngLat([marker.lng, marker.lat])
+        .setPopup(popup)
+        .addTo(this.map)
+    })
+  }
+
+  fitMapToMarkers() {
+    if (!this.hasMarkersValue || this.markersValue.length === 0) return
+
+    const bounds = new mapboxgl.LngLatBounds()
+    this.markersValue.forEach(marker => bounds.extend([marker.lng, marker.lat]))
+    this.map.fitBounds(bounds, { padding: 70, maxZoom: 15, duration: 0 })
   }
 
   disconnect() {

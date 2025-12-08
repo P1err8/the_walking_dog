@@ -4,8 +4,11 @@ require "open-uri"
 
 puts "Cleaning database..."
 puts ""
-User.destroy_all
 Point.destroy_all
+MeetUp.destroy_all
+Participation.destroy_all
+Walking.destroy_all
+User.destroy_all
 puts "Done."
 puts ""
 puts "Creating seed user..."
@@ -86,7 +89,7 @@ viktor.tags << tags[2]  # playful
 
 puts "Tags have been associated!"
 
-API_Meet_up_points_url = "https://data.grandlyon.com/fr/geoserv/ogc/features/v1/collections/metropole-de-lyon:com_donnees_communales.comparcjardin_1_0_0/items?&crs=EPSG:4171&f=application/geo%2Bjson&limit=10&startIndex=0&sortby=gid"
+API_Meet_up_points_url = "https://data.grandlyon.com/fr/geoserv/ogc/features/v1/collections/metropole-de-lyon:com_donnees_communales.comparcjardin_1_0_0/items?&crs=EPSG:4171&f=application/geo%2Bjson&limit=60&startIndex=0&sortby=gid"
 
 url = API_Meet_up_points_url
 user_serialized = URI.parse(url).read
