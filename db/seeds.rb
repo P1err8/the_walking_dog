@@ -89,10 +89,13 @@ viktor.tags << tags[2]  # playful
 
 puts "Tags have been associated!"
 
-API_Meet_up_points_url = "https://data.grandlyon.com/fr/geoserv/ogc/features/v1/collections/metropole-de-lyon:com_donnees_communales.comparcjardin_1_0_0/items?&crs=EPSG:4171&f=application/geo%2Bjson&limit=60&startIndex=0&sortby=gid"
+#API_Meet_up_points_url = "https://data.grandlyon.com/fr/geoserv/ogc/features/v1/collections/metropole-de-lyon:com_donnees_communales.comparcjardin_1_0_0/items?&crs=EPSG:4171&f=application/geo%2Bjson&limit=60&startIndex=0&sortby=gid"
 
-url = API_Meet_up_points_url
-user_serialized = URI.parse(url).read
+#url = API_Meet_up_points_url
+#user_serialized = URI.parse(url).read
+
+filepath = Rails.root.join('app', 'assets', 'meetup_point_list', 'metropole-de-lyon_com_donnees_communales.comparcjardin_1_0_0-2.json')
+user_serialized = File.read(filepath)
 user = JSON.parse(user_serialized)
 
 
