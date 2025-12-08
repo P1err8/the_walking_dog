@@ -1,0 +1,70 @@
+<div class="walking-form-card"
+     data-controller="generate-circuit draggable-panel"
+     data-generate-circuit-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>"
+     style="position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; background: white !important; z-index: 950 !important; padding: 2.5rem 1.5rem 1.5rem !important; border-radius: 20px 20px 0 0 !important; box-shadow: 0 -4px 20px rgba(0,0,0,0.2) !important; overflow-y: auto !important; display: block !important;">
+
+    <!-- Drag Handle -->
+    <div class="drag-handle"
+         data-draggable-panel-target="handle"
+         data-action="mousedown->draggable-panel#startDrag touchstart->draggable-panel#startDrag
+                      mousemove@window->draggable-panel#drag touchmove@window->draggable-panel#drag
+                      mouseup@window->draggable-panel#endDrag touchend@window->draggable-panel#endDrag">
+      <div class="drag-indicator"></div>
+    </div>
+
+    <h2 class="page-title">Nouvelle balade</h2>
+    <%= form_with model: @walking, local: true, class: "walk-form", data: { turbo: false } do |f| %>
+      <div class="form-group"
+           data-controller="address-autocomplete"
+           data-address-autocomplete-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>"
+           style="position: relative;">
+        <%= f.label :address, "Point de départ" %>
+        <div class="autocomplete-wrapper">
+          <%= f.text_field :address,
+              class: "form-input",
+              placeholder: "Entrez une adresse...",
+              data: { address_autocomplete_target: "address" },
+              autocomplete: "off"
+          %>
+          <%= f.hidden_field :latitude, data: { address_autocomplete_target: "latitude", generate_circuit_target: "latitude" } %>
+          <%= f.hidden_field :longitude, data: { address_autocomplete_target: "longitude", generate_circuit_target: "longitude" } %>
+          <%# Hidden field to store the generated  coordinates %>
+          <%= hidden_field_tag :coordinates, params[:coordinates], data: { generate_circuit_target: "circuitCoordinates" } %>
+        </div>
+        <div class="autocomplete-results"
+             data-address-autocomplete-target="results"
+             style="position: absolute; z-index: 1000; width: 100%; border: 1px solid #ddd; border-radius: 4px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        </div>
+      </div>
+
+      <div class="form-group" data-controller="slider">
+        <%= f.label :wanted_duration, "Durée de la balade" %>
+        <div class="slider-container">
+          <%= f.range_field :wanted_duration,
+              min: 5,
+              max: 120,
+              step: 5,
+              value: 30,
+              class: "form-slider",
+              data: {
+                slider_target: "input",
+                action: "input->slider#update",
+                generate_circuit_target: "duration"
+              } %>
+          <div class="slider-value">
+            <span data-slider-target="output">30</span> minutes
+          </div>
+        </div>
+      </div>
+
+
+      <button type="button" class="btn btn-primary btn-lg w-full" data-action="click->generate-circuit#initializeWalk">
+        Prévisualiser le circuit
+      </button>
+      <%= f.submit "Valider et Créer la balade",
+          class: "btn btn-success btn-lg w-full mt-3",
+          style: "display: none;",
+          data: { generate_circuit_target: "submitButton" }
+      %>
+    <% end %>
+  </div>
