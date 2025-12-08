@@ -3,31 +3,30 @@ import mapboxgl from 'mapbox-gl'
 import * as turf from '@turf/turf'
 
 export default class extends Controller {
-  static targets = ["map", "latitude", "longitude", "duration", "circuitCoordinates", "submitButton"]
+  static targets = ["latitude", "longitude", "duration", "circuitCoordinates", "submitButton"]
   static values = {
     apiKey: String
   }
 
   connect() {
     console.log("GenerateCircuitController connected")
-    if (!this.hasMapTarget) {
-      console.error("Map target not found")
-      return
-    }
 
     mapboxgl.accessToken = this.apiKeyValue
 
-    this.map = new mapboxgl.Map({
-      container: this.mapTarget,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [4.831946, 45.75762],
-      zoom: 12
-    })
+    // Récupérer le controller de la map de fond
+    const mapElement = document.querySelector('[data-controller*="map"]')
+    if (mapElement) {
+      this.mapController = this.application.getControllerForElementAndIdentifier(mapElement, 'map')
+      if (this.mapController) {
+        this.map = this.mapController.map
+        console.log("Map loaded from background")
+      }
+    }
 
-    this.map.on('load', () => {
-      console.log("Map loaded")
-      this.map.resize()
-    })
+    if (!this.map) {
+      console.error("Background map not found")
+      return
+    }
 
     this.lastIsochrone = null
     this.poiMarkers = []

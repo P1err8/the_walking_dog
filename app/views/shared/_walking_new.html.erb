@@ -13,7 +13,7 @@
     </div>
 
     <h2 class="page-title">Nouvelle balade</h2>
-    <%= form_with model: @walking, local: true, class: "walk-form" do |f| %>
+    <%= form_with model: @walking, local: true, class: "walk-form", data: { turbo: false } do |f| %>
       <div class="form-group"
            data-controller="address-autocomplete"
            data-address-autocomplete-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>"
