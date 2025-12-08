@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["map"]
+  static targets = []
   static values = {
     apiKey: String,
     coordinates: Array
@@ -11,8 +11,11 @@ export default class extends Controller {
     // console.log("Map controller connected")
     mapboxgl.accessToken = this.apiKeyValue
 
+    // Get map container - could be a target or the element itself
+    const mapContainer = this.hasMapTarget ? this.mapTarget : this.element
+
     this.map = new mapboxgl.Map({
-      container: this.element,
+      container: mapContainer,
       style: "mapbox://styles/mapbox/streets-v10",
       center: this.coordinatesValue && this.coordinatesValue.length > 0 ? this.coordinatesValue[0] : [4.8357, 45.7640],
       zoom: 12
@@ -96,5 +99,103 @@ export default class extends Controller {
     const bounds = new mapboxgl.LngLatBounds()
     this.coordinatesValue.forEach(coord => bounds.extend(coord))
     this.map.fitBounds(bounds, { padding: 70, maxZoom: 15, duration: 0 })
+  }
+
+  // Public methods for external controllers
+  clearAll() {
+    // Remove all markers
+    if (this.markers) {
+      this.markers.forEach(marker => marker.remove())
+    }
+    this.markers = []
+
+    // Remove all isochrone layers
+    if (this.isochroneLayers) {
+      this.isochroneLayers.forEach(id => {
+        if (this.map.getLayer(id)) { this.map.removeLayer(id) }
+        if (this.map.getSource(id)) { this.map.removeSource(id) }
+      })
+    }
+    this.isochroneLayers = []
+
+    // Remove route
+    if (this.map.getLayer('route-layer')) { this.map.removeLayer('route-layer') }
+    if (this.map.getSource('route-source')) { this.map.removeSource('route-source') }
+  }
+
+  addIsochrone(data, stepNumber, color) {
+    const layerId = `isochrone-${stepNumber}`
+    const sourceId = `isochrone-source-${stepNumber}`
+
+    if (this.map.getSource(sourceId)) return
+
+    this.map.addSource(sourceId, {
+      type: 'geojson',
+      data: data
+    })
+
+    this.map.addLayer({
+      id: layerId,
+      type: 'fill',
+      source: sourceId,
+      paint: {
+        'fill-color': color,
+        'fill-opacity': 0.3
+      }
+    })
+
+    if (!this.isochroneLayers) this.isochroneLayers = []
+    this.isochroneLayers.push(layerId)
+    this.isochroneLayers.push(sourceId)
+  }
+
+  addMarker(coords, color, popup) {
+    if (!this.markers) this.markers = []
+    const marker = new mapboxgl.Marker({ color })
+      .setLngLat(coords)
+
+    if (popup) {
+      marker.setPopup(new mapboxgl.Popup().setText(popup))
+    }
+
+    marker.addTo(this.map)
+    this.markers.push(marker)
+  }
+
+  addRouteGeometry(routeGeoJSON) {
+    if (this.map.getLayer('route-layer')) { this.map.removeLayer('route-layer') }
+    if (this.map.getSource('route-source')) { this.map.removeSource('route-source') }
+
+    this.map.addSource('route-source', {
+      type: 'geojson',
+      data: {
+        type: 'Feature',
+        properties: {},
+        geometry: routeGeoJSON
+      }
+    })
+
+    this.map.addLayer({
+      id: 'route-layer',
+      type: 'line',
+      source: 'route-source',
+      layout: {
+        'line-join': 'round',
+        'line-cap': 'round'
+      },
+      paint: {
+        'line-color': '#3498db',
+        'line-width': 6,
+        'line-opacity': 0.8
+      }
+    })
+  }
+
+  flyTo(coords, zoom = 12) {
+    this.map.flyTo({
+      center: coords,
+      zoom: zoom,
+      duration: 1000
+    })
   }
 }
