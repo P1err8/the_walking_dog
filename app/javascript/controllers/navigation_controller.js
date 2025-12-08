@@ -3,20 +3,34 @@ import mapboxgl from "mapbox-gl"
 
 export default class extends Controller {
 	static targets = ["instruction", "distance", "duration"]
-	static values = {
-		coordinates: Array
-	}
+	static values = { coordinates: Array }
 
 	connect() {
 		this.currentIndex = 0
-		this.totalDistance = this.calculateTotalDistance(this.coordinatesValue || [])
+		this.currentStepIndex = 0
+		this.userPosition = null
+
+		const coords = this.coordinatesValue || []
+		this.totalDistance = this.calculateTotalDistance(coords)
+		this.steps = this.buildTurnByTurn(coords)
 		this.mapController = this.findMapController()
+		this.startGeolocationWatch()
 		this.updatePanel()
+	}
+
+	disconnect() {
+		this.stopGeolocationWatch()
 	}
 
 	// Recenter the map to the route bounds
 	recenter() {
 		if (!this.mapController || !this.mapController.map || !this.coordinatesValue?.length) return
+
+		if (this.userPosition) {
+			this.mapController.map.flyTo({ center: this.userPosition, zoom: 17, speed: 1.2, curve: 1.4 })
+			return
+		}
+
 		const bounds = new mapboxgl.LngLatBounds()
 		this.coordinatesValue.forEach(c => bounds.extend(c))
 		this.mapController.map.fitBounds(bounds, { padding: 60, maxZoom: 16, duration: 800 })
@@ -27,18 +41,46 @@ export default class extends Controller {
 		const coords = this.coordinatesValue || []
 		if (!coords.length) return
 
-		// Instruction
-		const instruction = this.nextInstruction(coords, this.currentIndex)
+		// Instruction turn-by-turn style
+		const instruction = this.nextInstruction()
 		if (this.hasInstructionTarget) this.instructionTarget.textContent = instruction
 
-		// Distance restante (approx: total - parcouru)
-		const traveled = this.calculateTotalDistance(coords.slice(0, this.currentIndex + 1))
-		const remaining = Math.max(this.totalDistance - traveled, 0)
+		// Distance restante (approx: total - parcouru ou proximité de la position)
+		let remaining
+		if (this.userPosition && this.cumulativeDistances?.length === coords.length) {
+			const nearestIdx = this.findNearestCoordinateIndex(this.userPosition, coords)
+			const traveled = this.cumulativeDistances[nearestIdx] || 0
+			remaining = Math.max(this.totalDistance - traveled, 0)
+		} else {
+			const traveled = this.calculateTotalDistance(coords.slice(0, this.currentIndex + 1))
+			remaining = Math.max(this.totalDistance - traveled, 0)
+		}
 		if (this.hasDistanceTarget) this.distanceTarget.textContent = `${(remaining / 1000).toFixed(2)} km`
 
 		// Durée estimée (vitesse 1.4 m/s)
 		const etaMinutes = Math.max(Math.round(remaining / 1.4 / 60), 1)
 		if (this.hasDurationTarget) this.durationTarget.textContent = `${etaMinutes} min`
+	}
+
+	// --- Geolocation & progression ---
+	startGeolocationWatch() {
+		if (!navigator.geolocation) return
+		this.watchId = navigator.geolocation.watchPosition(
+			(pos) => {
+				this.userPosition = [pos.coords.longitude, pos.coords.latitude]
+				this.advanceStepIfNeeded()
+				this.updatePanel()
+			},
+			(err) => console.warn("Geolocation watch error", err),
+			{ enableHighAccuracy: true, maximumAge: 5000, timeout: 8000 }
+		)
+	}
+
+	stopGeolocationWatch() {
+		if (this.watchId !== undefined) {
+			navigator.geolocation.clearWatch(this.watchId)
+			this.watchId = undefined
+		}
 	}
 
 	// --- Helpers ---
@@ -86,14 +128,93 @@ export default class extends Controller {
 		return dirs[idx]
 	}
 
-	nextInstruction(coords, index) {
-		const curr = coords[index]
-		const nxt = coords[index + 1]
-		if (!nxt) return "Vous êtes arrivé à destination"
+	formatDistance(meters) {
+		if (!meters || meters <= 0) return "quelques mètres"
+		return meters > 1000 ? `${(meters / 1000).toFixed(1)} km` : `${Math.round(meters)} m`
+	}
 
-		const dist = this.haversine(curr, nxt)
-		const dir = this.directionName(this.bearing(curr, nxt))
-		const distText = dist > 1000 ? `${(dist / 1000).toFixed(2)} km` : `${Math.round(dist)} m`
-		return `Continuez ${dir} pendant ${distText}`
+	turnAction(delta) {
+		if (Math.abs(delta) > 135) return "faites demi-tour"
+		if (delta > 20) return "tournez à droite"
+		if (delta < -20) return "tournez à gauche"
+		return "continuez tout droit"
+	}
+
+	buildTurnByTurn(coords) {
+		if (!coords || coords.length < 2) return []
+
+		this.cumulativeDistances = [0]
+		for (let i = 1; i < coords.length; i++) {
+			this.cumulativeDistances[i] = this.cumulativeDistances[i - 1] + this.haversine(coords[i - 1], coords[i])
+		}
+
+		const steps = []
+		let lastTurnIdx = 0
+		for (let i = 1; i < coords.length - 1; i++) {
+			const prev = coords[i - 1]
+			const curr = coords[i]
+			const next = coords[i + 1]
+
+			const bearingIn = this.bearing(prev, curr)
+			const bearingOut = this.bearing(curr, next)
+			let delta = bearingOut - bearingIn
+			delta = ((delta + 540) % 360) - 180 // Normalize to [-180, 180]
+
+			if (Math.abs(delta) < 25) continue // Ignore slight bends
+
+			const action = this.turnAction(delta)
+			const distanceFromLastTurn = this.cumulativeDistances[i] - this.cumulativeDistances[lastTurnIdx]
+			steps.push({ index: i, action, distance: distanceFromLastTurn })
+			lastTurnIdx = i
+		}
+
+		// Arrival step
+		const remainingToEnd = this.cumulativeDistances[this.cumulativeDistances.length - 1] - this.cumulativeDistances[lastTurnIdx]
+		steps.push({ index: coords.length - 1, action: "Vous êtes arrivé à destination", distance: remainingToEnd })
+
+		return steps
+	}
+
+	findNearestCoordinateIndex(position, coords) {
+		let bestIdx = 0
+		let bestDist = Infinity
+		coords.forEach((c, idx) => {
+			const d = this.haversine(position, c)
+			if (d < bestDist) {
+				bestDist = d
+				bestIdx = idx
+			}
+		})
+		return bestIdx
+	}
+
+	advanceStepIfNeeded() {
+		if (!this.userPosition || !this.steps || this.steps.length === 0) return
+		const step = this.steps[this.currentStepIndex]
+		if (!step) return
+		const targetCoord = this.coordinatesValue?.[step.index]
+		if (!targetCoord) return
+
+		const distToTarget = this.haversine(this.userPosition, targetCoord)
+		const threshold = 10 // meters
+
+		if (distToTarget <= threshold && this.currentStepIndex < this.steps.length - 1) {
+			this.currentStepIndex += 1
+		}
+	}
+
+	nextInstruction() {
+		if (!this.steps || this.steps.length === 0) return "Navigation prête"
+		const step = this.steps[this.currentStepIndex] || this.steps[this.steps.length - 1]
+		const targetCoord = this.coordinatesValue?.[step.index]
+		let distance = step.distance
+
+		if (this.userPosition && targetCoord) {
+			distance = this.haversine(this.userPosition, targetCoord)
+		}
+
+		if (step.action === "Vous êtes arrivé à destination") return step.action
+		const distanceText = this.formatDistance(distance)
+		return `Dans ${distanceText}, ${step.action}`
 	}
 }
