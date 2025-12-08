@@ -24,6 +24,7 @@ class WalkingsController < ApplicationController
                     [4.834887,45.769481]
                   ]
                 end
+       raise
       @walking.coordinates = @coordinates
       @walking.user = current_user
     if @walking.save
