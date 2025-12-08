@@ -24,7 +24,7 @@ class WalkingsController < ApplicationController
                     [4.834887,45.769481]
                   ]
                 end
-      @walking.coordinates = @coordinates
+      @walking.coordinates = coordinates
       @walking.user = current_user
     if @walking.save
       # Get coordinates from the hidden field if available, otherwise fallback to default
