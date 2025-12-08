@@ -1,6 +1,14 @@
+// ========================================
+// Variables
+// ========================================
+$navbar-height: 10vh;
+
+// ========================================
+// Navigation Panel
+// ========================================
 .navigation-panel {
   position: fixed;
-  bottom: 0;
+  bottom: $navbar-height;
   left: 0;
   right: 0;
   width: 100%;
@@ -31,6 +39,13 @@
   flex-direction: column;
   gap: 0.35rem;
   margin-bottom: 1.25rem;
+}
+
+.navigation-panel__header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .navigation-panel__title {
@@ -71,20 +86,34 @@
   color: #8b8377;
 }
 
-.navigation-panel__actions {
-  display: flex;
-  gap: 1rem;
-}
-
 .navigation-panel__recenter-btn {
-  flex: 1;
+  width: 48px;
+  height: 48px;
   background: #a3b5d9;
   color: white;
   border: none;
-  padding: 1rem;
+  padding: 0;
   border-radius: 12px;
-  font-weight: 700;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover {
+    background: #8fa3c9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
 }
 
 @keyframes slideUp {

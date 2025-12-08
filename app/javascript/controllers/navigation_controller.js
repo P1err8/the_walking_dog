@@ -14,26 +14,34 @@ export default class extends Controller {
 		this.totalDistance = this.calculateTotalDistance(coords)
 		this.steps = this.buildTurnByTurn(coords)
 		this.mapController = this.findMapController()
-		this.startGeolocationWatch()
 		this.updatePanel()
 	}
 
 	disconnect() {
-		this.stopGeolocationWatch()
+		// Cleanup if needed
+		if (this.watchId) {
+			navigator.geolocation.clearWatch(this.watchId)
+		}
 	}
 
-	// Recenter the map to the route bounds
+	// Recenter the map to the user's location
 	recenter() {
-		if (!this.mapController || !this.mapController.map || !this.coordinatesValue?.length) return
+		if (!this.mapController || !this.mapController.map) return
 
-		if (this.userPosition) {
-			this.mapController.map.flyTo({ center: this.userPosition, zoom: 17, speed: 1.2, curve: 1.4 })
-			return
+		// Use stored location from geolocateControl
+		if (this.mapController.userLocation) {
+			this.mapController.map.flyTo({
+				center: this.mapController.userLocation,
+				zoom: 17,
+				speed: 1.2,
+				curve: 1.4
+			})
+		} else {
+			// Fallback: trigger geolocation if position not yet available
+			if (this.mapController.geolocateControl) {
+				this.mapController.geolocateControl.trigger()
+			}
 		}
-
-		const bounds = new mapboxgl.LngLatBounds()
-		this.coordinatesValue.forEach(c => bounds.extend(c))
-		this.mapController.map.fitBounds(bounds, { padding: 60, maxZoom: 16, duration: 800 })
 	}
 
 	// --- UI update ---
@@ -60,27 +68,6 @@ export default class extends Controller {
 		// Durée estimée (vitesse 1.4 m/s)
 		const etaMinutes = Math.max(Math.round(remaining / 1.4 / 60), 1)
 		if (this.hasDurationTarget) this.durationTarget.textContent = `${etaMinutes} min`
-	}
-
-	// --- Geolocation & progression ---
-	startGeolocationWatch() {
-		if (!navigator.geolocation) return
-		this.watchId = navigator.geolocation.watchPosition(
-			(pos) => {
-				this.userPosition = [pos.coords.longitude, pos.coords.latitude]
-				this.advanceStepIfNeeded()
-				this.updatePanel()
-			},
-			(err) => console.warn("Geolocation watch error", err),
-			{ enableHighAccuracy: true, maximumAge: 5000, timeout: 8000 }
-		)
-	}
-
-	stopGeolocationWatch() {
-		if (this.watchId !== undefined) {
-			navigator.geolocation.clearWatch(this.watchId)
-			this.watchId = undefined
-		}
 	}
 
 	// --- Helpers ---

@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl'
 import * as turf from '@turf/turf'
 
 export default class extends Controller {
-  static targets = ["latitude", "longitude", "duration", "circuitCoordinates", "submitButton"]
+  static targets = ["latitude", "longitude", "duration", "circuitCoordinates", "submitButton", "previewButton", "loadingIndicator"]
   static values = {
     apiKey: String
   }
@@ -47,7 +47,7 @@ export default class extends Controller {
     this.ROUTE_LAYER_ID = 'route-layer'
   }
 
-  // Ensure we have start coordinates; retry geolocation then fallback to map center
+  // Ensure we have start coordinates; try geolocation in parallel with timeout fallback
   async ensureStartCoordinates() {
     const lat = parseFloat(this.latitudeTarget.value)
     const lon = parseFloat(this.longitudeTarget.value)
@@ -79,8 +79,13 @@ export default class extends Controller {
       )
     })
 
-    const primary = await getPosition({ enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
-    const coords = primary || await getPosition({ enableHighAccuracy: false, timeout: 3000, maximumAge: 60000 })
+    // Use Promise.race with aggressive timeout - don't wait long
+    const timeoutPromise = new Promise((resolve) => {
+      setTimeout(() => resolve(null), 2000) // 2 second timeout instead of sequential 8 seconds
+    })
+
+    const geoPromise = getPosition({ enableHighAccuracy: true, timeout: 2000, maximumAge: 300000 })
+    const coords = await Promise.race([geoPromise, timeoutPromise])
 
     if (coords) {
       this.latitudeTarget.value = coords.latitude
@@ -133,26 +138,34 @@ export default class extends Controller {
     const isochroneBbox = turf.bbox(isochronePolygon)
     const maxDistance = turf.distance(centerPoint, turf.point([isochroneBbox[0], isochroneBbox[1]]), { units: 'kilometers' })
 
-    const MAX_ATTEMPTS = 15
+    const MAX_ATTEMPTS = 10 // Réduit de 15 à 10
 
+    // Générer tous les candidats POI en parallèle sans vérification immédiate
+    const poiCandidates = []
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-
       let currentBearing = bearing
-      let currentPoiCoords
 
       if (attempt > 0) {
         currentBearing += (Math.random() * 40 - 20)
       }
 
       const theoreticalPoint = turf.destination(centerPoint, maxDistance * 1.5, currentBearing, { units: 'kilometers' })
-
       const line = turf.polygonToLine(isochronePolygon)
       const nearestPoint = turf.nearestPointOnLine(line, theoreticalPoint)
-      currentPoiCoords = nearestPoint.geometry.coordinates
+      poiCandidates.push(nearestPoint.geometry.coordinates)
+    }
 
-      if (await this.verifyPoiLocation(currentPoiCoords)) {
-        return currentPoiCoords
-      }
+    // Vérifier tous les candidats en parallèle au lieu de séquentiellement
+    const verificationPromises = poiCandidates.map(coords =>
+      this.verifyPoiLocation(coords).then(isValid => ({ coords, isValid }))
+    )
+
+    const results = await Promise.all(verificationPromises)
+
+    // Retourner le premier candidat valide trouvé
+    const validPoi = results.find(result => result.isValid)
+    if (validPoi) {
+      return validPoi.coords
     }
 
     console.warn(`Échec de la génération d'un POI valide après ${MAX_ATTEMPTS} tentatives de projection.`)
@@ -201,62 +214,102 @@ export default class extends Controller {
 
   async initializeWalk() {
     console.log("Initializing walk...")
-    const startCoords = await this.ensureStartCoordinates()
-    if (!startCoords) {
-      alert('Impossible de récupérer votre position. Activez la localisation ou renseignez une adresse.')
-      return
+
+    // Show loading indicator
+    if (this.hasPreviewButtonTarget) {
+      this.previewButtonTarget.style.display = "none"
+    }
+    if (this.hasLoadingIndicatorTarget) {
+      this.loadingIndicatorTarget.style.display = "block"
     }
 
-    const { lat, lon } = startCoords
-    const walkDurationInput = this.durationTarget.value
-    const walkDuration = parseInt(walkDurationInput)
+    try {
+      const startCoords = await this.ensureStartCoordinates()
+      if (!startCoords) {
+        alert('Impossible de récupérer votre position. Activez la localisation ou renseignez une adresse.')
+        this.hideLoadingIndicator()
+        return
+      }
 
-    console.log("Inputs:", { lat, lon, walkDuration })
+      const { lat, lon } = startCoords
+      const walkDurationInput = this.durationTarget.value
+      const walkDuration = parseInt(walkDurationInput)
 
-    if (isNaN(lon) || isNaN(lat)) {
-      alert('Veuillez entrer une adresse valide pour obtenir les coordonnées.')
-      return
+      console.log("Inputs:", { lat, lon, walkDuration })
+
+      if (isNaN(lon) || isNaN(lat)) {
+        alert('Veuillez entrer une adresse valide pour obtenir les coordonnées.')
+        this.hideLoadingIndicator()
+        return
+      }
+      if (isNaN(walkDuration) || walkDuration <= 0) {
+        alert('Veuillez entrer une durée totale de promenade valide (> 0).')
+        this.hideLoadingIndicator()
+        return
+      }
+
+      const poiTarget = this.calculatePoiCountByDuration(walkDuration)
+
+      this.maxPoiCount = poiTarget
+      this.currentPoiCount = 0
+
+      if (this.maxPoiCount < 3) {
+        alert('Le nombre de POI calculé est trop faible pour une boucle guidée.')
+        this.hideLoadingIndicator()
+        return
+      }
+
+      this.initialStartCoords = [lon, lat]
+      this.currentStartCoords = [lon, lat]
+
+      this.isochroneDuration = Math.max(1, Math.floor(walkDuration / (this.maxPoiCount + 1)))
+      const totalSides = this.maxPoiCount + 1
+      this.rotationAngle = 360 / totalSides
+      this.currentBearing = Math.random() * 360
+
+      this.poiMarkers.forEach(marker => marker.remove())
+      this.poiMarkers = []
+      this.clearAllIsochrones()
+
+      this.calculateIsochrone(this.currentStartCoords, 0)
+        .then(() => {
+          this.hideLoadingIndicator()
+          this.generatePoi()
+        })
+        .catch(error => {
+          console.error('Erreur:', error)
+          this.hideLoadingIndicator()
+        })
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation:', error)
+      this.hideLoadingIndicator()
     }
-    if (isNaN(walkDuration) || walkDuration <= 0) {
-      alert('Veuillez entrer une durée totale de promenade valide (> 0).')
-      return
+  }
+
+  hideLoadingIndicator() {
+    if (this.hasPreviewButtonTarget) {
+      this.previewButtonTarget.style.display = "block"
     }
-
-    const poiTarget = this.calculatePoiCountByDuration(walkDuration)
-
-    this.maxPoiCount = poiTarget
-    this.currentPoiCount = 0
-
-    if (this.maxPoiCount < 3) {
-      alert('Le nombre de POI calculé est trop faible pour une boucle guidée.')
-      return
+    if (this.hasLoadingIndicatorTarget) {
+      this.loadingIndicatorTarget.style.display = "none"
     }
+  }
 
-    this.initialStartCoords = [lon, lat]
-    this.currentStartCoords = [lon, lat]
-
-    this.isochroneDuration = Math.max(1, Math.floor(walkDuration / (this.maxPoiCount + 1)))
-    const totalSides = this.maxPoiCount + 1
-    this.rotationAngle = 360 / totalSides
-    this.currentBearing = Math.random() * 360
-
-    this.poiMarkers.forEach(marker => marker.remove())
-    this.poiMarkers = []
-    this.clearAllIsochrones()
-
-    this.calculateIsochrone(this.currentStartCoords, 0)
-      .then(() => {
-        this.generatePoi()
-      })
-      .catch(error => {
-        console.error('Erreur:', error)
-      })
+  updateLoadingMessage(message) {
+    if (this.hasLoadingIndicatorTarget) {
+      const messageElement = this.loadingIndicatorTarget.querySelector('p')
+      if (messageElement) {
+        messageElement.textContent = message
+      }
+    }
   }
 
   async generatePoi() {
     if (!this.lastIsochrone || this.lastIsochrone.features.length === 0) {
       return
     }
+
+    this.updateLoadingMessage(`Génération du circuit... (${this.currentPoiCount + 1}/${this.maxPoiCount})`)
 
     if (this.currentPoiCount > 0) {
       this.currentBearing = (this.currentBearing + this.rotationAngle) % 360
@@ -266,6 +319,7 @@ export default class extends Controller {
 
     if (!poiCoords) {
       alert("Impossible de trouver un chemin valide sur la terre ferme. Veuillez changer le point de départ ou la durée.")
+      this.hideLoadingIndicator()
       return
     }
 
@@ -282,6 +336,7 @@ export default class extends Controller {
       await this.calculateIsochrone(this.currentStartCoords, this.currentPoiCount)
       await this.generatePoi()
     } else {
+      this.updateLoadingMessage('Calcul de l\'itinéraire final...')
       this.calculateRoute()
     }
   }
@@ -373,15 +428,33 @@ export default class extends Controller {
   }
 
   // Adapter le zoom de la carte pour voir tout l'itinéraire
+  // En tenant compte de la position du panel blanc
   fitMapToRoute(coordinates) {
     if (!coordinates || coordinates.length === 0) return
 
     const bounds = new mapboxgl.LngLatBounds()
     coordinates.forEach(coord => bounds.extend(coord))
 
-    // Ajuster la carte avec un padding pour ne pas que l'itinéraire soit collé aux bords
+    // Calculer la hauteur du panel blanc pour l'ajouter au padding
+    const panelElement = document.querySelector('.walking-form-card')
+    let panelHeight = 0
+    if (panelElement) {
+      panelHeight = panelElement.offsetHeight
+    }
+
+    // Padding supérieur et latéral standard, padding inférieur qui prend en compte le panel
+    const paddingTop = 80
+    const paddingSide = 80
+    const paddingBottom = Math.max(80, panelHeight + 40) // Ajouter du padding pour le panel
+
+    // Ajuster la carte avec un padding asymétrique
     this.map.fitBounds(bounds, {
-      padding: 80,
+      padding: {
+        top: paddingTop,
+        bottom: paddingBottom,
+        left: paddingSide,
+        right: paddingSide
+      },
       maxZoom: 15,
       duration: 1000
     })
