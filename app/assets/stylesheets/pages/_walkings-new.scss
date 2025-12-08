@@ -22,6 +22,26 @@
   --shadow-lg: 0 10px 40px rgba(163, 181, 217, 0.3);
 }
 
+/* Modal Frame Styles */
+turbo-frame#modal {
+  display: contents;
+
+  .modal-frame {
+    animation: slideUp 0.3s ease-out;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .walking-new-container {
   width: 100%;
   min-height: 100vh;
@@ -33,12 +53,26 @@
   background-color: var(--bg-page);
 
   .walking-form-card {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     width: 100%;
-    max-width: 500px;
+    max-width: 100vw;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
+    background: var(--surface);
+    border-radius: var(--radius) var(--radius) 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    padding: 1.5rem;
+    z-index: 900; /* Sous la navbar (z-index: 1000) mais au-dessus de la carte */
+    max-height: 60vh;
+    overflow-y: auto;
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
   }
 
   .page-title {
@@ -50,12 +84,45 @@
   }
 }
 
+/* Drag Handle Styles */
+.drag-handle {
+  width: 100%;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  touch-action: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  .drag-indicator {
+    width: 40px;
+    height: 4px;
+    background-color: var(--border);
+    border-radius: 2px;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover .drag-indicator {
+    opacity: 0.8;
+  }
+}
+
 .walk-form {
   width: 100%;
-  padding: 2rem;
-  background: var(--surface);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
+  max-width: 100%;
+  padding: 1.5rem;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
   border: none;
 
   .form-group {
