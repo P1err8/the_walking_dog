@@ -1,0 +1,17 @@
+<turbo-frame id="statsmodal">
+  <div class="modal-overlay" onclick="const f=document.getElementById('statsmodal'); f.removeAttribute('src'); f.innerHTML=''">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="const f=document.getElementById('statsmodal'); f.removeAttribute('src'); f.innerHTML=''">&times;</button>
+      <ul>Mes activités</ul>
+      <% @participations.each do |participation| %>
+        <li><%= participation.meet_up.point.name %></li>
+      <% end %>
+      <br>
+      <% @walkings.each do |walking| %>
+        <li><%= walking.created_at %></li>
+        <li><%= walking.distance %></li>
+        <li><%= walking.duration %></li>
+      <% end %>
+    </div>
+  </div>
+</turbo-frame>
