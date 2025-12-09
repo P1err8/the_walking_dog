@@ -5,13 +5,27 @@ export default class extends Controller {
   static targets = [ "hiddenInput", "queryInput", "list" ]
 
   connect() {
-    console.log("coufocuc");
+    // Fermer la liste quand on clique ailleurs
+    this.handleClickOutside = this.handleClickOutside.bind(this)
+    document.addEventListener("click", this.handleClickOutside)
+  }
+
+  disconnect() {
+    document.removeEventListener("click", this.handleClickOutside)
+  }
+
+  handleClickOutside(event) {
+    if (!this.element.contains(event.target)) {
+      this.hideList()
+    }
   }
 
   filter(event) {
-    console.log("apeourbveiz");
-
     const query = event.currentTarget.value.toLowerCase();
+
+    // Afficher la liste dès qu'on tape
+    this.showList()
+
     this.listTarget.querySelectorAll("a").forEach((element) => {
       const breed = element.dataset.breed.toLowerCase();
       if (breed.includes(query)) {

@@ -1,7 +1,6 @@
 <div class="walking-form-card"
      data-controller="generate-circuit draggable-panel"
-     data-generate-circuit-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>"
-     style="position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; background: white !important; z-index: 950 !important; padding: 2.5rem 1.5rem 1.5rem !important; border-radius: 20px 20px 0 0 !important; box-shadow: 0 -4px 20px rgba(0,0,0,0.2) !important; overflow-y: auto !important; display: block !important;">
+     data-generate-circuit-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>">
 
     <!-- Drag Handle -->
     <div class="drag-handle"
@@ -16,8 +15,7 @@
     <%= form_with model: @walking, local: true, class: "walk-form", data: { turbo: false } do |f| %>
       <div class="form-group"
            data-controller="address-autocomplete"
-           data-address-autocomplete-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>"
-           style="position: relative;">
+           data-address-autocomplete-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>">
         <%= f.label :address, "Point de départ" %>
         <div class="autocomplete-wrapper">
           <%= f.text_field :address,
@@ -32,8 +30,7 @@
           <%= hidden_field_tag :coordinates, params[:coordinates], data: { generate_circuit_target: "circuitCoordinates" } %>
         </div>
         <div class="autocomplete-results"
-             data-address-autocomplete-target="results"
-             style="position: absolute; z-index: 1000; width: 100%; border: 1px solid #ddd; border-radius: 4px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+             data-address-autocomplete-target="results">
         </div>
       </div>
 

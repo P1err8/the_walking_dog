@@ -1,35 +1,43 @@
-<div class="container">
+<div class="dog-new-container">
+  <div class="dog-new-card">
+    <%= simple_form_for @dog, html: { multipart: true } do |f| %>
 
-  <%#= simple_form_for @dog do |f| %>
-  <%= simple_form_for @dog, html: { multipart: true } do |f| %>
-    <div class="profile-header">
-      <div class="profile-photo-field">
-        <%= f.label :photo, class: "avatar-label" do %>
-+          <img id="profile-preview" class="profile-preview-img" src="" alt="">
-+          <%= f.file_field :photo, accept: "image/*", class: "avatar-input" %>
-+          <span class="avatar-add-icon" aria-hidden="true">+</span>
-+        <% end %>
-        <%#= f.file_field :photo, accept: "image/*" %>
-        <%# <img id="profile-preview" class="profile-preview-img" src="" alt=""> %>
+      <div class="dog-profile-header">
+        <div class="dog-photo-field">
+          <%= f.label :photo, class: "avatar-label" do %>
+            <div class="profile-upload-placeholder">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span>Photo</span>
+            </div>
+            <img id="profile-preview" class="profile-preview-img" src="" alt="">
+            <%= f.file_field :photo, accept: "image/*", class: "avatar-input" %>
+            <span class="avatar-add-icon" aria-hidden="true">+</span>
+          <% end %>
+        </div>
       </div>
-    </div>
 
-    <div class="form-fields">
-      <div class="form-row">
-        <div class="field">
+      <div class="dog-form-fields">
+        <div class="dog-field">
           <%= f.input :name, label: "Nom du chien", placeholder: "ex: Buddy" %>
         </div>
-        <div class="field">
-          <%= f.input :age, label: "Âge du chien (ans)", placeholder: "ex:3" %>
+
+        <div class="dog-field">
+          <%= f.input :age, label: "Âge (en années)", placeholder: "ex: 3" %>
         </div>
 
-        <div class="field">
-          <%= f.label "Race du chien" %>
-          <div data-controller="breed-list" >
-            <input type="hidden" name="dog[race]" id="dog_breed" data-breed-list-target="hiddenInput" />
-            <div>
-              <input type="text" data-action="input->breed-list#filter focus->breed-list#showList" data-breed-list-target="queryInput" id="breed-input" placeholder="Race du chien" autocomplete="off" />
-            </div>
+        <div class="dog-field">
+          <label>Race du chien</label>
+          <div data-controller="breed-list" style="position: relative;">
+            <input type="hidden" name="dog[race]" id="dog_breed" data-breed-list-target="hiddenInput">
+            <input type="text"
+                   data-action="input->breed-list#filter focus->breed-list#showList"
+                   data-breed-list-target="queryInput"
+                   id="breed-input"
+                   placeholder="Rechercher une race..."
+                   autocomplete="off">
             <div class="breed-list d-none" data-breed-list-target="list">
               <% Dog::BREEDS.each do |breed| %>
                 <a class="breed-suggestion" data-action="click->breed-list#select" data-breed="<%= breed %>"><%= breed %></a>
@@ -38,35 +46,35 @@
           </div>
         </div>
       </div>
-    </div>
 
-
-    <div class="dog-size">
-      <h2>Taille</h2>
-      <div class="size-options" role="radiogroup" aria-label="Taille du chien">
-        <%= f.collection_radio_buttons :size, [["Petit","Petit"], ["Moyen","Moyen"], ["Grand","Grand"]], :last, :first do |b| %>
-          <label class="size-option">
-            <%#= b.radio_button(class: "d-none") %>
-            <%= b.radio_button(class: "size-radio") %>
-            <span><%= b.text %></span>
-          </label>
-        <% end %>
-      </div>
-    </div>
-
-
-    <div class="dog-tags">
-      <h2>Personnalité</h2>
-      <div class="tag-options" aria-label="Personnalité du chien">
-        <%= f.collection_check_boxes :tag_ids, Tag.all, :id, :name do |b|  %>
-          <%= b.check_box(class: "d-none") %>
-          <%= b.label(class: "tag-option") do %>
-            <span><%= b.object.name %></span>
+      <div class="dog-size">
+        <h2>Taille</h2>
+        <div class="size-options" role="radiogroup" aria-label="Taille du chien">
+          <%= f.collection_radio_buttons :size, [["Petit", "Petit"], ["Moyen", "Moyen"], ["Grand", "Grand"]], :last, :first do |b| %>
+            <label class="size-option">
+              <%= b.radio_button(class: "size-radio") %>
+              <span><%= b.text %></span>
+            </label>
           <% end %>
-        <% end %>
+        </div>
       </div>
-    </div>
 
-  <%= f.submit "Valider", class: "btn-primary" %>
-  <% end %>
+      <div class="dog-tags">
+        <h2>Personnalité</h2>
+        <div class="tag-options" aria-label="Personnalité du chien">
+          <%= f.collection_check_boxes :tag_ids, Tag.all, :id, :name do |b| %>
+            <%= b.check_box(class: "d-none") %>
+            <%= b.label(class: "tag-option") do %>
+              <span><%= b.object.name %></span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="dog-submit">
+        <%= f.submit "Valider", class: "btn-primary" %>
+      </div>
+
+    <% end %>
+  </div>
 </div>

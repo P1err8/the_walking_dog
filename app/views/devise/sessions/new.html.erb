@@ -1,20 +1,48 @@
-<h2>Log in</h2>
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2.823.47-4.113 6.006-4 7 .08.703 1.725 1.722 3.656 1 1.261-.472 1.96-1.45 2.344-2.5M14.267 5.172c0-1.39 1.577-2.493 3.5-2.172 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.855-1.45-2.239-2.5M8 14v.5M16 14v.5M11.25 16.25h1.5L12 17l-.75-.75z"/>
+          <path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444a11.702 11.702 0 0 0-.493-3.309"/>
+        </svg>
+      </div>
+      <h1 class="auth-title">Bon retour !</h1>
+      <p class="auth-subtitle">Connectez-vous pour retrouver vos balades</p>
+    </div>
 
-<%= simple_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div class="form-inputs">
-    <%= f.input :email,
-                required: false,
-                autofocus: true,
-                input_html: { autocomplete: "email" } %>
-    <%= f.input :password,
-                required: false,
-                input_html: { autocomplete: "current-password" } %>
-    <%= f.input :remember_me, as: :boolean if devise_mapping.rememberable? %>
+    <%= simple_form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "auth-form" }) do |f| %>
+      <div class="form-group">
+        <%= f.input :email,
+                    required: false,
+                    autofocus: true,
+                    label: "Email",
+                    placeholder: "votre@email.com",
+                    input_html: { autocomplete: "email" } %>
+      </div>
+
+      <div class="form-group">
+        <%= f.input :password,
+                    required: false,
+                    label: "Mot de passe",
+                    placeholder: "Votre mot de passe",
+                    input_html: { autocomplete: "current-password" } %>
+      </div>
+
+      <% if devise_mapping.rememberable? %>
+        <%= f.input :remember_me, as: :boolean, label: "Se souvenir de moi" %>
+      <% end %>
+
+      <%= f.button :submit, "Se connecter", class: "auth-submit" %>
+    <% end %>
+
+    <div class="auth-links">
+      <%= link_to "Pas encore de compte ? S'inscrire", new_registration_path(resource_name) %>
+
+      <% if devise_mapping.recoverable? %>
+        <span class="auth-link-separator">ou</span>
+        <%= link_to "Mot de passe oubli\u00e9 ?", new_password_path(resource_name) %>
+      <% end %>
+    </div>
   </div>
-
-  <div class="form-actions">
-    <%= f.button :submit, "Log in" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>
