@@ -3,18 +3,32 @@ class PagesController < ApplicationController
   skip_before_action :authenticate_user!, only: [:isochrone]
 
   def home
-    @meetups = MeetUp.all
+    @meetups = MeetUp.all.includes(:point)
 
     @markers = @meetups.map do |meetup|
-      latitude = Point.find(meetup.point_id).latitude
-      longitude = Point.find(meetup.point_id).longitude
+      point = meetup.point
       {
-        lat: latitude,
-        lng: longitude,
-        # Optionnel : info window
-        #info_window_html: render_to_string(partial: "info_window", locals: { meetup: meetup }),
-        # Optionnel : image custom
-        #marker_html: render_to_string(partial: "marker", locals: { meetup: meetup })
+        lat: point.latitude,
+        lng: point.longitude,
+        marker_name: point.name,
+        meetup_id: meetup.id,
+        info_window_html: render_to_string(
+          partial: "shared/bulle_meetup",
+          locals: {
+            name: point.name,
+            type: "Point de rencontre",
+            location: "Lyon, France",
+            rating: "4.8",
+            reviews_count: "12",
+            distance: "Calcul...",
+            duration: "Calcul...",
+            price: "Gratuit",
+            nights: "",
+            dates: "",
+            marker_id: "#{point.latitude}-#{point.longitude}",
+            image_url: point.url_picture
+          }
+        )
       }
     end
   end

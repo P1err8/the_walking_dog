@@ -1,0 +1,240 @@
+<div class="sg-page">
+  <header class="sg-header">
+    <h1>Monitoring des Rencontres</h1>
+    <p>Surveillance en temps réel du système de rencontre</p>
+  </header>
+
+  <!-- Actions rapides -->
+  <section class="sg-section">
+    <h2>Actions</h2>
+    <div class="sg-button-row">
+      <button class="btn btn-primary" onclick="detectMeetings()">
+        Lancer Détection
+      </button>
+      <button class="btn btn-secondary" onclick="refreshData()">
+        Rafraîchir
+      </button>
+      <button class="btn btn-outline" onclick="runTestScript()">
+        Lancer Test
+      </button>
+    </div>
+  </section>
+
+  <!-- Statistiques -->
+  <section class="sg-section">
+    <h2>Statistiques</h2>
+    <div class="monitor-stats">
+      <div class="monitor-stat-item">
+        <span class="monitor-stat-value"><%= UserPosition.active.count %></span>
+        <span class="monitor-stat-label">Positions actives</span>
+      </div>
+      <div class="monitor-stat-item">
+        <span class="monitor-stat-value"><%= UserPosition.for_public_walkings.count %></span>
+        <span class="monitor-stat-label">Balades publiques</span>
+      </div>
+      <div class="monitor-stat-item">
+        <span class="monitor-stat-value"><%= WalkingMeeting.proposed.count %></span>
+        <span class="monitor-stat-label">En attente</span>
+      </div>
+      <div class="monitor-stat-item">
+        <span class="monitor-stat-value"><%= WalkingMeeting.in_progress.count %></span>
+        <span class="monitor-stat-label">En cours</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Positions GPS actives -->
+  <section class="sg-section">
+    <h2>Positions GPS Actives (<%= @active_positions.count %>)</h2>
+    <% if @active_positions.any? %>
+      <div class="monitor-list">
+        <% @active_positions.each do |pos| %>
+          <div class="monitor-card <%= pos.available_for_meeting? ? 'monitor-card--available' : '' %>">
+            <div class="monitor-card-header">
+              <strong><%= pos.user.email %></strong>
+              <% if pos.walking.sociable %>
+                <span class="monitor-badge monitor-badge--success">Public</span>
+              <% else %>
+                <span class="monitor-badge">Privé</span>
+              <% end %>
+            </div>
+            <div class="monitor-card-body">
+              <p class="body-small text-muted">
+                Walking #<%= pos.walking_id %> |
+                Position: <%= pos.latitude.round(4) %>, <%= pos.longitude.round(4) %> |
+                Mise à jour: <%= time_ago_in_words(pos.last_update_at) %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-muted">Aucune position active</p>
+    <% end %>
+  </section>
+
+  <!-- Rencontres -->
+  <section class="sg-section">
+    <h2>Rencontres (<%= @meetings.count %>)</h2>
+    <% if @meetings.any? %>
+      <div class="monitor-list">
+        <% @meetings.each do |meeting| %>
+          <div class="monitor-card">
+            <div class="monitor-card-header">
+              <strong><%= meeting.user_a.email %></strong>
+              <span class="text-muted">↔</span>
+              <strong><%= meeting.user_b.email %></strong>
+              <span class="monitor-badge monitor-badge--<%= status_color(meeting.status) %>">
+                <%= meeting.status.upcase %>
+              </span>
+            </div>
+            <div class="monitor-card-body">
+              <p class="body-small text-muted">
+                Match ID: <%= meeting.match_id.first(8) %>... |
+                Distance: <%= meeting.initial_distance_meters&.round(1) %>m |
+                <%= time_ago_in_words(meeting.created_at) %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-muted">Aucune rencontre</p>
+    <% end %>
+  </section>
+
+  <!-- Résultats de détection -->
+  <section class="sg-section" id="detection-results" style="display:none;">
+    <h2>Résultats de la détection</h2>
+    <div class="code-block">
+      <pre id="detection-output"></pre>
+    </div>
+  </section>
+</div>
+
+<style>
+  .monitor-stats {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .monitor-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: var(--beige-clair, #E8DDD3);
+    border-radius: 8px;
+  }
+
+  .monitor-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent, #1E3A5F);
+  }
+
+  .monitor-stat-label {
+    font-size: 0.875rem;
+    color: var(--text-muted, #64748B);
+  }
+
+  .monitor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .monitor-card {
+    padding: 1rem;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+  }
+
+  .monitor-card--available {
+    border-left: 4px solid var(--primary, #A3B5D9);
+    background: #f8fafc;
+  }
+
+  .monitor-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .monitor-card-body {
+    margin: 0;
+  }
+
+  .monitor-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 4px;
+    background: var(--taupe, #8B8377);
+    color: #fff;
+  }
+
+  .monitor-badge--success {
+    background: #22c55e;
+  }
+
+  .monitor-badge--warning {
+    background: #f59e0b;
+  }
+
+  .monitor-badge--info {
+    background: var(--primary, #A3B5D9);
+  }
+
+  .monitor-badge--primary {
+    background: var(--accent, #1E3A5F);
+  }
+
+  .monitor-badge--danger {
+    background: var(--danger, #DC2626);
+  }
+</style>
+
+<script>
+function detectMeetings() {
+  document.getElementById('detection-results').style.display = 'block';
+  document.getElementById('detection-output').textContent = 'Détection en cours...';
+
+  fetch('/meetings/monitor/detect', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    document.getElementById('detection-output').textContent = JSON.stringify(data, null, 2);
+    if (data.detected_count > 0) {
+      alert('Rencontre(s) détectée(s): ' + data.detected_count);
+      setTimeout(() => location.reload(), 1000);
+    } else {
+      alert('Aucune rencontre détectée');
+    }
+  })
+  .catch(error => {
+    document.getElementById('detection-output').textContent = 'Erreur: ' + error;
+  });
+}
+
+function refreshData() {
+  location.reload();
+}
+
+function runTestScript() {
+  alert('Lancez dans le terminal:\nrails runner test_meeting_clean.rb\n\nPuis rafraîchissez cette page.');
+}
+
+// Auto-refresh toutes les 10 secondes
+setInterval(refreshData, 10000);
+</script>

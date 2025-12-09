@@ -17,6 +17,7 @@
   </head>
   <body>
     <%= yield %>
+    <turbo-frame id="modal"></turbo-frame>
     <%= render "layouts/navbar" unless devise_controller? %>
     <turbo-frame id="statsmodal"></turbo-frame>
   </body>

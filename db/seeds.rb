@@ -117,6 +117,25 @@ user["features"].each do |point|
 )
 end
 
+point = Point.find_by(name: "Square de Thou")
+point.update(url_picture: "rue-de-thou.jpg")
+p point
+point = Point.find_by(name: "Place Maréchal Lyautey")
+point.update(url_picture: "21188192.jpg")
+p point
+point = Point.find_by(name: "Jardin du palais Saint Pierre")
+point.update(url_picture: "jardins-2-1600x1067.jpeg")
+p point
+point = Point.find_by(name: "Parc de la Tête d'Or")
+point.update(url_picture: "Parc_de_la_Tête_d'Or_Vue_sur_le_lac7.jpg")
+p point
+
+
+
+
+
+
+
 puts "Created #{Point.count} meet-up points."
 
 
