@@ -57,11 +57,11 @@ export default class extends Controller {
       }
       if (this.coordinatesValue && this.coordinatesValue.length > 0) {
         this.addRoute()
-        this.fitMapToRoute()
+        // this.fitMapToRoute()
       }
       if (this.hasMarkersValue && this.markersValue.length > 0) {
         this.addClustersToMap()
-        this.fitMapToMarkers()
+        // this.fitMapToMarkers()
       }
     })
 
