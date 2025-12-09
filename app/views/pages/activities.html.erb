@@ -1,17 +1,44 @@
-<turbo-frame id="statsmodal">
-  <div class="modal-overlay" onclick="const f=document.getElementById('statsmodal'); f.removeAttribute('src'); f.innerHTML=''">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <button class="close-btn" onclick="const f=document.getElementById('statsmodal'); f.removeAttribute('src'); f.innerHTML=''">&times;</button>
-      <ul>Mes activités</ul>
-      <% @participations.each do |participation| %>
-        <li><%= participation.meet_up.point.name %></li>
+<div class="activities-container">
+<div class="activities-list">
+    <% @walkings.order(created_at: :desc).each do |walking| %>
+      <% if walking.coordinates.present? %>
+        <div class="activity-card">
+          <!-- Header: User & Date -->
+          <div class="activity-header">
+            <div class="user-avatar">
+              <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
+                <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
+              <% else %>
+                <img src="https://i.pravatar.cc/150?img=12" class="avatar-img">
+              <% end %>
+            </div>
+            <div class="user-info">
+              <strong><%= current_user.email.split('@').first.capitalize %></strong>
+              <span class="date"><%= walking.created_at.strftime("%d %b à %H:%M") %></span>
+            </div>
+          </div>
+          <!-- Title -->
+          <h3>Promenade</h3>
+          <!-- Stats Grid -->
+          <div class="activity-stats">
+            <div class="stat">
+              <span class="label">Distance</span>
+              <span class="value"><%= walking.distance ? walking.distance.round(2) : (walking.coordinates.length / 100.0).round(2) %> km</span>
+            </div>
+            <div class="stat">
+              <span class="label">Durée</span>
+              <span class="value"><%= walking.duration ? "#{walking.duration.to_i} min" : "#{walking.wanted_duration} min" %></span>
+            </div>
+          </div>
+          <!-- The Static Map -->
+          <div class="activity-map">
+            <%= image_tag static_map_url(walking), alt: "Itinéraire de la balade", class: "static-map-img" %>
+          </div>
+        </div>
       <% end %>
-      <br>
-      <% @walkings.each do |walking| %>
-        <li><%= walking.created_at %></li>
-        <li><%= walking.distance %></li>
-        <li><%= walking.duration %></li>
-      <% end %>
-    </div>
+    <% end %>
+    <% if @walkings.empty? %>
+      <p class="no-activities">Aucune activité enregistrée pour le moment.</p>
+    <% end %>
   </div>
-</turbo-frame>
+</div>
