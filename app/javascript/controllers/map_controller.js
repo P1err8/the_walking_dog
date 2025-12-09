@@ -59,31 +59,134 @@ export default class extends Controller {
         this.addRoute()
         this.fitMapToRoute()
       }
+      if (this.hasMarkersValue && this.markersValue.length > 0) {
+        this.addClustersToMap()
+        this.fitMapToMarkers()
+      }
     })
 
-     this.map.on("load", () => {
-      this.addMarkersToMap() // Appel de la fonction
-      this.fitMapToMarkers() // Optionnel : centrer sur les points
-    })
+    //  this.map.on("load", () => {
+    //   this.addMarkersToMap() // Appel de la fonction
+    //   this.fitMapToMarkers() // Optionnel : centrer sur les points
+    // })
 
   }
 
-  addMarkersToMap() {
-    if (!this.hasMarkersValue) return
-
-    this.markersValue.forEach((marker) => {
-      // Créer un élément HTML custom si tu as passé marker_html, sinon marker par défaut
-      const popup = new mapboxgl.Popup().setHTML(marker.info_window_html)
-
-      // Si tu as un partial custom pour le marker (marker_html)
-      const customMarker = document.createElement("div")
-      customMarker.innerHTML = marker.marker_html
-
-      new mapboxgl.Marker(marker.marker_html ? customMarker : undefined)
-        .setLngLat([marker.lng, marker.lat])
-        .setPopup(popup)
-        .addTo(this.map)
+  addClustersToMap() {
+    // 1. Conversion de l'Array Rails en GeoJSON valide pour Mapbox
+    const features = this.markersValue.map(marker => {
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [marker.lng, marker.lat]
+        },
+        properties: {
+          // On passe le HTML de la popup dans les propriétés
+          info_window: marker.info_window_html
+        }
+      }
     })
+
+    const geojsonData = {
+      type: 'FeatureCollection',
+      features: features
+    }
+
+    // 2. Ajout de la source avec clustering activé
+    this.map.addSource('meetups', {
+      type: 'geojson',
+      data: geojsonData,
+      cluster: true,
+      clusterMaxZoom: 14, // Zoom au-delà duquel les points ne sont plus groupés
+      clusterRadius: 50   // Rayon du cluster
+    });
+
+    // 3. Layer : Les cercles de clusters (couleur selon densité)
+    this.map.addLayer({
+      id: 'clusters',
+      type: 'circle',
+      source: 'meetups',
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': [
+          'step', ['get', 'point_count'],
+          '#c8b59a', 10,  // Bleu si < 10
+          '#deaf6e', 50,  // Jaune si < 50
+          '#e5c99e'       // Rose si > 50
+        ],
+        'circle-radius': [
+          'step', ['get', 'point_count'],
+          20, 10, // Rayon 20px -> 30px -> 40px
+          30, 50,
+          40
+        ]
+      }
+    });
+
+    // 4. Layer : Le chiffre dans le cluster
+    this.map.addLayer({
+      id: 'cluster-count',
+      type: 'symbol',
+      source: 'meetups',
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+        'text-size': 12
+      }
+    });
+
+    // 5. Layer : Les points individuels (non clusterisés)
+    this.map.addLayer({
+      id: 'unclustered-point',
+      type: 'circle',
+      source: 'meetups',
+      filter: ['!', ['has', 'point_count']],
+      paint: {
+        'circle-color': '#f5840d',
+        'circle-radius': 8,
+        'circle-stroke-width': 1,
+        'circle-stroke-color': '#fff'
+      }
+    });
+
+    // --- Événements ---
+
+    // Clic sur un cluster -> Zoom dessus
+    this.map.on('click', 'clusters', (e) => {
+      const features = this.map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+      const clusterId = features[0].properties.cluster_id;
+      this.map.getSource('meetups').getClusterExpansionZoom(clusterId, (err, zoom) => {
+        if (err) return;
+        this.map.easeTo({
+          center: features[0].geometry.coordinates,
+          zoom: zoom
+        });
+      });
+    });
+
+    // Clic sur un point individuel -> Popup
+    this.map.on('click', 'unclustered-point', (e) => {
+      const coordinates = e.features[0].geometry.coordinates.slice();
+      const infoWindow = e.features[0].properties.info_window;
+
+      // Correction pour les mondes répétés à bas niveau de zoom
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+      new mapboxgl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(infoWindow)
+        .addTo(this.map);
+    });
+
+    // Changement de curseur (main) au survol
+    this.map.on('mouseenter', 'clusters', () => { this.map.getCanvas().style.cursor = 'pointer'; });
+    this.map.on('mouseleave', 'clusters', () => { this.map.getCanvas().style.cursor = ''; });
+    this.map.on('mouseenter', 'unclustered-point', () => { this.map.getCanvas().style.cursor = 'pointer'; });
+    this.map.on('mouseleave', 'unclustered-point', () => { this.map.getCanvas().style.cursor = ''; });
   }
 
   fitMapToMarkers() {
