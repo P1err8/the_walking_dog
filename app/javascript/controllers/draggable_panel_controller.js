@@ -7,34 +7,102 @@ export default class extends Controller {
     this.isDragging = false
     this.startY = 0
     this.startHeight = 0
-    // === AVANT ===
-    // this.minHeight = 150 // Hauteur minimale (juste le titre visible)
-    // this.maxHeight = window.innerHeight * 0.85 // 85% de la hauteur de l'écran
-    // this.defaultHeight = window.innerHeight * 0.65 // 65% par défaut
-    // === APRÈS ===
     this.minHeight = 150 // Hauteur minimale (juste le titre visible)
-    this.maxHeight = window.innerHeight * 0.60 // 60% de la hauteur de l'écran (avant: 85%)
-    this.defaultHeight = window.innerHeight * 0.40 // 40% par défaut (avant: 65%)
+    this.maxHeight = window.innerHeight * 0.70 // 70% de la hauteur de l'écran
+    this.defaultHeight = window.innerHeight * 0.52 // 52% par défaut
 
     // Pour la détection de swipe rapide
     this.dragStartTime = 0
     this.dragStartHeight = 0
 
+    // Pour la détection du scroll (hide/show)
+    this.lastScrollY = window.scrollY
+    this.isHidden = false
+    this.scrollThreshold = 10 // Seuil minimum de scroll pour déclencher
+
     // Définir la hauteur initiale
     this.element.style.height = `${this.defaultHeight}px`
 
-    // === AVANT ===
-    // // Assurer que le scroll fonctionne
-    // this.element.style.overflowY = 'auto'
-    // this.element.style.overflowX = 'hidden'
-    // === APRÈS ===
     // Désactiver le scroll dans le panel
     this.element.style.overflow = 'hidden'
+
+    // Ajouter la transition pour le hide/show au scroll
+    this.element.style.transition = 'transform 0.3s ease, opacity 0.3s ease, height 0.3s ease'
 
     // Créer la poignée de drag si elle n'existe pas
     if (!this.hasHandleTarget) {
       this.createHandle()
     }
+
+    // Écouter les événements de scroll
+    this.handleScroll = this.handleScroll.bind(this)
+    window.addEventListener('scroll', this.handleScroll, { passive: true })
+
+    // Écouter aussi le touch sur la map (pour mobile)
+    this.handleTouchMove = this.handleTouchMove.bind(this)
+    document.addEventListener('touchmove', this.handleTouchMove, { passive: true })
+  }
+
+  disconnect() {
+    window.removeEventListener('scroll', this.handleScroll)
+    document.removeEventListener('touchmove', this.handleTouchMove)
+  }
+
+  handleScroll() {
+    if (this.isDragging) return
+
+    const currentScrollY = window.scrollY
+    const deltaY = currentScrollY - this.lastScrollY
+
+    if (Math.abs(deltaY) > this.scrollThreshold) {
+      if (deltaY > 0 && !this.isHidden) {
+        // Scroll vers le bas → cacher la modal
+        this.hidePanel()
+      } else if (deltaY < 0 && this.isHidden) {
+        // Scroll vers le haut → montrer la modal
+        this.showPanel()
+      }
+      this.lastScrollY = currentScrollY
+    }
+  }
+
+  handleTouchMove(event) {
+    if (this.isDragging) return
+
+    // Ignorer si le touch est sur le panel lui-même
+    if (this.element.contains(event.target)) return
+
+    // Détecter le mouvement vertical sur la map
+    if (!this.touchStartY) {
+      this.touchStartY = event.touches[0].clientY
+      return
+    }
+
+    const currentY = event.touches[0].clientY
+    const deltaY = this.touchStartY - currentY
+
+    if (Math.abs(deltaY) > 30) {
+      if (deltaY > 0 && !this.isHidden) {
+        // Swipe vers le haut sur la map → cacher la modal
+        this.hidePanel()
+      } else if (deltaY < 0 && this.isHidden) {
+        // Swipe vers le bas sur la map → montrer la modal
+        this.showPanel()
+      }
+      this.touchStartY = currentY
+    }
+  }
+
+  hidePanel() {
+    this.isHidden = true
+    this.element.style.transform = 'translateY(calc(100% - 60px))'
+    this.element.style.opacity = '0.95'
+  }
+
+  showPanel() {
+    this.isHidden = false
+    this.element.style.transform = 'translateY(0)'
+    this.element.style.opacity = '1'
   }
 
   createHandle() {
@@ -46,6 +114,12 @@ export default class extends Controller {
   }
 
   startDrag(event) {
+    // Si le panel est caché, le montrer au clic
+    if (this.isHidden) {
+      this.showPanel()
+      return
+    }
+
     // Ne démarrer le drag que si on clique sur la poignée
     const isHandle = event.target.closest('.drag-handle')
     if (!isHandle) return
@@ -79,7 +153,7 @@ export default class extends Controller {
 
     this.isDragging = false
     document.body.style.userSelect = ''
-    this.element.style.transition = 'height 0.3s ease'
+    this.element.style.transition = 'transform 0.3s ease, opacity 0.3s ease, height 0.3s ease'
 
     // === APRÈS === Détecter le swipe rapide vers le bas pour fermer
     const dragDuration = Date.now() - this.dragStartTime

@@ -6,9 +6,16 @@
          data-map-api-key-value="<%= ENV.fetch('MAPBOX_API_KEY') %>">
     </div>
   </div>
-  <div class="button-container">
-    <%= button_to "SE BALADER", new_walking_path, method: :get, class: "walk-btn", data: { turbo_frame: "modal" } %>
-  </div>
 </div>
 
-<turbo-frame id="modal"></turbo-frame>
+<% if params[:open_modal] %>
+  <script>
+    // Ouvrir la modal
+    const modalFrame = document.querySelector('turbo-frame#modal');
+    if (modalFrame) {
+      modalFrame.src = '<%= new_walking_path %>';
+    }
+    // Nettoyer l'URL (enlever ?open_modal=true)
+    window.history.replaceState({}, '', '/');
+  </script>
+<% end %>

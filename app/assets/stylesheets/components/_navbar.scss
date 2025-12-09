@@ -10,7 +10,7 @@
   left: 0;
   right: 0;
   height: 60px;
-  z-index: 90;
+  z-index: 1000; // Au-dessus de la modal (950)
   background: rgba($surface, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -112,7 +112,7 @@
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 150;
+  z-index: 1001; // Au-dessus de la navbar (1000)
   width: 64px;
   height: 64px;
   border-radius: 50%;
