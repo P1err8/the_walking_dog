@@ -7,6 +7,10 @@ class Dog < ApplicationRecord
   BREEDS = [
     "Labrador",
     "Berger Allemand",
+    "Border Collie",
+    "Golden Retriever",
+    "Yorkshire",
+    "Teckel",
     "Bulldog",
     "Beagle",
     "Caniche",
