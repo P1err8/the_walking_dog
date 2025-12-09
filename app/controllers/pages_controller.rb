@@ -26,7 +26,8 @@ class PagesController < ApplicationController
             nights: "",
             dates: "",
             marker_id: "#{point.latitude}-#{point.longitude}",
-            image_url: point.url_picture
+            image_url: point.url_picture,
+            point_id: point.id
           }
         )
       }
