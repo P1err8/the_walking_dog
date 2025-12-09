@@ -42,6 +42,25 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_08_103019) do
     t.index ["point_id"], name: "index_meet_ups_on_point_id"
   end
 
+  create_table "meeting_routes", force: :cascade do |t|
+    t.bigint "walking_meeting_id", null: false
+    t.bigint "user_id", null: false
+    t.jsonb "segment_to_meeting"
+    t.float "segment_to_meeting_distance"
+    t.float "segment_to_meeting_duration"
+    t.jsonb "segment_from_meeting"
+    t.float "segment_from_meeting_distance"
+    t.float "segment_from_meeting_duration"
+    t.integer "resume_point_index"
+    t.decimal "resume_latitude", precision: 10, scale: 6
+    t.decimal "resume_longitude", precision: 10, scale: 6
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_meeting_routes_on_user_id"
+    t.index ["walking_meeting_id", "user_id"], name: "index_meeting_routes_on_walking_meeting_id_and_user_id", unique: true
+    t.index ["walking_meeting_id"], name: "index_meeting_routes_on_walking_meeting_id"
+  end
+
   create_table "participations", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "meet_up_id", null: false
@@ -66,6 +85,24 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_08_103019) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "user_positions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "walking_id", null: false
+    t.decimal "latitude", precision: 10, scale: 6, null: false
+    t.decimal "longitude", precision: 10, scale: 6, null: false
+    t.float "heading"
+    t.integer "route_progress_index"
+    t.float "route_progress_percent"
+    t.datetime "last_update_at", null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["last_update_at"], name: "index_user_positions_on_last_update_at"
+    t.index ["latitude", "longitude"], name: "index_user_positions_on_latitude_and_longitude"
+    t.index ["user_id"], name: "index_user_positions_on_user_id"
+    t.index ["walking_id"], name: "index_user_positions_on_walking_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -76,6 +113,31 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_08_103019) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
+  create_table "walking_meetings", force: :cascade do |t|
+    t.string "match_id", null: false
+    t.bigint "user_a_id", null: false
+    t.bigint "user_b_id", null: false
+    t.bigint "walking_a_id", null: false
+    t.bigint "walking_b_id", null: false
+    t.decimal "meeting_latitude", precision: 10, scale: 6
+    t.decimal "meeting_longitude", precision: 10, scale: 6
+    t.string "meeting_poi_name"
+    t.integer "status", default: 0, null: false
+    t.float "initial_distance_meters"
+    t.datetime "proposed_at"
+    t.datetime "accepted_at"
+    t.datetime "meeting_started_at"
+    t.datetime "meeting_ended_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["match_id"], name: "index_walking_meetings_on_match_id", unique: true
+    t.index ["status", "created_at"], name: "index_walking_meetings_on_status_and_created_at"
+    t.index ["user_a_id"], name: "index_walking_meetings_on_user_a_id"
+    t.index ["user_b_id"], name: "index_walking_meetings_on_user_b_id"
+    t.index ["walking_a_id"], name: "index_walking_meetings_on_walking_a_id"
+    t.index ["walking_b_id"], name: "index_walking_meetings_on_walking_b_id"
   end
 
   create_table "walkings", force: :cascade do |t|
@@ -92,7 +154,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_08_103019) do
   add_foreign_key "dogs_tags", "dogs"
   add_foreign_key "dogs_tags", "tags"
   add_foreign_key "meet_ups", "points"
+  add_foreign_key "meeting_routes", "users"
+  add_foreign_key "meeting_routes", "walking_meetings"
   add_foreign_key "participations", "meet_ups"
   add_foreign_key "participations", "users"
+  add_foreign_key "user_positions", "users"
+  add_foreign_key "user_positions", "walkings"
+  add_foreign_key "walking_meetings", "users", column: "user_a_id"
+  add_foreign_key "walking_meetings", "users", column: "user_b_id"
+  add_foreign_key "walking_meetings", "walkings", column: "walking_a_id"
+  add_foreign_key "walking_meetings", "walkings", column: "walking_b_id"
   add_foreign_key "walkings", "users"
 end
