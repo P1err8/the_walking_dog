@@ -1,4 +1,4 @@
-<nav class="navbar">
+<nav class="navbar" data-controller="active-walking">
   <%# Réglages %>
   <%= link_to edit_user_registration_path, class: "nav-link #{'active' if current_page?(edit_user_registration_path)}" do %>
     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -22,11 +22,11 @@
   <div class="nav-spacer"></div>
 
   <%# Carte / Accueil %>
-  <%= link_to root_path, class: "nav-link #{'active' if current_page?(root_path)}", data: { turbo: false } do %>
+  <%= link_to root_path, class: "nav-link #{'active' if current_page?(root_path)}", data: { turbo: false, action: "click->active-walking#goToActiveWalking" } do %>
     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" stroke-width="2" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"/>
     </svg>
-    <span class="nav-label">Carte</span>
+    <span class="nav-label">Votre parcours</span>
   <% end %>
 
   <%# Profil avec avatar %>
@@ -52,30 +52,8 @@
   <% end %>
 </nav>
 
-<!--
-  ========================================
-  BOUTON FAB CENTRAL - "Se balader"
-  ========================================
-
-  Pour activer le lien vers "Se balader", deux options :
-
-  OPTION 1 - Lien simple :
-  link_to new_walking_path, class: "fab-button", title: "Nouvelle balade" do
-    +
-  end
-
-  OPTION 2 - Avec modal Turbo Frame (comme dans home.html.erb) :
-  button_to "+", new_walking_path, method: :get, class: "fab-button",
-    title: "Nouvelle balade", data: { turbo_frame: "modal" }
-
-  Note pour Option 2 : Le turbo-frame id="modal" doit être
-  présent dans le layout (application.html.erb) et non dans home.html.erb
-  pour que ça fonctionne depuis n'importe quelle page.
-
-  Voir home.html.erb pour l'implémentation actuelle avec Turbo Frame.
--->
 <% if current_page?(root_path) %>
-  <%= link_to "GO", new_walking_path, class: "fab-button", title: "Nouvelle balade", data: { turbo_frame: "modal" } %>
+  <%= link_to "GO", new_walking_path, class: "fab-button", title: "Nouvelle balade", data: { turbo_frame: "modal", action: "click->active-walking#checkBeforeNew" } %>
 <% else %>
-  <%= link_to "GO", root_path(open_modal: true), class: "fab-button", title: "Nouvelle balade" %>
+  <%= link_to "GO", root_path(open_modal: true), class: "fab-button", title: "Nouvelle balade", data: { action: "click->active-walking#checkBeforeNew" } %>
 <% end %>
