@@ -128,22 +128,22 @@ puts "#{point.name} updated"
 
 puts "Created #{Point.count} meet-up points."
 
-meetups = MeetUp.all
+# meetups = MeetUp.all
 
-user1participation = Participation.create!(
-  user: user1,
-  meet_up: meetups[0]
-)
+# user1participation = Participation.create!(
+#   user: user1,
+#   meet_up: meetups[0]
+# )
 
-user2participation = Participation.create!(
-  user: user2,
-  meet_up: meetups[1]
-)
+# user2participation = Participation.create!(
+#   user: user2,
+#   meet_up: meetups[1]
+# )
 
-user3participation = Participation.create!(
-  user: user3,
-  meet_up: meetups[2]
-)
+# user3participation = Participation.create!(
+#   user: user3,
+#   meet_up: meetups[2]
+# )
 
 puts "Meet-ups and participations have been created!"
 
