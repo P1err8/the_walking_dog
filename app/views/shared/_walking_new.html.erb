@@ -18,12 +18,20 @@
            data-address-autocomplete-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>">
         <%= f.label :address, "Point de départ" %>
         <div class="autocomplete-wrapper">
-          <%= f.text_field :address,
-              class: "form-input",
-              placeholder: "Entrez une adresse...",
-              data: { address_autocomplete_target: "address" },
-              autocomplete: "off"
-          %>
+          <div class="address-input-row">
+            <%= f.text_field :address,
+                class: "form-input",
+                placeholder: "Entrez une adresse...",
+                data: { address_autocomplete_target: "address" },
+                autocomplete: "off"
+            %>
+            <button type="button" class="geolocate-btn" data-action="click->address-autocomplete#geolocate" title="Me géolocaliser">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+              </svg>
+            </button>
+          </div>
           <%= f.hidden_field :latitude, data: { address_autocomplete_target: "latitude", generate_circuit_target: "latitude" } %>
           <%= f.hidden_field :longitude, data: { address_autocomplete_target: "longitude", generate_circuit_target: "longitude" } %>
           <%# Hidden field to store the generated  coordinates %>

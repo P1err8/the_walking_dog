@@ -66,4 +66,58 @@ export default class extends Controller {
     this.longitudeTarget.value = feature.center[0]
     this.resultsTarget.innerHTML = "" // Clear results
   }
+
+  geolocate(event) {
+    event.preventDefault()
+    const button = event.currentTarget
+    const originalHTML = button.innerHTML
+    button.innerHTML = '<span class="geolocate-spinner"></span>'
+    button.disabled = true
+
+    if (!navigator.geolocation) {
+      alert("La géolocalisation n'est pas supportée par votre navigateur")
+      button.innerHTML = originalHTML
+      button.disabled = false
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude
+        const lng = position.coords.longitude
+
+        // Reverse geocoding to get address
+        try {
+          const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${this.apiKeyValue}&types=address`
+          const response = await fetch(url)
+          const data = await response.json()
+
+          if (data.features && data.features.length > 0) {
+            this.addressTarget.value = data.features[0].place_name
+          } else {
+            this.addressTarget.value = "Ma position actuelle"
+          }
+
+          this.latitudeTarget.value = lat
+          this.longitudeTarget.value = lng
+          this.resultsTarget.innerHTML = ""
+        } catch (error) {
+          console.error("Error reverse geocoding:", error)
+          this.addressTarget.value = "Ma position actuelle"
+          this.latitudeTarget.value = lat
+          this.longitudeTarget.value = lng
+        }
+
+        button.innerHTML = originalHTML
+        button.disabled = false
+      },
+      (error) => {
+        console.error("Geolocation error:", error)
+        alert("Impossible d'obtenir votre position. Vérifiez les permissions.")
+        button.innerHTML = originalHTML
+        button.disabled = false
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }
 }
