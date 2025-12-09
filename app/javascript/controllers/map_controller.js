@@ -83,40 +83,13 @@ export default class extends Controller {
         },
         properties: {
           // On passe le HTML de la popup dans les propriétés
-          info_window: marker.info_window_html
+          info_window: marker.info_window_html,
+          lat: marker.lat,
+          lng: marker.lng
         }
       }
     })
 
-    this.markersValue.forEach((marker) => {
-      // Créer un popup avec la partielle HTML
-      const popup = new mapboxgl.Popup({
-        closeButton: false,
-        maxWidth: '300px'
-      }).setHTML(marker.info_window_html)
-
-      // Si tu as un partial custom pour le marker (marker_html)
-      const customMarker = document.createElement("div")
-      customMarker.innerHTML = marker.marker_html || ''
-
-      const mapMarker = new mapboxgl.Marker(marker.marker_html ? customMarker : undefined)
-        .setLngLat([marker.lng, marker.lat])
-        .setPopup(popup)
-        .addTo(this.map)
-
-      // Quand le popup s'ouvre, calculer la distance et attacher l'événement de fermeture
-      popup.on('open', () => {
-        this.calculateDistanceAndDuration(marker)
-
-        // Attacher l'événement click sur le bouton de fermeture
-        const closeButton = document.querySelector('.bulle-meetup__close')
-        if (closeButton) {
-          closeButton.addEventListener('click', () => {
-            popup.remove()
-          })
-        }
-      })
-    })
     const geojsonData = {
       type: 'FeatureCollection',
       features: features
@@ -199,6 +172,8 @@ export default class extends Controller {
     this.map.on('click', 'unclustered-point', (e) => {
       const coordinates = e.features[0].geometry.coordinates.slice();
       const infoWindow = e.features[0].properties.info_window;
+      const markerLat = e.features[0].properties.lat;
+      const markerLng = e.features[0].properties.lng;
 
       // Correction pour les mondes répétés à bas niveau de zoom
       while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
@@ -208,7 +183,10 @@ export default class extends Controller {
       new mapboxgl.Popup()
         .setLngLat(coordinates)
         .setHTML(infoWindow)
-        .addTo(this.map);
+        .addTo(this.map)
+        .on('open', () => {
+          this.calculateDistanceAndDuration({ lat: markerLat, lng: markerLng })
+        });
     });
 
     // Changement de curseur (main) au survol
