@@ -7,6 +7,7 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "mapbox-gl", to: "mapbox-gl.js" # @3.16.0
 pin "@turf/turf", to: "https://esm.sh/@turf/turf@7"
+pin "@rails/actioncable", to: "https://cdn.jsdelivr.net/npm/@rails/actioncable@7.1.3/app/assets/javascripts/actioncable.esm.js"
 
 
 # ==============================================================================
