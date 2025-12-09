@@ -21,7 +21,7 @@ export default class extends Controller {
       return
     }
 
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${this.apiKeyValue}&autocomplete=true&types=address`
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${this.apiKeyValue}&autocomplete=true&types=address&country=fr`
 
     try {
       const response = await fetch(url)
