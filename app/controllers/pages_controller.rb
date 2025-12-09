@@ -21,4 +21,9 @@ class PagesController < ApplicationController
 
   def isochrone
   end
+
+  def activities
+    @walkings = Walking.where(user_id: current_user.id)
+    @participations = Participation.where(user_id: current_user.id)
+  end
 end

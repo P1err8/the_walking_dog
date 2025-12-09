@@ -5,6 +5,8 @@ Rails.application.routes.draw do
 
   resources :dogs, only: %i[index show new create]
 
+  get "my_activities", to: "pages#activities", as: "my_activities"
+
   # ==============================================================================
   # STYLEGUIDE - Charte graphique (ajouté par Julien)
   # ==============================================================================
