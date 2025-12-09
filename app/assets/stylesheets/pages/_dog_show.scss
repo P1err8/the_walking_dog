@@ -1,51 +1,38 @@
-/* ========================================
-   DOG SHOW PAGE - Inspired by Styleguide
-   ======================================== */
-
-/* Variables (Copied from styleguide/base.css) */
-:root {
-  --primary: #A3B5D9;
-  --primary-hover: #8B9EC5;
-  --secondary: #C9B5A0;
-  --accent-taupe: #8B8377;
-  --accent-navy: #1E3A5F;
-  --danger: #DC2626;
-  --bg-page: #E8DDD3;
-  --surface: #FFFFFF;
-  --border: #C9B5A0;
-  --text-main: #1E3A5F;
-  --text-muted: #8B8377;
-  --radius: 20px;
-  --radius-pill: 999px;
-  --shadow: 0 4px 20px rgba(163, 181, 217, 0.2);
-  --shadow-lg: 0 10px 40px rgba(163, 181, 217, 0.3);
-}
+// ========================================
+// DOG SHOW PAGE - Profil du chien
+// Utilise les variables SCSS centralisées
+// ========================================
+@import "../config/variables";
 
 .dog-show-container {
   width: 100%;
-  height: 90vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  background-color: var(--bg-page);
+  padding: 1.5rem 1rem;
+  padding-bottom: 80px; // Espace pour la navbar
+  background-color: $bg-page;
 }
 
 .dog-card {
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
+  background: $surface;
+  border-radius: $radius;
+  padding: 2rem 1.5rem;
+  box-shadow: $shadow;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .dog-profile-header {
   display: flex;
   justify-content: center;
-  margin-bottom: 0;
   width: 100%;
 }
 
@@ -54,8 +41,8 @@
   height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid var(--primary);
-  box-shadow: 0 8px 25px rgba(163, 181, 217, 0.5);
+  border: 4px solid $primary;
+  box-shadow: 0 8px 25px rgba($primary, 0.5);
 }
 
 .dog-profile-image {
@@ -65,42 +52,68 @@
 }
 
 .dog-info-group {
-  width: 80%;
+  width: 100%;
 
   .dog-info-label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
     font-weight: 600;
-    color: var(--text-muted);
-    font-size: 0.9rem;
+    color: $taupe;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
 
   .dog-info-value {
-    font-size: 1.2rem;
+    font-family: $font-family;
+    font-size: 1.1rem;
     font-weight: 700;
-    color: var(--text-main);
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--bg-page);
+    color: $text-main;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba($secondary, 0.3);
   }
+
   .dog-tags-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 0.5rem;
     margin-top: 0.5rem;
     justify-content: center;
 
     .dog-tag {
       display: inline-flex;
-      padding: 0.5rem 1rem;
-      background: var(--primary);
-      color: white;
-      border-radius: 999px;
-      font-size: 0.9rem;
+      padding: 0.4rem 0.9rem;
+      background: $primary;
+      color: $white;
+      border-radius: $radius-pill;
+      font-size: 0.85rem;
       font-weight: 600;
-      box-shadow: 0 4px 12px rgba(163, 181, 217, 0.4);
+      box-shadow: 0 2px 8px rgba($primary, 0.3);
     }
   }
+}
 
+// Bouton de déconnexion
+.dog-logout {
+  width: 100%;
+  margin-top: 0.5rem;
+
+  .logout-btn {
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+    background: transparent;
+    color: $danger;
+    border: 2px solid $danger;
+    border-radius: $radius-pill;
+    font-family: $font-family;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:active {
+      background: $danger;
+      color: $white;
+    }
+  }
 }
