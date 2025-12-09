@@ -26,6 +26,31 @@ class DogsController < ApplicationController
     end
   end
 
+  def edit
+    @dog = current_user.dogs.find_by(id: params[:id])
+    redirect_to new_dog_path unless @dog
+  end
+
+  def update
+    @dog = current_user.dogs.find_by(id: params[:id])
+    return redirect_to new_dog_path unless @dog
+
+    # Supprimer les anciens tags
+    @dog.dogs_tags.destroy_all
+
+    if @dog.update(dog_params.except(:tag_ids))
+      # Ajouter les nouveaux tags
+      tag_ids = dog_params[:tag_ids]&.reject(&:blank?) || []
+      Tag.where(id: tag_ids).each do |tag|
+        DogsTag.create(dog: @dog, tag: tag)
+      end
+
+      redirect_to @dog, notice: "Profil mis à jour avec succès"
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def dog_params

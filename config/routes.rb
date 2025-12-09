@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   root to: "pages#home"
   resources :walkings, only: %i[index show new create]
 
-  resources :dogs, only: %i[index show new create]
+  resources :dogs, only: %i[index show new create edit update]
 
   # ==============================================================================
   # STYLEGUIDE - Charte graphique (ajouté par Julien)

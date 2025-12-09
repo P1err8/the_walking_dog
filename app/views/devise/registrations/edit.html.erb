@@ -1,35 +1,58 @@
-<h2>Edit <%= resource_name.to_s.humanize %></h2>
+<div class="settings-container">
+  <div class="settings-card">
+    <h1 class="settings-title">Parametres</h1>
 
-<%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
-  <%= f.error_notification %>
+    <%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "settings-form" }) do |f| %>
+      <%= f.error_notification message: "Erreur :" %>
 
-  <div class="form-inputs">
-    <%= f.input :email, required: true, autofocus: true %>
+      <div class="settings-section">
+        <span class="settings-label">Email</span>
+        <%= f.input :email, label: false, placeholder: "votre@email.com", wrapper: false, input_html: { class: "settings-input" } %>
+      </div>
 
-    <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-      <p>Currently waiting confirmation for: <%= resource.unconfirmed_email %></p>
+      <div class="settings-section">
+        <span class="settings-label">Mot de passe actuel</span>
+        <%= f.input :current_password, label: false, placeholder: "Requis pour sauvegarder", wrapper: false, input_html: { class: "settings-input", autocomplete: "current-password" } %>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-section settings-half">
+          <span class="settings-label">Nouveau mdp</span>
+          <%= f.input :password, label: false, placeholder: "Optionnel", wrapper: false, input_html: { class: "settings-input", autocomplete: "new-password" } %>
+        </div>
+        <div class="settings-section settings-half">
+          <span class="settings-label">Confirmer</span>
+          <%= f.input :password_confirmation, label: false, placeholder: "Confirmer", wrapper: false, input_html: { class: "settings-input", autocomplete: "new-password" } %>
+        </div>
+      </div>
+
+      <div class="settings-toggle">
+        <%= f.input :geolocation_enabled, as: :boolean, label: false, wrapper: false, input_html: { class: "settings-checkbox" } %>
+        <span class="settings-toggle-label">Geolocalisation activee</span>
+      </div>
+
+      <%= f.button :submit, "Enregistrer", class: "settings-save-btn" %>
     <% end %>
 
-    <%= f.input :password,
-                hint: "leave it blank if you don't want to change it",
-                required: false,
-                input_html: { autocomplete: "new-password" } %>
-    <%= f.input :password_confirmation,
-                required: false,
-                input_html: { autocomplete: "new-password" } %>
-    <%= f.input :current_password,
-                hint: "we need your current password to confirm your changes",
-                required: true,
-                input_html: { autocomplete: "current-password" } %>
+    <div class="settings-actions">
+      <% if current_user.dogs.any? %>
+        <%= link_to edit_dog_path(current_user.dogs.first), class: "settings-btn" do %>
+          Modifier profil chien
+        <% end %>
+      <% else %>
+        <%= link_to new_dog_path, class: "settings-btn" do %>
+          Ajouter mon chien
+        <% end %>
+      <% end %>
+
+      <%= link_to "Retour", root_path, class: "settings-btn-light" %>
+    </div>
+
+    <div class="settings-danger">
+      <%= button_to "Supprimer mon compte", registration_path(resource_name),
+          method: :delete,
+          data: { turbo_confirm: "Supprimer definitivement ?" },
+          class: "settings-delete-btn" %>
+    </div>
   </div>
-
-  <div class="form-actions">
-    <%= f.button :submit, "Update" %>
-  </div>
-<% end %>
-
-<h3>Cancel my account</h3>
-
-<div>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete %></div>
-
-<%= link_to "Back", :back %>
+</div>
