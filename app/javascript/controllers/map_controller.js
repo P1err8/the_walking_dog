@@ -169,7 +169,7 @@ export default class extends Controller {
     });
 
     // Clic sur un point individuel -> Popup
-    this.map.on('click', 'unclustered-point', (e) => {
+    this.map.on('click', 'unclustered-point', async (e) => {
       const coordinates = e.features[0].geometry.coordinates.slice();
       const infoWindow = e.features[0].properties.info_window;
       const markerLat = e.features[0].properties.lat;
@@ -180,13 +180,33 @@ export default class extends Controller {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
 
-      new mapboxgl.Popup()
-        .setLngLat(coordinates)
-        .setHTML(infoWindow)
-        .addTo(this.map)
-        .on('open', () => {
-          this.calculateDistanceAndDuration({ lat: markerLat, lng: markerLng })
-        });
+      // Centrer la carte pour que la popup soit au milieu de l'écran
+      // Calculer la hauteur de la popup (environ 350px) et la décaler vers le haut
+      const popupHeight = 350; // Hauteur estimée de la popup
+      const mapHeight = this.map.getContainer().offsetHeight;
+      const offsetY = -(popupHeight / 2); // Décalage pour centrer verticalement
+
+      // D'abord centrer la carte, puis afficher la popup une fois l'animation terminée
+      this.map.easeTo({
+        center: coordinates,
+        offset: [0, offsetY],
+        duration: 200
+      });
+
+      // Attendre que l'animation soit terminée avant d'afficher la popup
+      this.map.once('moveend', () => {
+        // Créer la popup avec le HTML de base
+        const popup = new mapboxgl.Popup({
+          offset: 25,
+          maxWidth: '300px'
+        })
+          .setLngLat(coordinates)
+          .setHTML(infoWindow)
+          .addTo(this.map);
+
+        // Calculer et mettre à jour la distance et la durée
+        this.updatePopupDistanceAndDuration(popup, [markerLng, markerLat]);
+      });
     });
 
     // Changement de curseur (main) au survol
@@ -196,45 +216,7 @@ export default class extends Controller {
     this.map.on('mouseleave', 'unclustered-point', () => { this.map.getCanvas().style.cursor = ''; });
   }
 
-  async calculateDistanceAndDuration(marker) {
-    // Vérifier si on a la position de l'utilisateur
-    if (!this.userLocation) {
-      const distanceDiv = document.getElementById(`distance-${marker.lat}-${marker.lng}`)
-      const durationDiv = document.getElementById(`duration-${marker.lat}-${marker.lng}`)
-      if (distanceDiv) distanceDiv.textContent = 'Position non disponible'
-      if (durationDiv) durationDiv.textContent = ''
-      return
-    }
 
-    const [userLng, userLat] = this.userLocation
-    const [markerLng, markerLat] = [marker.lng, marker.lat]
-
-    // Appeler l'API Mapbox Directions pour obtenir la distance et la durée
-    const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${userLng},${userLat};${markerLng},${markerLat}?access_token=${this.apiKeyValue}`
-
-    try {
-      const response = await fetch(url)
-      const data = await response.json()
-
-      if (data.routes && data.routes.length > 0) {
-        const route = data.routes[0]
-        const distanceKm = (route.distance / 1000).toFixed(2)
-        const durationMin = Math.round(route.duration / 60)
-
-        const distanceDiv = document.getElementById(`distance-${marker.lat}-${marker.lng}`)
-        const durationDiv = document.getElementById(`duration-${marker.lat}-${marker.lng}`)
-
-        if (distanceDiv) distanceDiv.textContent = `${distanceKm} km`
-        if (durationDiv) durationDiv.textContent = `${durationMin} min`
-      }
-    } catch (error) {
-      console.error('Error calculating distance:', error)
-      const distanceDiv = document.getElementById(`distance-${marker.lat}-${marker.lng}`)
-      const durationDiv = document.getElementById(`duration-${marker.lat}-${marker.lng}`)
-      if (distanceDiv) distanceDiv.textContent = 'Erreur'
-      if (durationDiv) durationDiv.textContent = ''
-    }
-  }
 
   fitMapToMarkers() {
     if (!this.hasMarkersValue || this.markersValue.length === 0) return
@@ -439,5 +421,89 @@ export default class extends Controller {
       zoom: zoom,
       duration: 1000
     })
+  }
+
+  // Calculer la distance à vol d'oiseau entre deux points (en mètres)
+  calculateDistance(coord1, coord2) {
+    const R = 6371000; // Rayon de la Terre en mètres
+    const lat1 = coord1[1] * Math.PI / 180;
+    const lat2 = coord2[1] * Math.PI / 180;
+    const deltaLat = (coord2[1] - coord1[1]) * Math.PI / 180;
+    const deltaLng = (coord2[0] - coord1[0]) * Math.PI / 180;
+
+    const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+              Math.cos(lat1) * Math.cos(lat2) *
+              Math.sin(deltaLng/2) * Math.sin(deltaLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distance = R * c;
+
+    return distance;
+  }
+
+  // Formater la distance pour l'affichage
+  formatDistance(meters) {
+    if (meters < 1000) {
+      return `${Math.round(meters)} m`;
+    } else {
+      return `${(meters / 1000).toFixed(1)} km`;
+    }
+  }
+
+  // Formater la durée pour l'affichage
+  formatDuration(seconds) {
+    const minutes = Math.round(seconds / 60);
+    if (minutes < 60) {
+      return `${minutes} min`;
+    } else {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return mins > 0 ? `${hours}h${mins}` : `${hours}h`;
+    }
+  }
+
+  // Mettre à jour la popup avec la distance et la durée
+  async updatePopupDistanceAndDuration(popup, destinationCoords) {
+    // Vérifier si on a la position de l'utilisateur
+    if (!this.userLocation) {
+      const distanceElement = popup._content.querySelector('.distance-value');
+      const durationElement = popup._content.querySelector('.duration-value');
+      if (distanceElement) distanceElement.textContent = 'Position non disponible';
+      if (durationElement) durationElement.textContent = 'Position non disponible';
+      return;
+    }
+
+    // Afficher "Calcul..." pendant le chargement
+    const distanceElement = popup._content.querySelector('.distance-value');
+    const durationElement = popup._content.querySelector('.duration-value');
+    if (distanceElement) distanceElement.textContent = 'Calcul...';
+    if (durationElement) durationElement.textContent = 'Calcul...';
+
+    // Appeler l'API Mapbox pour obtenir la distance et la durée réelles
+    try {
+      const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${this.userLocation[0]},${this.userLocation[1]};${destinationCoords[0]},${destinationCoords[1]}?access_token=${this.apiKeyValue}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.routes && data.routes.length > 0) {
+        const duration = data.routes[0].duration; // en secondes
+        const realDistance = data.routes[0].distance; // en mètres
+
+        // Mettre à jour avec la distance et la durée réelles de l'itinéraire
+        if (durationElement) {
+          durationElement.textContent = this.formatDuration(duration);
+        }
+        if (distanceElement) {
+          distanceElement.textContent = this.formatDistance(realDistance);
+        }
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération de la durée:", error);
+      if (durationElement) {
+        durationElement.textContent = 'Non disponible';
+      }
+      if (distanceElement) {
+        distanceElement.textContent = 'Non disponible';
+      }
+    }
   }
 }

@@ -1,10 +1,4 @@
 <div class="bulle-meetup">
-  <button class="bulle-meetup__close" type="button">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-    </svg>
-  </button>
-
   <div class="bulle-meetup__image">
         <img src="<%= image_url.presence || asset_path('meetup-placeholder.svg') %>"
          alt="<%= name %>"
@@ -20,26 +14,25 @@
     <h3 class="bulle-meetup__title"><%= name %></h3>
     <p class="bulle-meetup__location"><%= location.presence || 'Lyon, France' %></p>
 
-    <div class="bulle-meetup__details">
+    <div class="bulle-meetup__info">
       <div class="bulle-meetup__distance">
-        <span class="bulle-meetup__icon">📍</span>
-        <span id="distance-<%= marker_id %>"><%= distance.presence || 'Calcul...' %></span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 1v14M8 1L4 5M8 1l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="distance-value">Calcul...</span>
       </div>
       <div class="bulle-meetup__duration">
-        <span class="bulle-meetup__icon">🚶</span>
-        <span id="duration-<%= marker_id %>"><%= duration.presence || '' %></span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="duration-value">Calcul...</span>
       </div>
     </div>
 
-    <div class="bulle-meetup__footer">
-      <div class="bulle-meetup__price">
-        <span class="bulle-meetup__price-amount"><%= price.presence || 'Gratuit' %></span>
-        <% if nights.present? || dates.present? %>
-          <span class="bulle-meetup__price-info">
-            <%= nights.presence || '—' %> nuits · <%= dates.presence || '' %>
-          </span>
-        <% end %>
-      </div>
-    </div>
+    <button type="button" class="btn btn-primary btn-lg w-full">
+      Créer une Rencontre
+    </button>
+
   </div>
 </div>

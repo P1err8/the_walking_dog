@@ -28,3 +28,56 @@ body {
 .d-none {
   display: none;
 }
+
+// Boutons globaux
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.25rem;
+  border-radius: 50px;
+  font-family: $font-family;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  text-decoration: none;
+
+  &.btn-primary {
+    background: $primary;
+    color: $surface;
+    box-shadow: 0 4px 15px rgba($primary, 0.4);
+
+    &:hover,
+    &:active {
+      background: $primary-hover;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba($primary, 0.5);
+    }
+  }
+
+  &.btn-success {
+    background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+    color: $surface;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+
+    &:hover,
+    &:active {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+    }
+  }
+
+  &.w-full {
+    width: 100%;
+  }
+
+  &.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  &.mt-3 {
+    margin-top: 0.5rem;
+  }
+}

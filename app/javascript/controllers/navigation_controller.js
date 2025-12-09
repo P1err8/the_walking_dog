@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import mapboxgl from "mapbox-gl"
 
 export default class extends Controller {
-	static targets = ["instruction", "distance", "duration"]
+	static targets = ["instruction", "distance", "duration", "icon"]
 	static values = { coordinates: Array }
 
 	connect() {
@@ -51,7 +51,8 @@ export default class extends Controller {
 
 		// Instruction turn-by-turn style
 		const instruction = this.nextInstruction()
-		if (this.hasInstructionTarget) this.instructionTarget.textContent = instruction
+		if (this.hasInstructionTarget) this.instructionTarget.textContent = instruction.text
+		if (this.hasIconTarget) this.iconTarget.innerHTML = this.getIconSvg(instruction.icon)
 
 		// Distance restante (approx: total - parcouru ou proximité de la position)
 		let remaining
@@ -121,10 +122,22 @@ export default class extends Controller {
 	}
 
 	turnAction(delta) {
-		if (Math.abs(delta) > 135) return "faites demi-tour"
-		if (delta > 20) return "tournez à droite"
-		if (delta < -20) return "tournez à gauche"
-		return "continuez tout droit"
+		if (Math.abs(delta) > 135) return { text: "faites demi-tour", icon: "uturn" }
+		if (delta > 20) return { text: "tournez à droite", icon: "right" }
+		if (delta < -20) return { text: "tournez à gauche", icon: "left" }
+		return { text: "continuez tout droit", icon: "straight" }
+	}
+
+	getIconSvg(iconType) {
+		const icons = {
+			straight: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+			left: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 20v-6a4 4 0 0 0-4-4H4"/><path d="M8 14l-4-4 4-4"/></svg>',
+			right: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 20v-6a4 4 0 0 1 4-4h6"/><path d="M16 14l4-4-4-4"/></svg>',
+			uturn: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a4 4 0 0 1 4 4v7"/></svg>',
+			arrival: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+			ready: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M7 21l3-9-2.5-1M17 21l-3-9 2.5-1M12 11v4"/></svg>'
+		}
+		return icons[iconType] || icons.straight
 	}
 
 	buildTurnByTurn(coords) {
@@ -151,13 +164,13 @@ export default class extends Controller {
 
 			const action = this.turnAction(delta)
 			const distanceFromLastTurn = this.cumulativeDistances[i] - this.cumulativeDistances[lastTurnIdx]
-			steps.push({ index: i, action, distance: distanceFromLastTurn })
+			steps.push({ index: i, action: action.text, icon: action.icon, distance: distanceFromLastTurn })
 			lastTurnIdx = i
 		}
 
 		// Arrival step
 		const remainingToEnd = this.cumulativeDistances[this.cumulativeDistances.length - 1] - this.cumulativeDistances[lastTurnIdx]
-		steps.push({ index: coords.length - 1, action: "Vous êtes arrivé à destination", distance: remainingToEnd })
+		steps.push({ index: coords.length - 1, action: "Vous êtes arrivé à destination", icon: "arrival", distance: remainingToEnd })
 
 		return steps
 	}
@@ -191,7 +204,9 @@ export default class extends Controller {
 	}
 
 	nextInstruction() {
-		if (!this.steps || this.steps.length === 0) return "Navigation prête"
+		if (!this.steps || this.steps.length === 0) {
+			return { text: "Navigation prête", icon: "ready" }
+		}
 		const step = this.steps[this.currentStepIndex] || this.steps[this.steps.length - 1]
 		const targetCoord = this.coordinatesValue?.[step.index]
 		let distance = step.distance
@@ -200,8 +215,10 @@ export default class extends Controller {
 			distance = this.haversine(this.userPosition, targetCoord)
 		}
 
-		if (step.action === "Vous êtes arrivé à destination") return step.action
+		if (step.action === "Vous êtes arrivé à destination") {
+			return { text: step.action, icon: "arrival" }
+		}
 		const distanceText = this.formatDistance(distance)
-		return `Dans ${distanceText}, ${step.action}`
+		return { text: `Dans ${distanceText}, ${step.action}`, icon: step.icon }
 	}
 }

@@ -3,15 +3,15 @@ class PagesController < ApplicationController
   skip_before_action :authenticate_user!, only: [:isochrone]
 
   def home
-    @meetups = MeetUp.all.includes(:point)
+    @points = Point.all
 
-    @markers = @meetups.map do |meetup|
-      point = meetup.point
+    @markers = @points.map do |point|
+
       {
         lat: point.latitude,
         lng: point.longitude,
         marker_name: point.name,
-        meetup_id: meetup.id,
+        point_id: point.id,
         info_window_html: render_to_string(
           partial: "shared/bulle_meetup",
           locals: {

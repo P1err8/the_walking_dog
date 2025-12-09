@@ -15,9 +15,16 @@
 				</svg>
 			</button>
 		</div>
-		<p class="navigation-panel__instruction" data-navigation-target="instruction">
-			Préparez-vous à partir
-		</p>
+		<div class="navigation-panel__instruction-row">
+			<div class="navigation-panel__icon" data-navigation-target="icon">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+					<path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+				</svg>
+			</div>
+			<p class="navigation-panel__instruction" data-navigation-target="instruction">
+				Préparez-vous à partir
+			</p>
+		</div>
 	</div>
 
 	<!-- Stats -->
@@ -31,5 +38,13 @@
 			<div class="navigation-panel__stat-label">Durée estimée</div>
 		</div>
 	</div>
+
+	<!-- Bouton Terminer -->
+	<%= link_to root_path, class: "navigation-panel__end-btn", data: { turbo: false, action: "click->active-walking#clearActiveWalking" } do %>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+			<path d="M6 6h12v12H6z"/>
+		</svg>
+		Terminer
+	<% end %>
 
 </div>
