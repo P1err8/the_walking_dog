@@ -11,10 +11,6 @@ class PagesController < ApplicationController
       {
         lat: latitude,
         lng: longitude,
-        # Optionnel : info window
-        #info_window_html: render_to_string(partial: "info_window", locals: { meetup: meetup }),
-        # Optionnel : image custom
-        #marker_html: render_to_string(partial: "marker", locals: { meetup: meetup })
       }
     end
   end
