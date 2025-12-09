@@ -208,6 +208,56 @@
   }
 }
 
+// Section labels
+.password-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba($border-color, 0.3);
+
+  .section-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $text-muted;
+    margin: 0 0 1rem;
+  }
+}
+
+.geolocation-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba($border-color, 0.3);
+}
+
+// Profile button
+.btn-profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $primary;
+  background: rgba($primary, 0.1);
+  border: 2px solid $primary;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover,
+  &:active {
+    background: $primary;
+    color: $white;
+  }
+}
+
 // Links section
 .auth-links {
   margin-top: 1.25rem;
@@ -215,7 +265,7 @@
   border-top: 1px solid rgba($border-color, 0.5);
   text-align: center;
 
-  a {
+  a:not(.btn-profile) {
     display: inline-block;
     color: $primary;
     text-decoration: none;
@@ -247,4 +297,233 @@
   margin-bottom: 1.25rem;
   color: $danger;
   font-size: 0.9rem;
+}
+
+// Danger zone (delete account)
+.auth-danger-zone {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba($danger, 0.3);
+  text-align: center;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $danger;
+    margin: 0 0 0.5rem;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: $text-muted;
+    margin: 0 0 1rem;
+  }
+
+  .btn-danger {
+    display: inline-block;
+    padding: 0.7rem 1.25rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $white;
+    background: $danger;
+    border: none;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover,
+    &:active {
+      background: darken($danger, 10%);
+    }
+  }
+}
+
+// ========================================
+// SETTINGS PAGE - Version compacte
+// ========================================
+.settings-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  padding-bottom: 80px;
+  background-color: $bg-page;
+}
+
+.settings-card {
+  width: 100%;
+  max-width: 400px;
+  background: $surface;
+  border-radius: $radius;
+  padding: 1.5rem;
+  box-shadow: $shadow-lg;
+}
+
+.settings-title {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: $text-main;
+  margin: 0 0 1.25rem;
+}
+
+.settings-form {
+  width: 100%;
+}
+
+.settings-section {
+  margin-bottom: 0.85rem;
+  width: 100%;
+}
+
+.settings-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.3rem;
+}
+
+.settings-input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-family: $font-family;
+  font-size: 0.95rem;
+  color: $text-main;
+  background: $bg-page;
+  border: 2px solid $border-color;
+  border-radius: $radius-md;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    background: $surface;
+  }
+}
+
+.settings-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.settings-half {
+  flex: 1;
+}
+
+.settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+}
+
+.settings-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: $primary;
+  cursor: pointer;
+}
+
+.settings-toggle-label {
+  font-size: 0.9rem;
+  color: $text-main;
+  font-weight: 500;
+}
+
+.settings-save-btn {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-family: $font-family;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $white;
+  background: $primary;
+  border: none;
+  border-radius: $radius-pill;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.settings-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.settings-btn {
+  flex: 1;
+  padding: 0.7rem 0.85rem;
+  font-family: $font-family;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $primary;
+  background: rgba($primary, 0.1);
+  border: 2px solid $primary;
+  border-radius: $radius-md;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $primary;
+    color: $white;
+  }
+}
+
+.settings-btn-light {
+  padding: 0.7rem 0.85rem;
+  font-family: $font-family;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text-muted;
+  background: $bg-page;
+  border: none;
+  border-radius: $radius-md;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: $text-main;
+  }
+}
+
+.settings-danger {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba($danger, 0.2);
+}
+
+.settings-delete-btn {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-family: $font-family;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $danger;
+  background: transparent;
+  border: 1px solid $danger;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $danger;
+    color: $white;
+  }
 }

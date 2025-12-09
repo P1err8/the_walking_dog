@@ -117,3 +117,174 @@
     }
   }
 }
+
+// ========================================
+// EDIT FORM - Styles pour l'édition
+// ========================================
+.dog-edit-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.dog-profile-editable {
+  cursor: pointer;
+  position: relative;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.dog-profile-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg-page;
+
+  svg {
+    width: 40px;
+    height: 40px;
+    color: $primary;
+  }
+}
+
+.dog-photo-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dog-edit-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-family: $font-family;
+  font-size: 1rem;
+  font-weight: 600;
+  color: $text-main;
+  text-align: center;
+  background: $bg-page;
+  border: 2px solid $border-color;
+  border-radius: $radius-md;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: $text-muted;
+    font-weight: 400;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    background: $surface;
+  }
+}
+
+.dog-size-options {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.dog-size-btn {
+  position: relative;
+  cursor: pointer;
+
+  input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+  }
+
+  span {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: $bg-page;
+    color: $text-muted;
+    border-radius: $radius-pill;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  input:checked + span {
+    background: $primary;
+    color: $white;
+    box-shadow: 0 2px 8px rgba($primary, 0.3);
+  }
+}
+
+.dog-tags-edit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.dog-tag-btn {
+  display: inline-flex;
+  padding: 0.4rem 0.9rem;
+  background: $bg-page;
+  color: $text-muted;
+  border-radius: $radius-pill;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked + .dog-tag-btn {
+  background: $primary;
+  color: $white;
+  box-shadow: 0 2px 8px rgba($primary, 0.3);
+}
+
+.dog-edit-actions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.dog-save-btn {
+  flex: 1;
+  padding: 0.9rem 1.5rem;
+  background: $primary;
+  color: $white;
+  border: none;
+  border-radius: $radius-pill;
+  font-family: $font-family;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.dog-cancel-btn {
+  padding: 0.9rem 1.5rem;
+  background: transparent;
+  color: $text-muted;
+  border: 2px solid $border-color;
+  border-radius: $radius-pill;
+  font-family: $font-family;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $text-muted;
+    color: $text-main;
+  }
+}

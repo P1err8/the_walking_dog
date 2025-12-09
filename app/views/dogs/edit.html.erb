@@ -5,10 +5,13 @@
       <div class="dog-profile-header">
         <div class="dog-profile-image-wrapper dog-profile-editable">
           <%= f.label :photo do %>
-            <div class="dog-profile-placeholder" id="photo-placeholder">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg>
-            </div>
-            <img id="profile-preview" class="dog-profile-image" src="" alt="" style="display: none;">
+            <% if @dog.url_picture.present? %>
+              <%= image_tag @dog.url_picture, class: "dog-profile-image", alt: @dog.name %>
+            <% else %>
+              <div class="dog-profile-placeholder">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg>
+              </div>
+            <% end %>
             <%= f.file_field :photo, accept: "image/*", class: "dog-photo-input" %>
           <% end %>
         </div>
@@ -27,8 +30,8 @@
       <div class="dog-info-group">
         <span class="dog-info-label">Race</span>
         <div data-controller="breed-list" style="position: relative; width: 100%;">
-          <input type="hidden" name="dog[race]" id="dog_breed" data-breed-list-target="hiddenInput">
-          <input type="text" data-action="input->breed-list#filter focus->breed-list#showList" data-breed-list-target="queryInput" id="breed-input" placeholder="Rechercher une race..." autocomplete="off" class="dog-edit-input">
+          <input type="hidden" name="dog[race]" data-breed-list-target="hiddenInput" value="<%= @dog.race %>">
+          <input type="text" data-action="input->breed-list#filter focus->breed-list#showList" data-breed-list-target="queryInput" placeholder="Rechercher une race..." autocomplete="off" value="<%= @dog.race %>" class="dog-edit-input">
           <div class="breed-list d-none" data-breed-list-target="list">
             <% Dog::BREEDS.each do |breed| %>
               <a class="breed-suggestion" data-action="click->breed-list#select" data-breed="<%= breed %>"><%= breed %></a>
@@ -49,7 +52,7 @@
       <div class="dog-info-group">
         <span class="dog-info-label">Personnalité & Traits</span>
         <div class="dog-tags-edit">
-          <%= f.collection_check_boxes :tag_ids, Tag.all, :id, :name do |b| %>
+          <%= f.collection_check_boxes :tag_ids, Tag.all, :id, :name, checked: @dog.tags.pluck(:id) do |b| %>
             <%= b.check_box(class: "d-none") %>
             <%= b.label(class: "dog-tag-btn") { b.object.name } %>
           <% end %>
@@ -57,7 +60,8 @@
       </div>
 
       <div class="dog-edit-actions">
-        <%= f.submit "Créer le profil", class: "dog-save-btn" %>
+        <%= f.submit "Enregistrer", class: "dog-save-btn" %>
+        <%= link_to "Annuler", dog_path(@dog), class: "dog-cancel-btn" %>
       </div>
 
     <% end %>
