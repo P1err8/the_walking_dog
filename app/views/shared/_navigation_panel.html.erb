@@ -1,17 +1,20 @@
 <div class="navigation-panel"
-		 data-controller="navigation draggable-panel"
+		 data-controller="navigation"
 		 data-navigation-coordinates-value="<%= @walking.coordinates.to_json %>">
-
-	<!-- Drag handle for the bottom sheet -->
-	<div class="navigation-panel__handle-wrapper drag-handle"
-			 data-draggable-panel-target="handle"
-			 data-action="mousedown->draggable-panel#startDrag touchstart->draggable-panel#startDrag mousemove@window->draggable-panel#drag touchmove@window->draggable-panel#drag mouseup@window->draggable-panel#endDrag touchend@window->draggable-panel#endDrag">
-		<div class="navigation-panel__handle"></div>
-	</div>
 
 	<!-- Heading and instruction -->
 	<div class="navigation-panel__header">
-		<h3 class="navigation-panel__title">Navigation</h3>
+		<div class="navigation-panel__header-top">
+			<h3 class="navigation-panel__title">Navigation</h3>
+			<button type="button"
+							data-action="click->navigation#recenter"
+						class="navigation-panel__recenter-btn"
+						aria-label="Me recentrer">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+					<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+				</svg>
+			</button>
+		</div>
 		<p class="navigation-panel__instruction" data-navigation-target="instruction">
 			Préparez-vous à partir
 		</p>
@@ -29,12 +32,4 @@
 		</div>
 	</div>
 
-	<!-- Actions -->
-	<div class="navigation-panel__actions">
-		<button type="button"
-						data-action="click->navigation#recenter"
-					class="navigation-panel__recenter-btn">
-			Me recentrer
-		</button>
-	</div>
 </div>

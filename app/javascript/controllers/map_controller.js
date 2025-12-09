@@ -16,6 +16,9 @@ export default class extends Controller {
     // Get map container - prefer target if present
     const mapContainer = this.hasMapTarget ? this.mapTarget : this.element
 
+    // Clear the container to prevent Mapbox GL warnings about non-empty containers
+    mapContainer.innerHTML = ''
+
     this.map = new mapboxgl.Map({
       container: mapContainer,
       style: "mapbox://styles/mapbox/streets-v10",
@@ -24,6 +27,7 @@ export default class extends Controller {
     })
 
     // Geolocate user whenever the map is active
+    this.userLocation = null
     this.geolocateControl = new mapboxgl.GeolocateControl({
       positionOptions: { enableHighAccuracy: true },
       trackUserLocation: true,
@@ -31,6 +35,11 @@ export default class extends Controller {
       showAccuracyCircle: false
     })
     this.map.addControl(this.geolocateControl, 'top-left')
+
+    // Store user location when geolocate is successful
+    this.geolocateControl.on('geolocate', (e) => {
+      this.userLocation = [e.coords.longitude, e.coords.latitude]
+    })
 
     // Ensure the map matches the container size immediately
     this.map.resize()
@@ -159,7 +168,29 @@ export default class extends Controller {
   fitMapToRoute() {
     const bounds = new mapboxgl.LngLatBounds()
     this.coordinatesValue.forEach(coord => bounds.extend(coord))
-    this.map.fitBounds(bounds, { padding: 70, maxZoom: 15, duration: 0 })
+
+    // Calculer la hauteur du panel blanc pour l'ajouter au padding
+    const panelElement = document.querySelector('.walking-form-card')
+    let panelHeight = 0
+    if (panelElement) {
+      panelHeight = panelElement.offsetHeight
+    }
+
+    // Padding asymétrique en tenant compte du panel
+    const paddingTop = 70
+    const paddingSide = 70
+    const paddingBottom = Math.max(70, panelHeight + 30)
+
+    this.map.fitBounds(bounds, {
+      padding: {
+        top: paddingTop,
+        bottom: paddingBottom,
+        left: paddingSide,
+        right: paddingSide
+      },
+      maxZoom: 15,
+      duration: 0
+    })
   }
 
   // Public methods for external controllers
