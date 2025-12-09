@@ -30,9 +30,12 @@
       </div>
     </div>
 
-    <button type="button" class="btn btn-primary btn-lg w-full">
-      Créer une Rencontre
-    </button>
+    <%= simple_form_for MeetUp.new do |f| %>
+      <%# Champ caché pour lier le meetup au point actuel %>
+      <%= f.input :point_id, as: :hidden, input_html: { value: point_id } %>
+      <%= f.submit "Créer une Rencontre", class: "btn btn-primary btn-sm" %>
+    <% end %>
+
 
   </div>
 </div>
