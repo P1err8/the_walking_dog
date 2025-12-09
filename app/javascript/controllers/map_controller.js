@@ -88,6 +88,35 @@ export default class extends Controller {
       }
     })
 
+    this.markersValue.forEach((marker) => {
+      // Créer un popup avec la partielle HTML
+      const popup = new mapboxgl.Popup({
+        closeButton: false,
+        maxWidth: '300px'
+      }).setHTML(marker.info_window_html)
+
+      // Si tu as un partial custom pour le marker (marker_html)
+      const customMarker = document.createElement("div")
+      customMarker.innerHTML = marker.marker_html || ''
+
+      const mapMarker = new mapboxgl.Marker(marker.marker_html ? customMarker : undefined)
+        .setLngLat([marker.lng, marker.lat])
+        .setPopup(popup)
+        .addTo(this.map)
+
+      // Quand le popup s'ouvre, calculer la distance et attacher l'événement de fermeture
+      popup.on('open', () => {
+        this.calculateDistanceAndDuration(marker)
+
+        // Attacher l'événement click sur le bouton de fermeture
+        const closeButton = document.querySelector('.bulle-meetup__close')
+        if (closeButton) {
+          closeButton.addEventListener('click', () => {
+            popup.remove()
+          })
+        }
+      })
+    })
     const geojsonData = {
       type: 'FeatureCollection',
       features: features
@@ -187,6 +216,46 @@ export default class extends Controller {
     this.map.on('mouseleave', 'clusters', () => { this.map.getCanvas().style.cursor = ''; });
     this.map.on('mouseenter', 'unclustered-point', () => { this.map.getCanvas().style.cursor = 'pointer'; });
     this.map.on('mouseleave', 'unclustered-point', () => { this.map.getCanvas().style.cursor = ''; });
+  }
+
+  async calculateDistanceAndDuration(marker) {
+    // Vérifier si on a la position de l'utilisateur
+    if (!this.userLocation) {
+      const distanceDiv = document.getElementById(`distance-${marker.lat}-${marker.lng}`)
+      const durationDiv = document.getElementById(`duration-${marker.lat}-${marker.lng}`)
+      if (distanceDiv) distanceDiv.textContent = 'Position non disponible'
+      if (durationDiv) durationDiv.textContent = ''
+      return
+    }
+
+    const [userLng, userLat] = this.userLocation
+    const [markerLng, markerLat] = [marker.lng, marker.lat]
+
+    // Appeler l'API Mapbox Directions pour obtenir la distance et la durée
+    const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${userLng},${userLat};${markerLng},${markerLat}?access_token=${this.apiKeyValue}`
+
+    try {
+      const response = await fetch(url)
+      const data = await response.json()
+
+      if (data.routes && data.routes.length > 0) {
+        const route = data.routes[0]
+        const distanceKm = (route.distance / 1000).toFixed(2)
+        const durationMin = Math.round(route.duration / 60)
+
+        const distanceDiv = document.getElementById(`distance-${marker.lat}-${marker.lng}`)
+        const durationDiv = document.getElementById(`duration-${marker.lat}-${marker.lng}`)
+
+        if (distanceDiv) distanceDiv.textContent = `${distanceKm} km`
+        if (durationDiv) durationDiv.textContent = `${durationMin} min`
+      }
+    } catch (error) {
+      console.error('Error calculating distance:', error)
+      const distanceDiv = document.getElementById(`distance-${marker.lat}-${marker.lng}`)
+      const durationDiv = document.getElementById(`duration-${marker.lat}-${marker.lng}`)
+      if (distanceDiv) distanceDiv.textContent = 'Erreur'
+      if (durationDiv) durationDiv.textContent = ''
+    }
   }
 
   fitMapToMarkers() {
