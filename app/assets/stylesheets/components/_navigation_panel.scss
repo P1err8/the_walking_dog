@@ -207,7 +207,7 @@ $navbar-height: 70px; // Hauteur de la navbar (60px) + marge
 
 .active-walking-modal__content {
   position: absolute;
-  top: 50%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
@@ -272,6 +272,15 @@ $navbar-height: 70px; // Hauteur de la navbar (60px) + marge
 
     &:hover {
       background: #e0e0e0;
+    }
+  }
+
+  &--danger {
+    background: #e74c3c;
+    color: white;
+
+    &:hover {
+      background: #c0392b;
     }
   }
 

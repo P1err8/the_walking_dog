@@ -2,25 +2,25 @@
 
 .bulle-meetup {
   position: relative;
-  width: 300px;
+  width: 280px;
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  font-family: $font-family;
 
   &__image {
     width: 100%;
-    height: 200px;
+    height: 140px;
     overflow: hidden;
-    background: #f0f0f0;
+    background: linear-gradient(135deg, #e8f0f8 0%, #d4e4f4 100%);
   }
 
   &__img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s;
+    transition: transform 0.3s ease;
 
     &:hover {
       transform: scale(1.05);
@@ -28,26 +28,31 @@
   }
 
   &__content {
-    padding: 12px 16px 16px;
+    padding: 1rem 1.25rem 1.25rem;
   }
 
   &__header {
     display: flex;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 0.5rem;
   }
 
   &__type {
-    font-size: 14px;
+    font-size: 0.75rem;
     font-weight: 600;
-    color: #222222;
+    color: $accent;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba($primary, 0.3);
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
   }
 
   &__title {
-    font-size: 15px;
-    font-weight: 400;
-    color: #222222;
-    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $accent;
+    margin: 0 0 0.25rem 0;
     line-height: 1.3;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -55,49 +60,51 @@
   }
 
   &__location {
-    font-size: 15px;
-    color: #717171;
-    margin: 0 0 8px 0;
+    font-size: 0.85rem;
+    color: $taupe;
+    margin: 0 0 0.75rem 0;
     line-height: 1.3;
   }
 
   &__info {
     display: flex;
-    gap: 16px;
-    padding: 8px 0;
-    border-top: 1px solid #ebebeb;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    margin-bottom: 0.75rem;
+    border-top: 1px solid $beige-light;
+    border-bottom: 1px solid $beige-light;
   }
 
   &__details {
     display: flex;
-    gap: 16px;
-    margin-bottom: 12px;
-    padding: 8px 0;
-    border-top: 1px solid #ebebeb;
-    border-bottom: 1px solid #ebebeb;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid $beige-light;
+    border-bottom: 1px solid $beige-light;
   }
 
   &__distance,
   &__duration {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 14px;
-    color: #222222;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: $accent;
 
     svg {
-      color: #717171;
+      color: $primary;
       flex-shrink: 0;
     }
 
     .distance-value,
     .duration-value {
-      font-weight: 500;
+      font-weight: 600;
     }
   }
 
   &__icon {
-    font-size: 16px;
+    font-size: 1rem;
   }
 
   &__footer {
@@ -113,14 +120,14 @@
   }
 
   &__price-amount {
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 600;
-    color: #222222;
+    color: $accent;
   }
 
   &__price-info {
-    font-size: 14px;
-    color: #717171;
+    font-size: 0.85rem;
+    color: $taupe;
   }
 }
 
