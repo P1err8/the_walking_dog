@@ -112,9 +112,7 @@ user["features"].each do |point|
     longitude: center_lng,
     latitude: center_lat
   )
-  MeetUp.create!(
-  point: instance_point
-)
+
 end
 
 point = Point.find_by(name: "Square de Thou")
