@@ -1,9 +1,12 @@
 <div class="walking-form-card"
      data-controller="generate-circuit draggable-panel"
      data-generate-circuit-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>"
-     data-action="mousedown->draggable-panel#startDrag touchstart->draggable-panel#startDrag
-                  mousemove@window->draggable-panel#drag touchmove@window->draggable-panel#drag
-                  mouseup@window->draggable-panel#endDrag touchend@window->draggable-panel#endDrag">
+     data-action="mousedown->draggable-panel#startDrag
+                  touchstart->draggable-panel#startDrag:!passive
+                  mousemove@window->draggable-panel#drag
+                  touchmove@window->draggable-panel#drag:!passive
+                  mouseup@window->draggable-panel#endDrag
+                  touchend@window->draggable-panel#endDrag">
 
     <!-- Drag Handle -->
     <div class="drag-handle"

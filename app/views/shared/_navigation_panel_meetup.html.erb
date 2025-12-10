@@ -1,7 +1,23 @@
-<div class="navigation-panel"
-		 data-controller="navigation">
+<div class="navigation-panel-wrapper"
+		 data-controller="navigation draggable-panel">
 
-      <%= render "shared/navigation_panel", destination: @destination %>
-      <%= render "meet_ups/details_meetup_panel", destination: @destination, point: @point, meet_up: @meetup %>
+	<!-- Bouton recentrer flottant au-dessus du panel -->
+	<button type="button"
+					data-action="click->navigation#recenter"
+					class="navigation-panel__floating-recenter-btn"
+					aria-label="Me recentrer">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+			<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+		</svg>
+	</button>
 
-</div
+	<div class="navigation-panel"
+			 data-action="mousedown->draggable-panel#startDrag
+			              touchstart->draggable-panel#startDrag:!passive
+			              mousemove@window->draggable-panel#drag
+			              touchmove@window->draggable-panel#drag:!passive
+			              mouseup@window->draggable-panel#endDrag
+			              touchend@window->draggable-panel#endDrag">
+		<%= render "shared/navigation_panel" %>
+	</div>
+</div>
