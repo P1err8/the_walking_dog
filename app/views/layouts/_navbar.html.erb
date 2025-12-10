@@ -52,6 +52,6 @@
 <% if current_page?(root_path) %>
   <%= link_to "GO", new_walking_path, class: "fab-button", title: "Nouvelle balade", data: { turbo_frame: "modal", action: "click->active-walking#checkBeforeNew" } %>
 <% else %>
-  <%= link_to "GO", root_path(open_modal: true), class: "fab-button", title: "Nouvelle balade", data: { action: "click->active-walking#checkBeforeNew" } %>
+  <%= link_to "GO", root_path(open_modal: true), class: "fab-button", title: "Nouvelle balade", data: { turbo: false, action: "click->active-walking#checkBeforeNew" } %>
 <% end %>
 </div>
