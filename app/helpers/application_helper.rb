@@ -1,4 +1,29 @@
 module ApplicationHelper
+  DEFAULT_META = {
+    title: "The Walking Dog - Promenez votre chien avec passion",
+    description: "Découvrez The Walking Dog, l'application pour promener votre chien, suivre vos balades et rencontrer d'autres propriétaires de chiens.",
+    image: "https://s10.aconvert.com/convert/p3r68-cdx67/aqakk-mkoat.jpg"
+  }.freeze
+
+  def page_title
+    if content_for?(:title)
+      "#{content_for(:title)} | The Walking Dog"
+    else
+      DEFAULT_META[:title]
+    end
+  end
+
+  def page_description
+    content_for?(:description) ? content_for(:description) : DEFAULT_META[:description]
+  end
+
+  def page_image
+    image = content_for?(:image) ? content_for(:image) : DEFAULT_META[:image]
+    return image if image.start_with?("http", "/")
+
+    image_url(image)
+  end
+
   def static_map_url(walking)
     return "" unless walking.coordinates.present?
 

@@ -1,3 +1,5 @@
+<% content_for :title, "Modifier #{@dog.name}" %>
+
 <div class="dog-show-container">
   <div class="dog-card">
     <%= simple_form_for @dog, html: { multipart: true, class: "dog-edit-form" } do |f| %>
