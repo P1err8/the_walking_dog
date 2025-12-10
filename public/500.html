@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
+  <meta charset="UTF-8">
   <title>Erreur serveur - TheWalkingDog</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon.png">
@@ -220,7 +221,7 @@
   <div class="error-container">
     <div class="error-code">500</div>
     <h1 class="error-title">Bug dans le serveur !</h1>
-    <p class="error-message">Des bugs ont envahi notre serveur ! Aide le toutou a les ecraser avant qu'ils ne s'echappent !</p>
+    <p class="error-message">Des bugs ont envahi notre serveur ! Aide le toutou à les écraser avant qu'ils ne s'échappent !</p>
 
     <div class="game-container" id="gameContainer">
       <div class="server-icon">
@@ -242,10 +243,10 @@
       </div>
     </div>
 
-    <p class="game-instructions">Clique sur les bugs pour les ecraser ! 30 secondes pour en attraper un maximum</p>
-    <p class="score-display">Bugs ecrases: <span id="score">0</span> | Record: <span id="highScore">0</span></p>
+    <p class="game-instructions">Clique sur les bugs pour les écraser ! 30 secondes pour en attraper un maximum</p>
+    <p class="score-display">Bugs écrasés: <span id="score">0</span> | Record: <span id="highScore">0</span></p>
 
-    <a href="/" class="error-btn">Retour a l'accueil</a>
+    <a href="/" class="error-btn">Retour à l'accueil</a>
   </div>
 
   <script>
@@ -270,7 +271,6 @@
     let bugTimeout = null;
     let currentBugIndex = -1;
     let bugSpeed = 1200;
-    let gameInterval = null;
     let timerInterval = null;
 
     // Show a random bug
@@ -381,13 +381,13 @@
         highScoreElement.textContent = highScore;
         gameOverText.textContent = 'Nouveau record !';
       } else {
-        gameOverText.textContent = 'Temps ecoule !';
+        gameOverText.textContent = 'Temps écoulé !';
       }
 
       // Server fixed if score > 10
       if (score >= 10) {
         serverLight.classList.add('fixed');
-        gameOverText.textContent += ' Serveur repare !';
+        gameOverText.textContent += ' Serveur réparé !';
       }
 
       gameOverlay.style.display = 'flex';
