@@ -1,7 +1,8 @@
 <div class="activities-container">
-<div class="activities-list">
-    <% @walkings.order(created_at: :desc).each do |walking| %>
-      <% if walking.coordinates.present? %>
+  <div class="activities-list">
+    <% activities = (@walkings.to_a + @meetups.to_a).sort_by(&:created_at).reverse %>
+    <% activities.each do |activity| %>
+      <% if activity.is_a?(Walking) && activity.coordinates.present? %>
         <div class="activity-card">
           <!-- Header: User & Date -->
           <div class="activity-header">
@@ -14,30 +15,53 @@
             </div>
             <div class="user-info">
               <strong><%= current_user.email.split('@').first.capitalize %></strong>
-              <span class="date"><%= walking.created_at.in_time_zone('Paris').strftime("%d %b à %H:%M") %></span>
+              <span class="date"><%= activity.created_at.in_time_zone('Paris').strftime("%d %b à %H:%M") %></span>
             </div>
           </div>
           <!-- Title -->
           <h3>Promenade</h3>
           <!-- The Static Map -->
           <div class="activity-map">
-            <%= image_tag static_map_url(walking), alt: "Itinéraire de la balade", class: "static-map-img" %>
+            <%= image_tag static_map_url(activity), alt: "Itinéraire de la balade", class: "static-map-img" %>
           </div>
           <!-- Stats Grid -->
           <div class="activity-stats">
             <div class="stat">
               <i class="fa-solid fa-route"></i>
-              <span class="value"><strong><%= walking.calculated_distance ? "#{walking.calculated_distance} km" : "- km" %></strong></span>
+              <span class="value"><strong><%= activity.calculated_distance ? "#{activity.calculated_distance} km" : "- km" %></strong></span>
             </div>
             <div class="stat">
               <i class="fa-regular fa-clock"></i>
-              <span class="value"><strong><%= walking.calculated_duration ? "#{walking.calculated_duration} min" : "- min" %></strong></span>
+              <span class="value"><strong><%= activity.calculated_duration ? "#{activity.calculated_duration} min" : "- min" %></strong></span>
             </div>
+          </div>
+        </div>
+      <% elsif activity.is_a?(MeetUp) %>
+        <div class="activity-card">
+          <!-- Header: User & Date -->
+          <div class="activity-header">
+            <div class="user-avatar">
+              <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
+                <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
+              <% else %>
+                <img src="https://i.pravatar.cc/150?img=12" class="avatar-img">
+              <% end %>
+            </div>
+            <div class="user-info">
+              <strong><%= current_user.email.split('@').first.capitalize %></strong>
+              <span class="date"><%= activity.created_at.in_time_zone('Paris').strftime("%d %b à %H:%M") %></span>
+            </div>
+          </div>
+          <!-- Title -->
+          <h3>Rencontre : <%= activity.point.name %></h3>
+          <!-- The Static Map -->
+          <div class="activity-map">
+            <%= image_tag static_marker_map_url(activity.point), alt: "Lieu de rencontre", class: "static-map-img border-bottom" %>
           </div>
         </div>
       <% end %>
     <% end %>
-    <% if @walkings.empty? %>
+    <% if activities.empty? %>
       <p class="no-activities">Aucune activité enregistrée pour le moment.</p>
     <% end %>
   </div>

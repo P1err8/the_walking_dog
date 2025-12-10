@@ -39,6 +39,6 @@ class PagesController < ApplicationController
 
   def activities
     @walkings = Walking.where(user_id: current_user.id)
-    @participations = Participation.where(user_id: current_user.id)
+    @meetups = MeetUp.joins(:participations).where(participations: { user_id: current_user.id })
   end
 end

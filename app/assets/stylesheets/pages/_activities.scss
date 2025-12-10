@@ -22,7 +22,10 @@
   margin-bottom: 1rem;
   border-radius: $radius;
   box-shadow: $shadow;
-
+  .border-bottom {
+    border-bottom-left-radius: $radius-md;
+    border-bottom-right-radius: $radius-md;
+  }
   .activity-header {
     display: flex;
     align-items: center;
@@ -106,7 +109,7 @@
     height: 180px;
     border-radius: $radius-md $radius-md 0 0;
     overflow: hidden;
-    background-color: $beige-light;
+    background-color: $surface;
 
     .static-map-img {
       width: 100%;
