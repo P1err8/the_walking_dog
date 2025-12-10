@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
+  <meta charset="UTF-8">
   <title>Action non autorisée - TheWalkingDog</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon.png">
@@ -119,30 +120,24 @@
       text-align: center;
     }
 
-    .lives-display {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 1.2rem;
-    }
-  </style>
+      </style>
 </head>
 
 <body>
   <div class="error-container">
     <div class="error-code">422</div>
-    <h1 class="error-title">Oups ! Acces interdit</h1>
-    <p class="error-message">Ce toutou n'a pas le droit d'aller la... Mais il peut attraper des friandises !</p>
+    <h1 class="error-title">Oups ! Accès interdit</h1>
+    <p class="error-message">Ce toutou n'a pas le droit d'aller là... Mais il peut attraper des friandises !</p>
 
     <div class="game-container" id="gameContainer">
       <canvas id="gameCanvas"></canvas>
       <div class="game-over-text" id="gameOverText">Partie terminee !<br>Clique pour rejouer</div>
     </div>
 
-    <p class="game-instructions">Utilise les fleches ou glisse pour deplacer le chien</p>
+    <p class="game-instructions">Utilise les flèches ou glisse pour déplacer le chien</p>
     <p class="score-display">Friandises: <span id="score">0</span> | Record: <span id="highScore">0</span> | Vies: <span id="lives">3</span></p>
 
-    <a href="/" class="error-btn">Retour a l'accueil</a>
+    <a href="/" class="error-btn">Retour à l'accueil</a>
   </div>
 
   <script>
@@ -154,30 +149,36 @@
     const livesElement = document.getElementById('lives');
     const gameOverText = document.getElementById('gameOverText');
 
-    function resizeCanvas() {
-      canvas.width = gameContainer.offsetWidth;
-      canvas.height = gameContainer.offsetHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
     // Game state
-    let gameRunning = true;
+    let gameRunning = false;
+    let gameStarted = false;
     let score = 0;
     let lives = 3;
     let highScore = localStorage.getItem('treatGameHighScore') || 0;
     highScoreElement.textContent = highScore;
 
-    const groundY = canvas.height - 25;
+    function getGroundY() {
+      return canvas.height - 25;
+    }
 
     // Dog (bowl/catcher)
     const dog = {
-      x: canvas.width / 2 - 30,
-      y: groundY - 35,
+      x: 0,
+      y: 0,
       width: 60,
       height: 40,
       speed: 8
     };
+
+    function resizeCanvas() {
+      canvas.width = gameContainer.offsetWidth;
+      canvas.height = gameContainer.offsetHeight;
+      // Reset dog position
+      dog.x = canvas.width / 2 - 30;
+      dog.y = getGroundY() - 35;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
     // Treats falling
     let treats = [];
@@ -275,6 +276,7 @@
 
     // Draw ground
     function drawGround() {
+      const groundY = getGroundY();
       ctx.fillStyle = '#228B22';
       ctx.fillRect(0, groundY, canvas.width, 30);
       ctx.fillStyle = '#32CD32';
@@ -379,11 +381,11 @@
       drawDog();
 
       // Start message
-      if (!gameRunning && lives > 0) {
+      if (!gameStarted) {
         ctx.fillStyle = 'rgba(30, 58, 95, 0.9)';
         ctx.font = 'bold 14px Bitter';
         ctx.textAlign = 'center';
-        ctx.fillText('Utilise les fleches pour commencer', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('Utilise les flèches pour commencer', canvas.width / 2, canvas.height / 2);
       }
 
       requestAnimationFrame(gameLoop);
@@ -402,13 +404,20 @@
       scoreElement.textContent = score;
       livesElement.textContent = lives;
       gameRunning = true;
+      gameStarted = true;
       gameOverText.style.display = 'none';
     }
 
     // Keyboard controls
     document.addEventListener('keydown', (e) => {
-      if (e.code === 'ArrowLeft') moveLeft = true;
-      if (e.code === 'ArrowRight') moveRight = true;
+      if (e.code === 'ArrowLeft') {
+        moveLeft = true;
+        if (!gameStarted) { gameStarted = true; gameRunning = true; }
+      }
+      if (e.code === 'ArrowRight') {
+        moveRight = true;
+        if (!gameStarted) { gameStarted = true; gameRunning = true; }
+      }
       if (!gameRunning && lives <= 0) resetGame();
     });
 
@@ -424,6 +433,7 @@
         resetGame();
         return;
       }
+      if (!gameStarted) { gameStarted = true; gameRunning = true; }
       touchStartX = e.touches[0].clientX;
     });
 
