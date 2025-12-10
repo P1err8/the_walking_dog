@@ -29,8 +29,9 @@
       </div>
     <% end %>
     <% if point.meet_ups.any?(&:active?) %>
-      <% active_meetup = point.meet_ups.active.last %>
-      <% dogs = active_meetup.present_dogs %>
+      <% active_meetup = point.meet_ups.with_recent_activity.find(&:active?) %>
+      <% if active_meetup %>
+        <% dogs = active_meetup.present_dogs %>
 
       <% if dogs.any? %>
         <div class="bulle-meetup__dogs">
@@ -56,6 +57,7 @@
         <%= simple_form_for [active_meetup, Participation.new] do |f| %>
           <%= f.submit "Rejoindre la Rencontre", class: "btn btn-primary btn-sm" %>
         <% end %>
+      <% end %>
       <% end %>
     <% else %>
       <% unless controller_name == 'meet_ups' && action_name == 'show' %>

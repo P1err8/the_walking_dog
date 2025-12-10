@@ -4,14 +4,17 @@ class MeetUp < ApplicationRecord
   has_many :users, through: :participations
   has_many :dogs, through: :users
 
-  scope :active, -> { joins(:participations).where('participations.created_at > ?', 1.hours.ago).distinct }
+  # Scope pour récupérer les meetups avec participations récentes (utilisé comme filtre initial)
+  # La vérification finale se fait avec active? qui vérifie present_dogs
+  scope :with_recent_activity, -> {
+    joins(:participations)
+      .where('participations.updated_at > ?', 40.minutes.ago)
+      .distinct
+  }
 
    def active?
-    # Get the time of the last participation, or the meetup creation time if no one joined yet
-    last_activity_time = participations.maximum(:created_at) || created_at
-
-    # The meetup is active if the last activity was less than 2 hours ago
-    last_activity_time > 1.hours.ago
+    # Un meetup est actif s'il a des chiens présents (arrivés il y a moins de 40 min)
+    present_dogs.any?
   end
 
   def closed?
