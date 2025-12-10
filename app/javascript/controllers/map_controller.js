@@ -284,11 +284,45 @@ export default class extends Controller {
 
       if (data.routes && data.routes.length > 0) {
         this.coordinatesValue = [this.userLocation, this.destinationValue]
+
+        // Stocker le GeoJSON complet de l'itinéraire
+        this.currentRouteGeoJSON = data.routes[0].geometry
+        this.currentRouteData = data.routes[0] // Inclut distance, duration, etc.
+
+        // Log pour debug (vous pouvez le récupérer dans la console)
+        console.log("Route GeoJSON:", JSON.stringify(this.currentRouteGeoJSON, null, 2))
+        console.log("Route Data:", {
+          distance: `${(data.routes[0].distance / 1000).toFixed(2)} km`,
+          duration: `${Math.round(data.routes[0].duration / 60)} min`,
+          geometry: this.currentRouteGeoJSON
+        })
+
         this.drawRoute(data.routes[0].geometry)
+
+        // Dispatch un événement personnalisé avec le GeoJSON
+        this.element.dispatchEvent(new CustomEvent('route:calculated', {
+          detail: {
+            geometry: this.currentRouteGeoJSON,
+            distance: data.routes[0].distance,
+            duration: data.routes[0].duration,
+            coordinates: this.currentRouteGeoJSON.coordinates
+          },
+          bubbles: true
+        }))
       }
     } catch (error) {
       console.error("Error fetching route:", error)
     }
+  }
+
+  // Méthode publique pour récupérer le GeoJSON de l'itinéraire actuel
+  getRouteGeoJSON() {
+    return this.currentRouteGeoJSON || null
+  }
+
+  // Méthode publique pour récupérer toutes les données de l'itinéraire
+  getRouteData() {
+    return this.currentRouteData || null
   }
 
   drawRoute(geometry) {
