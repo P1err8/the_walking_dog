@@ -1,67 +1,429 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>The page you were looking for doesn't exist (404)</title>
+  <title>Page introuvable - TheWalkingDog</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-  .rails-default-error-page {
-    background-color: #EFEFEF;
-    color: #2E2F30;
-    text-align: center;
-    font-family: arial, sans-serif;
-    margin: 0;
-  }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  .rails-default-error-page div.dialog {
-    width: 95%;
-    max-width: 33em;
-    margin: 4em auto 0;
-  }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #E8DDD3;
+      font-family: 'Bitter', Georgia, serif;
+      padding: 1rem;
+    }
 
-  .rails-default-error-page div.dialog > div {
-    border: 1px solid #CCC;
-    border-right-color: #999;
-    border-left-color: #999;
-    border-bottom-color: #BBB;
-    border-top: #B00100 solid 4px;
-    border-top-left-radius: 9px;
-    border-top-right-radius: 9px;
-    background-color: white;
-    padding: 7px 12% 0;
-    box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
-  }
+    .error-container {
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      background: #FFFFFF;
+      border-radius: 20px;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 10px 40px rgba(163, 181, 217, 0.3);
+    }
 
-  .rails-default-error-page h1 {
-    font-size: 100%;
-    color: #730E15;
-    line-height: 1.5em;
-  }
+    .error-code {
+      font-size: 5rem;
+      font-weight: 700;
+      color: #1E3A5F;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
 
-  .rails-default-error-page div.dialog > p {
-    margin: 0 0 1em;
-    padding: 1em;
-    background-color: #F7F7F7;
-    border: 1px solid #CCC;
-    border-right-color: #999;
-    border-left-color: #999;
-    border-bottom-color: #999;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    border-top-color: #DADADA;
-    color: #666;
-    box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
-  }
+    .error-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1E3A5F;
+      margin-bottom: 0.5rem;
+    }
+
+    .error-message {
+      font-size: 0.9rem;
+      color: #8B8377;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    .game-container {
+      position: relative;
+      width: 100%;
+      height: 150px;
+      background: linear-gradient(to bottom, #E8F4FD 0%, #E8F4FD 70%, #90EE90 70%, #228B22 100%);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      border: 2px solid #A3B5D9;
+    }
+
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .game-instructions {
+      font-size: 0.8rem;
+      color: #A3B5D9;
+      margin-bottom: 1rem;
+    }
+
+    .score-display {
+      font-size: 0.9rem;
+      color: #1E3A5F;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .error-btn {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      background: #1E3A5F;
+      color: #FFFFFF;
+      text-decoration: none;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .error-btn:hover {
+      background: #2c4a6e;
+      transform: translateY(-2px);
+    }
+
+    .game-over-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1E3A5F;
+      background: rgba(255,255,255,0.9);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .clouds {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      height: 40px;
+    }
   </style>
 </head>
 
-<body class="rails-default-error-page">
-  <!-- This file lives in public/404.html -->
-  <div class="dialog">
-    <div>
-      <h1>The page you were looking for doesn't exist.</h1>
-      <p>You may have mistyped the address or the page may have moved.</p>
+<body>
+  <div class="error-container">
+    <div class="error-code">404</div>
+    <h1 class="error-title">Wouf ! Page introuvable</h1>
+    <p class="error-message">Ce toutou s'est perdu en cherchant cette page... Aide-le a sauter par-dessus les obstacles !</p>
+
+    <div class="game-container" id="gameContainer">
+      <canvas id="gameCanvas"></canvas>
+      <div class="game-over-text" id="gameOverText">Game Over ! Clique pour rejouer</div>
     </div>
-    <p>If you are the application owner check the logs for more information.</p>
+
+    <p class="game-instructions">Appuie sur ESPACE ou clique pour sauter</p>
+    <p class="score-display">Score: <span id="score">0</span> | Record: <span id="highScore">0</span></p>
+
+    <a href="/" class="error-btn">Retour a l'accueil</a>
   </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const gameContainer = document.getElementById('gameContainer');
+    const scoreElement = document.getElementById('score');
+    const highScoreElement = document.getElementById('highScore');
+    const gameOverText = document.getElementById('gameOverText');
+
+    // Set canvas size
+    function resizeCanvas() {
+      canvas.width = gameContainer.offsetWidth;
+      canvas.height = gameContainer.offsetHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Game variables
+    let gameRunning = false;
+    let gameOver = false;
+    let score = 0;
+    let highScore = localStorage.getItem('dogGameHighScore') || 0;
+    highScoreElement.textContent = highScore;
+
+    // Ground level
+    const groundY = canvas.height - 30;
+
+    // Dog character
+    const dog = {
+      x: 50,
+      y: groundY,
+      width: 40,
+      height: 35,
+      velocityY: 0,
+      jumping: false,
+      frame: 0
+    };
+
+    // Obstacles
+    let obstacles = [];
+    let obstacleTimer = 0;
+    const obstacleInterval = 100;
+
+    // Game speed
+    let gameSpeed = 3;
+
+    // Draw dog (simple pixel art style)
+    function drawDog() {
+      ctx.fillStyle = '#8B4513';
+
+      // Body
+      ctx.fillRect(dog.x, dog.y - 20, 30, 20);
+
+      // Head
+      ctx.fillRect(dog.x + 25, dog.y - 30, 15, 18);
+
+      // Ear
+      ctx.fillStyle = '#654321';
+      ctx.fillRect(dog.x + 35, dog.y - 35, 6, 8);
+
+      // Eye
+      ctx.fillStyle = '#000';
+      ctx.fillRect(dog.x + 33, dog.y - 25, 3, 3);
+
+      // Nose
+      ctx.fillRect(dog.x + 38, dog.y - 18, 4, 3);
+
+      // Tail
+      ctx.fillStyle = '#8B4513';
+      const tailWag = Math.sin(Date.now() / 100) * 5;
+      ctx.fillRect(dog.x - 8, dog.y - 25 + tailWag, 10, 5);
+
+      // Legs (animated)
+      ctx.fillStyle = '#654321';
+      if (dog.jumping) {
+        // Legs tucked when jumping
+        ctx.fillRect(dog.x + 5, dog.y - 5, 6, 8);
+        ctx.fillRect(dog.x + 18, dog.y - 5, 6, 8);
+      } else {
+        // Running animation
+        const legOffset = Math.sin(Date.now() / 80) * 4;
+        ctx.fillRect(dog.x + 5, dog.y - 3, 6, 10 + legOffset);
+        ctx.fillRect(dog.x + 18, dog.y - 3, 6, 10 - legOffset);
+      }
+    }
+
+    // Draw obstacle (fire hydrant)
+    function drawObstacle(obs) {
+      // Hydrant body
+      ctx.fillStyle = '#DC143C';
+      ctx.fillRect(obs.x + 5, obs.y - obs.height + 10, 15, obs.height - 10);
+
+      // Hydrant top
+      ctx.fillRect(obs.x, obs.y - obs.height, 25, 12);
+
+      // Hydrant caps
+      ctx.fillStyle = '#B22222';
+      ctx.fillRect(obs.x - 3, obs.y - obs.height + 15, 8, 8);
+      ctx.fillRect(obs.x + 20, obs.y - obs.height + 15, 8, 8);
+    }
+
+    // Draw ground
+    function drawGround() {
+      ctx.fillStyle = '#228B22';
+      ctx.fillRect(0, groundY + 5, canvas.width, 30);
+
+      // Grass details
+      ctx.fillStyle = '#32CD32';
+      for (let i = 0; i < canvas.width; i += 15) {
+        ctx.fillRect(i, groundY + 2, 2, 8);
+      }
+    }
+
+    // Draw clouds
+    function drawClouds() {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.beginPath();
+      ctx.arc(50, 25, 15, 0, Math.PI * 2);
+      ctx.arc(70, 20, 20, 0, Math.PI * 2);
+      ctx.arc(90, 25, 15, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(canvas.width - 80, 30, 12, 0, Math.PI * 2);
+      ctx.arc(canvas.width - 60, 25, 18, 0, Math.PI * 2);
+      ctx.arc(canvas.width - 40, 30, 12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Jump
+    function jump() {
+      if (!dog.jumping && !gameOver) {
+        dog.velocityY = -12;
+        dog.jumping = true;
+        if (!gameRunning) {
+          startGame();
+        }
+      }
+      if (gameOver) {
+        resetGame();
+      }
+    }
+
+    // Start game
+    function startGame() {
+      gameRunning = true;
+      gameOver = false;
+      gameOverText.style.display = 'none';
+    }
+
+    // Reset game
+    function resetGame() {
+      dog.y = groundY;
+      dog.velocityY = 0;
+      dog.jumping = false;
+      obstacles = [];
+      score = 0;
+      gameSpeed = 3;
+      scoreElement.textContent = score;
+      gameOver = false;
+      gameRunning = false;
+      gameOverText.style.display = 'none';
+    }
+
+    // Check collision
+    function checkCollision(obs) {
+      const dogBox = {
+        x: dog.x + 5,
+        y: dog.y - 25,
+        width: 30,
+        height: 25
+      };
+
+      const obsBox = {
+        x: obs.x,
+        y: obs.y - obs.height,
+        width: 25,
+        height: obs.height
+      };
+
+      return dogBox.x < obsBox.x + obsBox.width &&
+             dogBox.x + dogBox.width > obsBox.x &&
+             dogBox.y < obsBox.y + obsBox.height &&
+             dogBox.y + dogBox.height > obsBox.y;
+    }
+
+    // Game loop
+    function gameLoop() {
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw background
+      ctx.fillStyle = '#E8F4FD';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      drawClouds();
+      drawGround();
+
+      if (gameRunning && !gameOver) {
+        // Update dog physics
+        dog.velocityY += 0.6; // Gravity
+        dog.y += dog.velocityY;
+
+        if (dog.y >= groundY) {
+          dog.y = groundY;
+          dog.velocityY = 0;
+          dog.jumping = false;
+        }
+
+        // Spawn obstacles
+        obstacleTimer++;
+        if (obstacleTimer >= obstacleInterval - Math.min(score / 5, 40)) {
+          obstacles.push({
+            x: canvas.width,
+            y: groundY + 5,
+            height: 30 + Math.random() * 15
+          });
+          obstacleTimer = 0;
+        }
+
+        // Update obstacles
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+          obstacles[i].x -= gameSpeed;
+
+          // Check collision
+          if (checkCollision(obstacles[i])) {
+            gameOver = true;
+            gameOverText.style.display = 'block';
+            if (score > highScore) {
+              highScore = score;
+              localStorage.setItem('dogGameHighScore', highScore);
+              highScoreElement.textContent = highScore;
+            }
+          }
+
+          // Remove off-screen obstacles
+          if (obstacles[i].x < -30) {
+            obstacles.splice(i, 1);
+            score++;
+            scoreElement.textContent = score;
+
+            // Increase speed
+            if (score % 10 === 0) {
+              gameSpeed += 0.5;
+            }
+          }
+        }
+      }
+
+      // Draw dog
+      drawDog();
+
+      // Draw obstacles
+      obstacles.forEach(obs => drawObstacle(obs));
+
+      // Start prompt
+      if (!gameRunning && !gameOver) {
+        ctx.fillStyle = 'rgba(30, 58, 95, 0.8)';
+        ctx.font = 'bold 14px Bitter';
+        ctx.textAlign = 'center';
+        ctx.fillText('Clique ou appuie sur ESPACE pour commencer', canvas.width / 2, canvas.height / 2);
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Event listeners
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        jump();
+      }
+    });
+
+    gameContainer.addEventListener('click', jump);
+    gameContainer.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      jump();
+    });
+
+    // Start game loop
+    gameLoop();
+  </script>
 </body>
 </html>
