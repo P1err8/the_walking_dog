@@ -45,7 +45,11 @@
         <% end %>
       <% end %>
 
-      <%= link_to "Retour", root_path, class: "settings-btn-light" %>
+      <%= link_to "Retour", root_path, class: "settings-btn-light", data: { turbo: false } %>
+    </div>
+
+    <div class="settings-logout">
+      <%= button_to "Se déconnecter", destroy_user_session_path, method: :delete, class: "settings-logout-btn" %>
     </div>
 
     <div class="settings-danger">

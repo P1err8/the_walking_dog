@@ -10,7 +10,7 @@
 
 <% if params[:open_modal] %>
   <script>
-    // Ouvrir la modal
+    // Ouvrir la modal directement
     const modalFrame = document.querySelector('turbo-frame#modal');
     if (modalFrame) {
       modalFrame.src = '<%= new_walking_path %>';
