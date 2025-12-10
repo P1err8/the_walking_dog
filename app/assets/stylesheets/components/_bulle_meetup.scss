@@ -129,6 +129,137 @@
     font-size: 0.85rem;
     color: $taupe;
   }
+
+  // Liste des chiens participants
+  &__dogs {
+    margin-bottom: 1rem;
+  }
+
+  // Vue compacte style Strava
+  &__dogs-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #e9ecef;
+    }
+  }
+
+  &__dogs-avatars {
+    display: flex;
+    margin-left: -8px; // Pour créer l'effet de chevauchement
+  }
+
+  &__dog-avatar-small {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffffff;
+    margin-left: -8px;
+    transition: transform 0.2s;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &.placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e9ecef;
+      font-size: 1rem;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      z-index: 10;
+    }
+  }
+
+  &__dogs-count {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $accent;
+    flex: 1;
+  }
+
+  &__dogs-chevron {
+    color: $taupe;
+    transition: transform 0.3s ease;
+  }
+
+  &__dogs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+
+  &__dog-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+
+  &__dog-avatar,
+  &__dog-avatar-placeholder {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid $beige-light;
+  }
+
+  &__dog-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $beige-light;
+    font-size: 1.2rem;
+  }
+
+  &__dog-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__dog-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $accent;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__dog-race {
+    font-size: 0.75rem;
+    color: $taupe;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 // Styles pour le popup Mapbox

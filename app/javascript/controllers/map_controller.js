@@ -214,22 +214,40 @@ export default class extends Controller {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
 
-      // Centrer la carte pour que la popup soit au milieu de l'écran
-      // Calculer la hauteur de la popup (environ 350px) et la décaler vers le haut
-      const popupHeight = 350; // Hauteur estimée de la popup
-      const mapHeight = this.map.getContainer().offsetHeight;
-      const offsetY = -(popupHeight / 2); // Décalage pour centrer verticalement
+      // Créer d'abord la popup cachée pour mesurer sa hauteur réelle
+      const tempPopup = new mapboxgl.Popup({
+        offset: 25,
+        maxWidth: '300px',
+        className: 'temp-popup-measure'
+      })
+        .setLngLat(coordinates)
+        .setHTML(infoWindow)
+        .addTo(this.map);
 
-      // D'abord centrer la carte, puis afficher la popup une fois l'animation terminée
+      // Attendre le prochain frame pour que le DOM soit rendu
+      await new Promise(resolve => requestAnimationFrame(resolve));
+
+      // Mesurer la hauteur réelle de la popup
+      const popupElement = tempPopup._content;
+      const popupHeight = popupElement ? popupElement.offsetHeight : 350;
+
+      // Retirer la popup temporaire
+      tempPopup.remove();
+
+      // Calculer l'offset dynamique basé sur la hauteur réelle
+      const mapHeight = this.map.getContainer().offsetHeight;
+      const offsetY = -(popupHeight / 2);
+
+      // Centrer la carte avec l'offset calculé
       this.map.easeTo({
         center: coordinates,
         offset: [0, offsetY],
         duration: 200
       });
 
-      // Attendre que l'animation soit terminée avant d'afficher la popup
+      // Attendre que l'animation soit terminée avant d'afficher la vraie popup
       this.map.once('moveend', () => {
-        // Créer la popup avec le HTML de base
+        // Créer la popup finale
         const popup = new mapboxgl.Popup({
           offset: 25,
           maxWidth: '300px'
