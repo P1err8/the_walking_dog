@@ -20,15 +20,21 @@ export default class extends Controller {
     // Clear the container to prevent Mapbox GL warnings about non-empty containers
     mapContainer.innerHTML = ''
 
+    // Try to get cached user location first for smoother UX
+    const cachedLocation = this.getCachedUserLocation()
+    const defaultCenter = this.coordinatesValue && this.coordinatesValue.length > 0
+      ? this.coordinatesValue[0]
+      : (cachedLocation || [4.8357, 45.7640])
+
     this.map = new mapboxgl.Map({
       container: mapContainer,
       style: "mapbox://styles/mapbox/streets-v10",
-      center: this.coordinatesValue && this.coordinatesValue.length > 0 ? this.coordinatesValue[0] : [4.8357, 45.7640],
+      center: defaultCenter,
       zoom: 12
     })
 
     // Geolocate user whenever the map is active
-    this.userLocation = null
+    this.userLocation = cachedLocation
     this.geolocateControl = new mapboxgl.GeolocateControl({
       positionOptions: { enableHighAccuracy: true },
       trackUserLocation: true,
@@ -44,6 +50,8 @@ export default class extends Controller {
       if (this.hasDestinationValue) {
         this.calculateRouteFromUser()
       }
+      // Cache location for next time
+      this.cacheUserLocation(this.userLocation)
     })
 
     // Ensure the map matches the container size immediately
@@ -57,6 +65,7 @@ export default class extends Controller {
 
     this.map.on("load", () => {
       this.map.resize()
+      // Trigger geolocate to show user position and enable tracking
       if (this.geolocateControl) {
         this.geolocateControl.trigger()
       }
@@ -535,6 +544,24 @@ export default class extends Controller {
       if (distanceElement) {
         distanceElement.textContent = 'Non disponible';
       }
+    }
+  }
+
+  // Cache user location in localStorage for smoother map loading
+  cacheUserLocation(coords) {
+    try {
+      localStorage.setItem('userMapLocation', JSON.stringify(coords))
+    } catch (e) {
+      // localStorage might be unavailable
+    }
+  }
+
+  getCachedUserLocation() {
+    try {
+      const cached = localStorage.getItem('userMapLocation')
+      return cached ? JSON.parse(cached) : null
+    } catch (e) {
+      return null
     }
   }
 }

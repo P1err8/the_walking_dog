@@ -1,103 +1,128 @@
+// ========================================
+// ACTIVITIES PAGE - Historique des balades
+// ========================================
+@import "../config/variables";
+
 .activities-container {
-  padding-bottom: 60px;
+  min-height: 100vh;
+  padding: 1rem;
+  padding-bottom: 100px;
   width: 100%;
-  background: white;
+  background: $bg-page;
+}
 
-  .activity-card {
-    background: white;
-    padding: 15px;
-    margin-bottom: 0;
-    border-bottom: 1px solid #f0f0f0;
+.activities-list {
+  max-width: 500px;
+  margin: 0 auto;
+}
 
-    .activity-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 12px;
+.activity-card {
+  background: $surface;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: $radius;
+  box-shadow: $shadow;
 
-      .user-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        overflow: hidden;
-        margin-right: 10px;
+  .activity-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
 
-        .avatar-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-      }
-
-      .user-info {
-        display: flex;
-        flex-direction: column;
-        font-size: 0.9rem;
-
-        strong {
-          color: #333;
-        }
-
-        .date {
-          color: #888;
-          font-size: 0.75rem;
-        }
-      }
-    }
-
-    h3 {
-      font-size: 1.1rem;
-      margin: 0 0 15px 0;
-      font-weight: 600;
-    }
-
-    .activity-stats {
-      display: flex;
-      gap: 30px;
-      margin-bottom: 15px;
-
-      .stat {
-        display: flex;
-        flex-direction: column;
-
-        .label {
-          font-size: 0.7rem;
-          color: #888;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .value {
-          font-size: 1.3rem;
-          font-weight: 500;
-          color: #333;
-        }
-      }
-    }
-
-    .activity-map {
-      width: 100%;
-      height: 200px;
-      border-radius: 8px;
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
       overflow: hidden;
-      background-color: #eee;
+      margin-right: 0.75rem;
+      border: 2px solid $primary;
 
-      .static-map-img {
+      .avatar-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
       }
     }
-  }
 
-  .no-activities {
-    text-align: center;
-    bottom: 100px;
-    h2 {
-      text-align: center;
-      margin: 20px 0;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #333;
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+
+      strong {
+        color: $text-main;
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+
+      .date {
+        color: $text-muted;
+        font-size: 0.8rem;
+      }
     }
   }
+
+  h3 {
+    font-size: 1.15rem;
+    margin: 0 0 1rem 0;
+    font-weight: 700;
+    color: $accent;
+  }
+
+  // Stats fusionnés avec la map
+  .activity-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 0.75rem 0.5rem;
+    background: lighten($bg-page, 2%);
+    border-radius: 0 0 $radius-md $radius-md;
+    border: 1px solid $border-color;
+    border-top: none;
+
+    .stat {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.4rem;
+
+      i {
+        font-size: 0.95rem;
+        color: $primary;
+      }
+
+      .value {
+        font-size: 0.95rem;
+        color: $accent;
+
+        strong {
+          font-weight: 700;
+        }
+      }
+    }
+  }
+
+  // Map et stats fusionnés
+  .activity-map {
+    width: 100%;
+    height: 180px;
+    border-radius: $radius-md $radius-md 0 0;
+    overflow: hidden;
+    background-color: $beige-light;
+
+    .static-map-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+.no-activities {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: $surface;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  color: $text-muted;
+  font-size: 1rem;
+  font-style: italic;
 }

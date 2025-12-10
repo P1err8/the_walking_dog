@@ -19,20 +19,20 @@
           </div>
           <!-- Title -->
           <h3>Promenade</h3>
-          <!-- Stats Grid -->
-          <div class="activity-stats">
-            <div class="stat">
-              <span class="label">Distance</span>
-              <span class="value"><%= walking.distance ? walking.distance.round(2) : (walking.coordinates.length / 100.0).round(2) %> km</span>
-            </div>
-            <div class="stat">
-              <span class="label">Durée</span>
-              <span class="value"><%= "#{walking.duration} min"%></span>
-            </div>
-          </div>
           <!-- The Static Map -->
           <div class="activity-map">
             <%= image_tag static_map_url(walking), alt: "Itinéraire de la balade", class: "static-map-img" %>
+          </div>
+          <!-- Stats Grid -->
+          <div class="activity-stats">
+            <div class="stat">
+              <i class="fa-solid fa-route"></i>
+              <span class="value"><strong><%= walking.calculated_distance ? "#{walking.calculated_distance} km" : "- km" %></strong></span>
+            </div>
+            <div class="stat">
+              <i class="fa-regular fa-clock"></i>
+              <span class="value"><strong><%= walking.calculated_duration ? "#{walking.calculated_duration} min" : "- min" %></strong></span>
+            </div>
           </div>
         </div>
       <% end %>
