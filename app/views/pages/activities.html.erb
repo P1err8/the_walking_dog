@@ -14,7 +14,7 @@
             </div>
             <div class="user-info">
               <strong><%= current_user.email.split('@').first.capitalize %></strong>
-              <span class="date"><%= walking.created_at.strftime("%d %b à %H:%M") %></span>
+              <span class="date"><%= walking.created_at.in_time_zone('Paris').strftime("%d %b à %H:%M") %></span>
             </div>
           </div>
           <!-- Title -->
