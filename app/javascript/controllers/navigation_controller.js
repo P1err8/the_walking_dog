@@ -11,6 +11,36 @@ export default class extends Controller {
 		this.userPosition = null
 
 		const coords = this.coordinatesValue || []
+
+		// Vérifier si on a un tableau valide de coordonnées
+		if (coords.length === 0 || !Array.isArray(coords)) {
+			console.warn("Navigation controller: no valid coordinates provided")
+			// Écouter l'événement route:calculated pour obtenir l'itinéraire
+			this.handleRouteCalculatedBound = this.handleRouteCalculated.bind(this)
+			document.addEventListener('route:calculated', this.handleRouteCalculatedBound)
+			return
+		}
+
+		// Vérifier si le premier élément est bien un tableau [lng, lat]
+		if (!Array.isArray(coords[0])) {
+			console.warn("Navigation controller: invalid coordinate format, expected [[lng, lat], ...]")
+			this.handleRouteCalculatedBound = this.handleRouteCalculated.bind(this)
+			document.addEventListener('route:calculated', this.handleRouteCalculatedBound)
+			return
+		}
+
+		this.initializeNavigation(coords)
+	}
+
+	handleRouteCalculated(event) {
+		const { coordinates } = event.detail
+		if (coordinates && Array.isArray(coordinates) && coordinates.length > 0) {
+			this.coordinatesValue = coordinates
+			this.initializeNavigation(coordinates)
+		}
+	}
+
+	initializeNavigation(coords) {
 		this.totalDistance = this.calculateTotalDistance(coords)
 		this.steps = this.buildTurnByTurn(coords)
 		this.mapController = this.findMapController()
@@ -21,6 +51,9 @@ export default class extends Controller {
 		// Cleanup if needed
 		if (this.watchId) {
 			navigator.geolocation.clearWatch(this.watchId)
+		}
+		if (this.handleRouteCalculatedBound) {
+			document.removeEventListener('route:calculated', this.handleRouteCalculatedBound)
 		}
 	}
 
@@ -47,7 +80,13 @@ export default class extends Controller {
 	// --- UI update ---
 	updatePanel() {
 		const coords = this.coordinatesValue || []
-		if (!coords.length) return
+		if (!coords.length || !Array.isArray(coords[0])) {
+			// Pas encore d'itinéraire, afficher un message par défaut
+			if (this.hasInstructionTarget) this.instructionTarget.textContent = "Calcul de l'itinéraire..."
+			if (this.hasDistanceTarget) this.distanceTarget.textContent = "-- km"
+			if (this.hasDurationTarget) this.durationTarget.textContent = "-- min"
+			return
+		}
 
 		// Instruction turn-by-turn style
 		const instruction = this.nextInstruction()
@@ -79,6 +118,7 @@ export default class extends Controller {
 	}
 
 	calculateTotalDistance(coordinates) {
+		if (!coordinates || coordinates.length < 2) return 0
 		let total = 0
 		for (let i = 1; i < coordinates.length; i++) {
 			total += this.haversine(coordinates[i - 1], coordinates[i])
@@ -87,6 +127,10 @@ export default class extends Controller {
 	}
 
 	haversine(a, b) {
+		if (!Array.isArray(a) || !Array.isArray(b)) {
+			console.error("haversine: invalid coordinates", a, b)
+			return 0
+		}
 		const [lon1, lat1] = a
 		const [lon2, lat2] = b
 		const R = 6371e3
