@@ -6,7 +6,8 @@ export default class extends Controller {
   static values = {
     apiKey: String,
     coordinates: Array,
-    markers: Array
+    markers: Array,
+    destination: Array
   }
 
   connect() {
@@ -39,6 +40,10 @@ export default class extends Controller {
     // Store user location when geolocate is successful
     this.geolocateControl.on('geolocate', (e) => {
       this.userLocation = [e.coords.longitude, e.coords.latitude]
+
+      if (this.hasDestinationValue) {
+        this.calculateRouteFromUser()
+      }
     })
 
     // Ensure the map matches the container size immediately
@@ -261,7 +266,31 @@ export default class extends Controller {
     }
   }
 
+  async calculateRouteFromUser() {
+    const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${this.userLocation[0]},${this.userLocation[1]};${this.destinationValue[0]},${this.destinationValue[1]}?geometries=geojson&access_token=${this.apiKeyValue}`
+
+    try {
+      const response = await fetch(url)
+      const data = await response.json()
+
+      if (data.routes && data.routes.length > 0) {
+        this.coordinatesValue = [this.userLocation, this.destinationValue]
+        this.drawRoute(data.routes[0].geometry)
+      }
+    } catch (error) {
+      console.error("Error fetching route:", error)
+    }
+  }
+
   drawRoute(geometry) {
+    if (this.map.getLayer("route")) { this.map.removeLayer("route") }
+    if (this.map.getSource("route")) { this.map.removeSource("route") }
+
+    if (this.routeMarkers) {
+      this.routeMarkers.forEach(marker => marker.remove())
+    }
+    this.routeMarkers = []
+
     // 3. Add the source using the fetched geometry
     this.map.addSource("route", {
       type: "geojson",
@@ -287,14 +316,16 @@ export default class extends Controller {
     })
 
     // Start Marker (Green)
-    new mapboxgl.Marker({ color: "#10B981" })
+    const startMarker = new mapboxgl.Marker({ color: "#10B981" })
       .setLngLat(this.coordinatesValue[0])
       .addTo(this.map)
 
     // End Marker (Red)
-    new mapboxgl.Marker({ color: "#EF4444" })
+    const endMarker = new mapboxgl.Marker({ color: "#EF4444" })
       .setLngLat(this.coordinatesValue[this.coordinatesValue.length - 1])
       .addTo(this.map)
+
+    this.routeMarkers.push(startMarker, endMarker)
   }
 
   fitMapToRoute() {

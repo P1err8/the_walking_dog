@@ -11,9 +11,9 @@ class MeetUpsController < ApplicationController
       info_window_html: render_to_string(partial: "shared/bulle_meetup", locals: {
         point_id: @point.id,
         name: @point.name,
-       image_url: @point.url_picture,
-       type: "Point de rencontre",
-       location: "Lyon, France"
+        image_url: @point.url_picture,
+        type: "Point de rencontre",
+        location: "Lyon, France"
        })
     }
   end
