@@ -45,6 +45,34 @@ export default class extends Controller {
 		this.steps = this.buildTurnByTurn(coords)
 		this.mapController = this.findMapController()
 		this.updatePanel()
+
+		// Démarrer la mise à jour en temps réel si on a un map controller
+		if (this.mapController) {
+			this.startRealtimeUpdates()
+		}
+	}
+
+	startRealtimeUpdates() {
+		// Écouter les événements de géolocalisation du map controller
+		if (this.mapController.geolocateControl) {
+			this.handleGeolocateBound = this.handleGeolocationUpdate.bind(this)
+			this.mapController.geolocateControl.on('geolocate', this.handleGeolocateBound)
+		}
+
+		// Mise à jour périodique toutes les 2 secondes (fallback si pas de geolocate)
+		this.updateInterval = setInterval(() => {
+			if (this.mapController && this.mapController.userLocation) {
+				this.userPosition = this.mapController.userLocation
+				this.advanceStepIfNeeded()
+				this.updatePanel()
+			}
+		}, 2000)
+	}
+
+	handleGeolocationUpdate(e) {
+		this.userPosition = [e.coords.longitude, e.coords.latitude]
+		this.advanceStepIfNeeded()
+		this.updatePanel()
 	}
 
 	disconnect() {
@@ -54,6 +82,13 @@ export default class extends Controller {
 		}
 		if (this.handleRouteCalculatedBound) {
 			document.removeEventListener('route:calculated', this.handleRouteCalculatedBound)
+		}
+		// Nettoyer les mises à jour en temps réel
+		if (this.updateInterval) {
+			clearInterval(this.updateInterval)
+		}
+		if (this.handleGeolocateBound && this.mapController && this.mapController.geolocateControl) {
+			this.mapController.geolocateControl.off('geolocate', this.handleGeolocateBound)
 		}
 	}
 
