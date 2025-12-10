@@ -29,6 +29,11 @@ body {
   display: none;
 }
 
+// Cacher le bouton de géolocalisation Mapbox
+.mapboxgl-ctrl-geolocate {
+  display: none !important;
+}
+
 // Boutons globaux
 .btn {
   display: inline-flex;

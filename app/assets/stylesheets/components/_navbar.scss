@@ -21,6 +21,7 @@
   align-items: center;
   justify-content: space-around;
   padding: 0 1rem;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 
   // Effet curved au centre pour le bouton FAB
   &::before {
@@ -125,7 +126,7 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;

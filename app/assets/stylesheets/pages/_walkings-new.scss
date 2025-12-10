@@ -10,6 +10,7 @@ turbo-frame#modal {
 
   .modal-frame {
     animation: slideUp 0.3s ease-out;
+    transition: height 0.3s ease, bottom 0.3s ease;
   }
 }
 
@@ -52,9 +53,9 @@ turbo-frame#modal {
   border-radius: $radius $radius 0 0;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   padding: 1.5rem 1.5rem 5rem; // Padding bas augmenté pour la navbar
-  z-index: 950;
+  z-index: 1100; // Au-dessus de la navbar (1000) et du bouton GO (1001)
   overflow: hidden;
-  max-height: 60vh;
+  max-height: 50vh;
   // Animation d'apparition
   animation: slideUpModal 0.4s ease-out;
 }
@@ -110,6 +111,34 @@ turbo-frame#modal {
   &:hover .drag-indicator {
     opacity: 0.8;
   }
+
+  .drag-close-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: $taupe;
+    transition: all 0.2s ease;
+    padding: 0;
+
+    &:hover {
+      background: rgba($border-color, 0.3);
+      color: $text-main;
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+  }
 }
 
 // Formulaire de balade
@@ -156,6 +185,27 @@ turbo-frame#modal {
       border-color: $primary;
       background: $surface;
       box-shadow: 0 0 0 4px rgba($primary, 0.1);
+    }
+  }
+
+  // Select dropdown
+  .form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: $bg-page;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px;
+    padding-right: 2.5rem;
+    cursor: pointer;
+    font-weight: 600;
+
+    option {
+      padding: 0.75rem;
+      background: $surface;
+      color: $text-main;
     }
   }
 
@@ -226,6 +276,11 @@ turbo-frame#modal {
   overflow-y: auto;
   box-shadow: $shadow-lg;
   margin-top: 0.25rem;
+
+  // Cacher quand vide
+  &:empty {
+    display: none;
+  }
 
   .autocomplete-item {
     padding: 0.75rem 1rem;

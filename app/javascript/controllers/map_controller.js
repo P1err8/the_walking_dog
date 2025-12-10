@@ -119,7 +119,29 @@ export default class extends Controller {
       clusterRadius: 50   // Rayon du cluster
     });
 
-    // 3. Layer : Les cercles de clusters (couleur selon densité)
+    // 3. Layer : Halo externe des clusters (effet glow)
+    this.map.addLayer({
+      id: 'clusters-glow',
+      type: 'circle',
+      source: 'meetups',
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': '#C9B5A0',
+        'circle-radius': [
+          'interpolate', ['linear'], ['get', 'point_count'],
+          1, 24,
+          10, 28,
+          50, 38,
+          100, 44
+        ],
+        'circle-opacity': 0.25,
+        'circle-blur': 1,
+        'circle-radius-transition': { duration: 300 },
+        'circle-opacity-transition': { duration: 300 }
+      }
+    });
+
+    // 4. Layer : Les cercles de clusters
     this.map.addLayer({
       id: 'clusters',
       type: 'circle',
@@ -127,21 +149,27 @@ export default class extends Controller {
       filter: ['has', 'point_count'],
       paint: {
         'circle-color': [
-          'step', ['get', 'point_count'],
-          '#c8b59a', 10,  // Bleu si < 10
-          '#deaf6e', 50,  // Jaune si < 50
-          '#e5c99e'       // Rose si > 50
+          'interpolate', ['linear'], ['get', 'point_count'],
+          1, '#c8b59a',
+          10, '#d4b98a',
+          50, '#deaf6e',
+          100, '#C9B5A0'
         ],
         'circle-radius': [
-          'step', ['get', 'point_count'],
-          20, 10, // Rayon 20px -> 30px -> 40px
-          30, 50,
-          40
-        ]
+          'interpolate', ['linear'], ['get', 'point_count'],
+          1, 18,
+          10, 22,
+          50, 30,
+          100, 36
+        ],
+        'circle-stroke-width': 3,
+        'circle-stroke-color': '#ffffff',
+        'circle-color-transition': { duration: 300 },
+        'circle-radius-transition': { duration: 300 }
       }
     });
 
-    // 4. Layer : Le chiffre dans le cluster
+    // 5. Layer : Le chiffre dans le cluster
     this.map.addLayer({
       id: 'cluster-count',
       type: 'symbol',
@@ -149,8 +177,18 @@ export default class extends Controller {
       filter: ['has', 'point_count'],
       layout: {
         'text-field': '{point_count_abbreviated}',
-        'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-        'text-size': 12
+        'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
+        'text-size': [
+          'interpolate', ['linear'], ['get', 'point_count'],
+          1, 12,
+          10, 14,
+          50, 16,
+          100, 18
+        ]
+      },
+      paint: {
+        'text-color': '#1E3A5F',
+        'text-opacity-transition': { duration: 300 }
       }
     });
 
@@ -164,10 +202,11 @@ export default class extends Controller {
         'circle-color': '#ef4444', // Rouge
         'circle-radius': 40,
         'circle-opacity': 0.3,
-        'circle-stroke-width': 0
+        'circle-stroke-width': 0,
+        'circle-opacity-transition': { duration: 300 },
+        'circle-radius-transition': { duration: 300 }
       }
     });
-
     // 6. Layer : Les points individuels (non clusterisés)
     this.map.addLayer({
       id: 'unclustered-point',
@@ -179,11 +218,13 @@ export default class extends Controller {
           'case',
           ['get', 'has_active_meetup'],
           '#ef4444', // Rouge si actif
-          '#f5840d'  // Orange par défaut
+          '#C9B5A0'  // Beige par défaut
         ],
-        'circle-radius': 8,
-        'circle-stroke-width': 1,
-        'circle-stroke-color': '#fff'
+        'circle-radius': 10,
+        'circle-stroke-width': 3,
+        'circle-stroke-color': '#ffffff',
+        'circle-opacity-transition': { duration: 300 },
+        'circle-radius-transition': { duration: 300 }
       }
     });
 
