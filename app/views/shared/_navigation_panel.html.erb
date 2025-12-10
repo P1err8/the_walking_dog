@@ -37,9 +37,18 @@
 	</div>
 
 	<!-- Bouton Terminer -->
-	<%= link_to root_path, class: "navigation-panel__end-btn", data: { turbo: false, action: "click->active-walking#clearActiveWalking" } do %>
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-			<path d="M6 6h12v12H6z"/>
-		</svg>
-		Terminer
+	<% if local_assigns[:meet_up] %>
+		<%= button_to "Terminer", arrive_meet_up_participations_path(meet_up), method: :post, class: "navigation-panel__end-btn", data: { turbo: false } do %>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+				<path d="M6 6h12v12H6z"/>
+			</svg>
+			Terminer
+		<% end %>
+	<% else %>
+		<%= link_to root_path, class: "navigation-panel__end-btn", data: { turbo: false, action: "click->active-walking#clearActiveWalking" } do %>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+				<path d="M6 6h12v12H6z"/>
+			</svg>
+			Terminer
+		<% end %>
 	<% end %>

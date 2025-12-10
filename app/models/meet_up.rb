@@ -17,4 +17,14 @@ class MeetUp < ApplicationRecord
   def closed?
     !active?
   end
+
+  # Retourne les chiens des utilisateurs arrivés il y a moins de 40 minutes
+  def present_dogs
+    active_participations = participations.where('updated_at > ?', 40.minutes.ago)
+    User.joins(:participations)
+        .where(participations: { id: active_participations.pluck(:id) })
+        .includes(:dogs)
+        .flat_map(&:dogs)
+        .uniq
+  end
 end
