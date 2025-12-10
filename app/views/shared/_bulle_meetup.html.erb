@@ -27,9 +27,29 @@
       </div>
     </div>
     <% if point.meet_ups.any?(&:active?) %>
-      <span class="badge bg-success">En cours</span>
-      <%= simple_form_for [point.meet_ups.active.last, Participation.new] do |f| %>
-        <%# Champ caché pour lier le meetup au point actuel %>
+      <% active_meetup = point.meet_ups.active.last %>
+      <% dogs = active_meetup.dogs %>
+
+      <% if dogs.any? %>
+        <div class="bulle-meetup__dogs">
+          <div class="bulle-meetup__dogs-avatars">
+            <% dogs.first(3).each do |dog| %>
+              <% if dog.url_picture.present? %>
+                <%= image_tag dog.url_picture, alt: dog.name, class: "bulle-meetup__dog-avatar-small" %>
+              <% else %>
+                <div class="bulle-meetup__dog-avatar-small placeholder">🐕</div>
+              <% end %>
+            <% end %>
+          </div>
+          <div class="bulle-meetup__dogs-races">
+            <% dogs.each_with_index do |dog, index| %>
+              <span class="bulle-meetup__dog-race"><%= dog.race %></span><%= index < dogs.size - 1 ? ' - ' : '' %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <%= simple_form_for [active_meetup, Participation.new] do |f| %>
         <%= f.submit "Rejoindre la Rencontre", class: "btn btn-primary btn-sm" %>
       <% end %>
     <% else %>
