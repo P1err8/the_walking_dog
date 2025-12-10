@@ -234,9 +234,22 @@ export default class extends Controller {
       // Retirer la popup temporaire
       tempPopup.remove();
 
-      // Calculer l'offset dynamique basé sur la hauteur réelle
-      const mapHeight = this.map.getContainer().offsetHeight;
-      const offsetY = -(popupHeight / 2);
+      // Calculer l'offset dynamique basé sur la position du panneau de navigation
+      const mapContainer = this.map.getContainer();
+      const mapHeight = mapContainer.offsetHeight;
+      const navigationPanel = document.querySelector('.navigation-panel');
+
+      let availableHeight = mapHeight;
+      if (navigationPanel) {
+        // Calculer la distance du haut du panneau par rapport au haut de la carte
+        const mapRect = mapContainer.getBoundingClientRect();
+        const panelRect = navigationPanel.getBoundingClientRect();
+        const panelTopRelativeToMap = panelRect.top - mapRect.top;
+        availableHeight = panelTopRelativeToMap;
+      }
+
+      // Centrer la popup dans l'espace disponible au-dessus du panneau
+      const offsetY = (availableHeight / 2) - (popupHeight / 2) - (mapHeight / 2);
 
       // Centrer la carte avec l'offset calculé
       this.map.easeTo({

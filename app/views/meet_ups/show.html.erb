@@ -2,6 +2,14 @@
 <div class="walkingmap-container"
     data-controller="map"
     data-map-destination-value="<%= [@destination[:lng], @destination[:lat]].to_json %>"
+    data-map-markers-value="<%= [{
+      lat: @destination[:lat],
+      lng: @destination[:lng],
+      marker_name: @point.name,
+      point_id: @point.id,
+      has_active_meetup: @point.meet_ups.any?(&:active?),
+      info_window_html: @destination[:info_window_html]
+    }].to_json %>"
     data-map-api-key-value="<%= ENV['MAPBOX_API_KEY'] %>"
     data-map-route-value="true">
 

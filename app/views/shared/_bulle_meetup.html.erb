@@ -33,7 +33,7 @@
       <% if dogs.any? %>
         <div class="bulle-meetup__dogs">
           <div class="bulle-meetup__dogs-avatars">
-            <% dogs.first(3).each do |dog| %>
+            <% dogs.each do |dog| %>
               <% if dog.url_picture.present? %>
                 <%= image_tag dog.url_picture, alt: dog.name, class: "bulle-meetup__dog-avatar-small" %>
               <% else %>
@@ -49,14 +49,18 @@
         </div>
       <% end %>
 
-      <%= simple_form_for [active_meetup, Participation.new] do |f| %>
-        <%= f.submit "Rejoindre la Rencontre", class: "btn btn-primary btn-sm" %>
+      <% unless controller_name == 'meet_ups' && action_name == 'show' %>
+        <%= simple_form_for [active_meetup, Participation.new] do |f| %>
+          <%= f.submit "Rejoindre la Rencontre", class: "btn btn-primary btn-sm" %>
+        <% end %>
       <% end %>
     <% else %>
-      <%= simple_form_for MeetUp.new do |f| %>
-        <%# Champ caché pour lier le meetup au point actuel %>
-        <%= f.input :point_id, as: :hidden, input_html: { value: point_id } %>
-        <%= f.submit "Créer une Rencontre", class: "btn btn-primary btn-sm" %>
+      <% unless controller_name == 'meet_ups' && action_name == 'show' %>
+        <%= simple_form_for MeetUp.new do |f| %>
+          <%# Champ caché pour lier le meetup au point actuel %>
+          <%= f.input :point_id, as: :hidden, input_html: { value: point_id } %>
+          <%= f.submit "Créer une Rencontre", class: "btn btn-primary btn-sm" %>
+        <% end %>
       <% end %>
     <% end %>
   </div>
