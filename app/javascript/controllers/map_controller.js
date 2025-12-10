@@ -99,7 +99,8 @@ export default class extends Controller {
           // On passe le HTML de la popup dans les propriétés
           info_window: marker.info_window_html,
           lat: marker.lat,
-          lng: marker.lng
+          lng: marker.lng,
+          has_active_meetup: marker.has_active_meetup
         }
       }
     })
@@ -153,14 +154,33 @@ export default class extends Controller {
       }
     });
 
-    // 5. Layer : Les points individuels (non clusterisés)
+    // 5. Layer : Zone active (cercle rouge autour des points actifs)
+    this.map.addLayer({
+      id: 'active-meetup-zone',
+      type: 'circle',
+      source: 'meetups',
+      filter: ['all', ['!', ['has', 'point_count']], ['get', 'has_active_meetup']],
+      paint: {
+        'circle-color': '#ef4444', // Rouge
+        'circle-radius': 40,
+        'circle-opacity': 0.3,
+        'circle-stroke-width': 0
+      }
+    });
+
+    // 6. Layer : Les points individuels (non clusterisés)
     this.map.addLayer({
       id: 'unclustered-point',
       type: 'circle',
       source: 'meetups',
       filter: ['!', ['has', 'point_count']],
       paint: {
-        'circle-color': '#f5840d',
+        'circle-color': [
+          'case',
+          ['get', 'has_active_meetup'],
+          '#ef4444', // Rouge si actif
+          '#f5840d'  // Orange par défaut
+        ],
         'circle-radius': 8,
         'circle-stroke-width': 1,
         'circle-stroke-color': '#fff'

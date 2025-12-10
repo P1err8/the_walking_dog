@@ -1,19 +1,16 @@
 <div class="bulle-meetup">
   <div class="bulle-meetup__image">
-        <img src="<%= image_url.presence || asset_path('meetup-placeholder.svg') %>"
+    <img src="<%= image_url.presence || asset_path('meetup-placeholder.svg') %>"
          alt="<%= name %>"
          class="bulle-meetup__img"
           onerror="this.onerror=null;this.src='<%= asset_path('meetup-placeholder.svg') %>'" />
   </div>
-
   <div class="bulle-meetup__content">
     <div class="bulle-meetup__header">
       <span class="bulle-meetup__type"><%= type.presence || 'Point de rencontre' %></span>
     </div>
-
     <h3 class="bulle-meetup__title"><%= name %></h3>
     <p class="bulle-meetup__location"><%= location.presence || 'Lyon, France' %></p>
-
     <div class="bulle-meetup__info">
       <div class="bulle-meetup__distance">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -29,13 +26,18 @@
         <span class="duration-value">Calcul...</span>
       </div>
     </div>
-
-    <%= simple_form_for MeetUp.new do |f| %>
-      <%# Champ caché pour lier le meetup au point actuel %>
-      <%= f.input :point_id, as: :hidden, input_html: { value: point_id } %>
-      <%= f.submit "Créer une Rencontre", class: "btn btn-primary btn-sm" %>
+    <% if point.meet_ups.any?(&:active?) %>
+      <span class="badge bg-success">En cours</span>
+      <%= simple_form_for [point.meet_ups.active.last, Participation.new] do |f| %>
+        <%# Champ caché pour lier le meetup au point actuel %>
+        <%= f.submit "Rejoindre la Rencontre", class: "btn btn-primary btn-sm" %>
+      <% end %>
+    <% else %>
+      <%= simple_form_for MeetUp.new do |f| %>
+        <%# Champ caché pour lier le meetup au point actuel %>
+        <%= f.input :point_id, as: :hidden, input_html: { value: point_id } %>
+        <%= f.submit "Créer une Rencontre", class: "btn btn-primary btn-sm" %>
+      <% end %>
     <% end %>
-
-
   </div>
 </div>

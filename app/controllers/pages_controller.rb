@@ -3,8 +3,8 @@ class PagesController < ApplicationController
   skip_before_action :authenticate_user!, only: [:isochrone]
 
   def home
-    @points = Point.all
-
+    @points = Point.includes(meet_ups: :participations).all
+    @meet_ups = MeetUp.all
     @markers = @points.map do |point|
 
       {
@@ -12,9 +12,11 @@ class PagesController < ApplicationController
         lng: point.longitude,
         marker_name: point.name,
         point_id: point.id,
+        has_active_meetup: point.meet_ups.any?(&:active?),
         info_window_html: render_to_string(
           partial: "shared/bulle_meetup",
           locals: {
+            point: point,
             name: point.name,
             type: "Point de rencontre",
             location: "Lyon, France",

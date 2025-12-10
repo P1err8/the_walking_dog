@@ -9,6 +9,7 @@ class MeetUpsController < ApplicationController
       lat: @point.latitude,
       lng: @point.longitude,
       info_window_html: render_to_string(partial: "shared/bulle_meetup", locals: {
+        point: @point,
         point_id: @point.id,
         name: @point.name,
         image_url: @point.url_picture,
