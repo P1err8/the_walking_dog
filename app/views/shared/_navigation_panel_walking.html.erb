@@ -13,9 +13,12 @@
 	</button>
 
 	<div class="navigation-panel"
-			 data-action="mousedown->draggable-panel#startDrag touchstart->draggable-panel#startDrag
-			              mousemove@window->draggable-panel#drag touchmove@window->draggable-panel#drag
-			              mouseup@window->draggable-panel#endDrag touchend@window->draggable-panel#endDrag">
+			 data-action="mousedown->draggable-panel#startDrag
+			              touchstart->draggable-panel#startDrag:!passive
+			              mousemove@window->draggable-panel#drag
+			              touchmove@window->draggable-panel#drag:!passive
+			              mouseup@window->draggable-panel#endDrag
+			              touchend@window->draggable-panel#endDrag">
 		<%= render "shared/navigation_panel", walking: @walking %>
 	</div>
 </div>

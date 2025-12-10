@@ -240,7 +240,10 @@ export default class extends Controller {
   drag(event) {
     if (!this.isDragging) return
 
-    event.preventDefault()
+    // Prévenir le comportement par défaut seulement si possible (non-passive)
+    if (event.cancelable) {
+      event.preventDefault()
+    }
 
     const currentY = event.type.includes('touch') ? event.touches[0].clientY : event.clientY
     const deltaY = currentY - this.startY // positif = drag vers le bas
