@@ -18,6 +18,7 @@ user1 = User.create!(
   password: "demodemo"
 )
 
+
 user2 = User.create!(
   email: "carol@demo.com",
   password: "demodemo"
@@ -28,39 +29,46 @@ user3 = User.create!(
   password: "demodemo"
 )
 
+user4 = User.create!(
+  email: "igor@demo.com",
+  password: "demodemo"
+)
+
 puts "the user with the #{user1.email} has been created!"
 puts "the user with the #{user2.email} has been created!"
 
 Tag.destroy_all
 puts "Creating tags for dogs' personalities..."
 
-dogs_tags = ["Amical", "Calme", "Joueur", "Énergique", "Protecteur", "Timide"]
-
-puts "Creating tags..."
-tags = dogs_tags.map do |tag_name|
-  Tag.create!(name: tag_name)
-end
-
-puts "All tags have been created!"
 
 croket = Dog.create!(
   name: "Croket",
-  size: "small",
+  size: "petit",
   age: 3,
   race: "Chihuahua",
   url_picture: "chihuahua.jpeg",
   user: user1
+  )
+
+  puts "#{croket.name} has been created!"
+
+luna = Dog.create!(
+  name: "Luna",
+  size: "grand",
+  age: 6,
+  race: "saint-bernard",
+  url_picture: "saint-bernard.png",
+  user: user1
 )
 
-puts "#{croket.name} has been created!"
+  puts "#{croket.name} has been created!"
 
-
-pilou = Dog.create!(
-  name: "Pilou",
-  size: "large",
-  age: 3,
-  race: "Cairn Terrier",
-  url_picture: "cairn-terrier.png",
+    pilou = Dog.create!(
+      name: "Pilou",
+      size: "petit",
+      age: 5,
+      race: "Cairn Terrier",
+      url_picture: "cairn-terrier.png",
   user: user2
 )
 
@@ -68,28 +76,38 @@ puts "#{pilou.name} has been created!"
 
 viktor = Dog.create!(
   name: "Viktor",
-  size: "small",
+  size: "moyen",
   age: 1,
   race: "Cocker Spaniel",
   url_picture: "cocker-spaniel.jpg",
   user: user3
-)
+  )
 
-puts "#{viktor.name} has been created!"
+  puts "#{viktor.name} has been created!"
 
+  dogs_tags = ["Amical", "Calme", "Joueur", "Énergique", "Protecteur", "Timide"]
 
-puts "Associating tags to dogs..."
+  puts "Creating tags..."
+  tags = dogs_tags.map do |tag_name|
+    Tag.create!(name: tag_name)
+  end
 
-croket.tags << tags[0]  # friendly
-croket.tags << tags[2]  # playful
-pilou.tags << tags[1]     # calm
-pilou.tags << tags[3]     # energetic
-viktor.tags << tags[0]  # friendly
-viktor.tags << tags[2]  # playful
+  puts "All tags have been created!"
 
-puts "Tags have been associated!"
+  puts "Associating tags to dogs..."
 
-#API_Meet_up_points_url = "https://data.grandlyon.com/fr/geoserv/ogc/features/v1/collections/metropole-de-lyon:com_donnees_communales.comparcjardin_1_0_0/items?&crs=EPSG:4171&f=application/geo%2Bjson&limit=60&startIndex=0&sortby=gid"
+  luna.tags << tags[4]
+  luna.tags << tags[5]
+  croket.tags << tags[0]
+  croket.tags << tags[2]
+  pilou.tags << tags[1]
+  pilou.tags << tags[3]
+  viktor.tags << tags[0]
+  viktor.tags << tags[2]
+
+  puts "Tags have been associated!"
+
+  #API_Meet_up_points_url = "https://data.grandlyon.com/fr/geoserv/ogc/features/v1/collections/metropole-de-lyon:com_donnees_communales.comparcjardin_1_0_0/items?&crs=EPSG:4171&f=application/geo%2Bjson&limit=60&startIndex=0&sortby=gid"
 
 #url = API_Meet_up_points_url
 #user_serialized = URI.parse(url).read
@@ -116,15 +134,34 @@ end
 point = Point.find_by(name: "Square de Thou")
 point.update(url_picture: "rue-de-thou.jpg")
 puts "#{point.name} updated"
-point = Point.find_by(name: "Place Maréchal Lyautey")
-point.update(url_picture: "21188192.jpg")
+marechal = Point.find_by(name: "Place Maréchal Lyautey")
+marechal.update(url_picture: "21188192.jpg")
 puts "#{point.name} updated"
 point = Point.find_by(name: "Jardin du palais Saint Pierre")
 point.update(url_picture: "jardins-2-1600x1067.jpeg")
 puts "#{point.name} updated"
-point = Point.find_by(name: "Parc de la Tête d'Or")
-point.update(url_picture: "Parc_de_la_Tête_d'Or_Vue_sur_le_lac7.jpg")
-puts "#{point.name} updated"
+tetedor = Point.find_by(name: "Parc de la Tête d'Or")
+tetedor.update(url_picture: "Parc_de_la_Tête_d'Or_Vue_sur_le_lac7.jpg")
+tetedor.update(longitude: 4.845573593206147)
+tetedor.update(latitude: 45.777356001313436)
+puts "#{tetedor.name} updated"
+
+grandecote = Point.find_by(name: "Jardin de la Grande Côte")
+grandecote.update(url_picture: "grandecote.jfif")
+puts "#{grandecote.name} updated"
+
+breti = Point.find_by(name: "Parc du Brétillod")
+breti.update(longitude: 4.844462907019957)
+breti.update(latitude: 45.77944069836079)
+
+cite = Point.find_by(name: "Parc du Brétillod")
+cite.update(longitude:  4.851952545580239)
+cite.update(latitude: 45.78242254040114)
+
+
+saone = Point.find_by(name: "Parc du Brétillod")
+saone.update(longitude:  4.822366503103803)
+saone.update(latitude: 45.76813221059604)
 
 puts "Created #{Point.count} meet-up points."
 
@@ -141,8 +178,8 @@ puts "Created #{Point.count} meet-up points."
 # )
 
 # user3participation = Participation.create!(
-#   user: user3,
-#   meet_up: meetups[2]
+  #   user: user3,
+  #   meet_up: meetups[2]
 # )
 
 puts "Meet-ups and participations have been created!"
@@ -189,4 +226,32 @@ Walking.create!(
   duration: 35,
   distance: 3.51,
   user: john
+)
+
+marechalmeetup = MeetUp.create!(
+  point: marechal
+)
+
+grandecotemeetup = MeetUp.create!(
+  point: grandecote
+)
+
+Participation.create!(
+  meet_up: marechalmeetup,
+  user: user4
+)
+
+Participation.create!(
+  meet_up: marechalmeetup,
+  user: user3
+)
+
+Participation.create!(
+  meet_up: marechalmeetup,
+  user: user1
+)
+
+Participation.create!(
+  meet_up: grandecotemeetup,
+  user: user2
 )
