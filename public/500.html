@@ -26,51 +26,102 @@
 
     .error-container {
       text-align: center;
-      max-width: 400px;
+      max-width: 500px;
       width: 100%;
       background: #FFFFFF;
       border-radius: 20px;
-      padding: 2.5rem 2rem;
+      padding: 2rem 1.5rem;
       box-shadow: 0 10px 40px rgba(163, 181, 217, 0.3);
     }
 
-    .error-icon {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 1.5rem;
-      background: #A3B5D9;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .error-icon svg {
-      width: 50px;
-      height: 50px;
-      color: #1E3A5F;
-    }
-
     .error-code {
-      font-size: 4rem;
+      font-size: 5rem;
       font-weight: 700;
       color: #1E3A5F;
       line-height: 1;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
     }
 
     .error-title {
       font-size: 1.25rem;
       font-weight: 600;
       color: #1E3A5F;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
     }
 
     .error-message {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: #8B8377;
       line-height: 1.5;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .game-container {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: #2C3E50;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      border: 2px solid #A3B5D9;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 8px;
+      padding: 15px;
+      height: 100%;
+    }
+
+    .hole {
+      background: linear-gradient(to bottom, #1a252f 0%, #34495e 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.1s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hole:active {
+      transform: scale(0.95);
+    }
+
+    .bug {
+      font-size: 2rem;
+      position: absolute;
+      transition: all 0.15s ease-out;
+      transform: translateY(100%);
+      opacity: 0;
+    }
+
+    .bug.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .bug.caught {
+      transform: scale(0) rotate(180deg);
+      opacity: 0;
+    }
+
+    .game-instructions {
+      font-size: 0.8rem;
+      color: #A3B5D9;
+      margin-bottom: 1rem;
+    }
+
+    .score-display {
+      font-size: 0.9rem;
+      color: #1E3A5F;
+      font-weight: 600;
+      margin-bottom: 1rem;
     }
 
     .error-btn {
@@ -90,23 +141,274 @@
       transform: translateY(-2px);
     }
 
-    .error-btn:active {
-      transform: scale(0.98);
+    .game-over-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .game-over-overlay span {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 400;
+    }
+
+    .timer-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 5px;
+      background: #3498db;
+      transition: width 0.1s linear;
+    }
+
+    .splash {
+      position: absolute;
+      pointer-events: none;
+      font-size: 1.5rem;
+      animation: splash 0.5s ease-out forwards;
+    }
+
+    @keyframes splash {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+
+    .server-icon {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      color: #7f8c8d;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .server-light {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e74c3c;
+      animation: blink 1s infinite;
+    }
+
+    .server-light.fixed {
+      background: #2ecc71;
+      animation: none;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
   </style>
 </head>
 
 <body>
   <div class="error-container">
-    <div class="error-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
-    </div>
     <div class="error-code">500</div>
-    <h1 class="error-title">Erreur serveur</h1>
-    <p class="error-message">Oups ! Notre serveur a trébuché sur une laisse. Nous travaillons à résoudre le problème.</p>
-    <a href="/" class="error-btn">Retour à l'accueil</a>
+    <h1 class="error-title">Bug dans le serveur !</h1>
+    <p class="error-message">Des bugs ont envahi notre serveur ! Aide le toutou a les ecraser avant qu'ils ne s'echappent !</p>
+
+    <div class="game-container" id="gameContainer">
+      <div class="server-icon">
+        <div class="server-light" id="serverLight"></div>
+        <span>SERVEUR</span>
+      </div>
+      <div class="game-grid" id="gameGrid">
+        <div class="hole" data-index="0"><span class="bug">🐛</span></div>
+        <div class="hole" data-index="1"><span class="bug">🐛</span></div>
+        <div class="hole" data-index="2"><span class="bug">🐛</span></div>
+        <div class="hole" data-index="3"><span class="bug">🐛</span></div>
+        <div class="hole" data-index="4"><span class="bug">🐛</span></div>
+        <div class="hole" data-index="5"><span class="bug">🐛</span></div>
+      </div>
+      <div class="timer-bar" id="timerBar"></div>
+      <div class="game-over-overlay" id="gameOverlay">
+        <div id="gameOverText">Temps ecoule !</div>
+        <span>Clique pour rejouer</span>
+      </div>
+    </div>
+
+    <p class="game-instructions">Clique sur les bugs pour les ecraser ! 30 secondes pour en attraper un maximum</p>
+    <p class="score-display">Bugs ecrases: <span id="score">0</span> | Record: <span id="highScore">0</span></p>
+
+    <a href="/" class="error-btn">Retour a l'accueil</a>
   </div>
+
+  <script>
+    const gameContainer = document.getElementById('gameContainer');
+    const gameGrid = document.getElementById('gameGrid');
+    const scoreElement = document.getElementById('score');
+    const highScoreElement = document.getElementById('highScore');
+    const timerBar = document.getElementById('timerBar');
+    const gameOverlay = document.getElementById('gameOverlay');
+    const gameOverText = document.getElementById('gameOverText');
+    const serverLight = document.getElementById('serverLight');
+    const holes = document.querySelectorAll('.hole');
+    const bugs = document.querySelectorAll('.bug');
+
+    let score = 0;
+    let highScore = localStorage.getItem('bugGameHighScore') || 0;
+    highScoreElement.textContent = highScore;
+
+    let gameRunning = false;
+    let gameTime = 30000; // 30 seconds
+    let timeLeft = gameTime;
+    let bugTimeout = null;
+    let currentBugIndex = -1;
+    let bugSpeed = 1200;
+    let gameInterval = null;
+    let timerInterval = null;
+
+    // Show a random bug
+    function showBug() {
+      if (!gameRunning) return;
+
+      // Hide current bug
+      if (currentBugIndex >= 0) {
+        bugs[currentBugIndex].classList.remove('visible');
+      }
+
+      // Pick new random hole
+      let newIndex;
+      do {
+        newIndex = Math.floor(Math.random() * 6);
+      } while (newIndex === currentBugIndex);
+
+      currentBugIndex = newIndex;
+
+      // Random bug emoji
+      const bugEmojis = ['🐛', '🐜', '🪲', '🦗', '🕷️'];
+      bugs[currentBugIndex].textContent = bugEmojis[Math.floor(Math.random() * bugEmojis.length)];
+      bugs[currentBugIndex].classList.add('visible');
+
+      // Schedule next bug
+      bugTimeout = setTimeout(() => {
+        bugs[currentBugIndex].classList.remove('visible');
+        showBug();
+      }, bugSpeed);
+    }
+
+    // Handle click on hole
+    function handleClick(index) {
+      if (!gameRunning) {
+        startGame();
+        return;
+      }
+
+      const bug = bugs[index];
+      if (bug.classList.contains('visible') && !bug.classList.contains('caught')) {
+        // Caught!
+        bug.classList.add('caught');
+        score++;
+        scoreElement.textContent = score;
+
+        // Create splash effect
+        const splash = document.createElement('div');
+        splash.className = 'splash';
+        splash.textContent = '💥';
+        splash.style.left = '50%';
+        splash.style.top = '50%';
+        splash.style.transform = 'translate(-50%, -50%)';
+        holes[index].appendChild(splash);
+        setTimeout(() => splash.remove(), 500);
+
+        // Speed up slightly
+        if (bugSpeed > 600) {
+          bugSpeed -= 15;
+        }
+
+        // Show next bug faster
+        clearTimeout(bugTimeout);
+        setTimeout(() => {
+          bug.classList.remove('visible', 'caught');
+          showBug();
+        }, 200);
+      }
+    }
+
+    // Start game
+    function startGame() {
+      score = 0;
+      timeLeft = gameTime;
+      bugSpeed = 1200;
+      scoreElement.textContent = score;
+      gameRunning = true;
+      gameOverlay.style.display = 'none';
+      serverLight.classList.remove('fixed');
+      timerBar.style.width = '100%';
+
+      showBug();
+
+      // Timer
+      timerInterval = setInterval(() => {
+        timeLeft -= 100;
+        timerBar.style.width = (timeLeft / gameTime * 100) + '%';
+
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 100);
+    }
+
+    // End game
+    function endGame() {
+      gameRunning = false;
+      clearTimeout(bugTimeout);
+      clearInterval(timerInterval);
+
+      // Hide all bugs
+      bugs.forEach(b => b.classList.remove('visible', 'caught'));
+      currentBugIndex = -1;
+
+      // Check high score
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('bugGameHighScore', highScore);
+        highScoreElement.textContent = highScore;
+        gameOverText.textContent = 'Nouveau record !';
+      } else {
+        gameOverText.textContent = 'Temps ecoule !';
+      }
+
+      // Server fixed if score > 10
+      if (score >= 10) {
+        serverLight.classList.add('fixed');
+        gameOverText.textContent += ' Serveur repare !';
+      }
+
+      gameOverlay.style.display = 'flex';
+    }
+
+    // Add click handlers
+    holes.forEach((hole, index) => {
+      hole.addEventListener('click', () => handleClick(index));
+      hole.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        handleClick(index);
+      });
+    });
+
+    gameOverlay.addEventListener('click', () => {
+      if (!gameRunning) startGame();
+    });
+
+    // Initial message
+    gameOverlay.style.display = 'flex';
+    gameOverText.textContent = 'Clique pour commencer';
+  </script>
 </body>
 </html>
