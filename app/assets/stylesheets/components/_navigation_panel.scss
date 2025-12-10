@@ -18,9 +18,11 @@ $navbar-height: 52px; // Hauteur de la navbar (légèrement moins pour couvrir l
   border-radius: 20px 20px 0 0;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   animation: slideUp 0.25s ease-out;
-  max-height: 50vh;
+  max-height: 45vh; // Réduit à 45% de la hauteur de l'écran
   display: flex;
   flex-direction: column;
+  overflow-y: auto; // Permettre le scroll vertical
+  overflow-x: hidden; // Empêcher le scroll horizontal
 }
 
 .navigation-panel__handle-wrapper {
@@ -296,6 +298,108 @@ $navbar-height: 52px; // Hauteur de la navbar (légèrement moins pour couvrir l
   &:active {
     transform: scale(0.98);
   }
+}
+
+// ========================================
+// Meetup Dogs List (for meet_ups/show)
+// ========================================
+.meetup-dogs-list {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e5e5;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e3a5f;
+    margin: 0 0 1rem 0;
+  }
+}
+
+.dogs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dog-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  transition: background 0.2s;
+
+  &:active {
+    background: #e9ecef;
+  }
+}
+
+.dog-avatar,
+.dog-avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  border: 2px solid #e5e5e5;
+}
+
+.dog-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.dog-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dog-name {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e3a5f;
+}
+
+.dog-details {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6c757d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dog-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.dog-tag {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  background: #e8f4f8;
+  color: #1e3a5f;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.no-dogs-message {
+  margin: 0;
+  padding: 1rem;
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-style: italic;
 }
 
 @keyframes fadeIn {
