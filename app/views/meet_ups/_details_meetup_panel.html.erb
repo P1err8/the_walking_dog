@@ -1,1 +1,32 @@
-<h1><%= @point.name %></h1>
+<h2><%= @point.name %></h2>
+
+<div class="meetup-dogs-list">
+  <h3>Chiens participants (<%= @meet_up.dogs.count %>)</h3>
+
+  <% if @meet_up.dogs.any? %>
+    <div class="dogs-grid">
+      <% @meet_up.dogs.each do |dog| %>
+        <div class="dog-card">
+          <% if dog.url_picture.present? %>
+            <%= image_tag dog.url_picture, alt: dog.name, class: "dog-avatar" %>
+          <% else %>
+            <div class="dog-avatar-placeholder">🐕</div>
+          <% end %>
+          <div class="dog-info">
+            <p class="dog-name"><%= dog.name %></p>
+            <p class="dog-details"><%= dog.race %> • <%= dog.size %></p>
+            <% if dog.tags.any? %>
+              <div class="dog-tags">
+                <% dog.tags.each do |tag| %>
+                  <span class="dog-tag"><%= tag.name %></span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="no-dogs-message">Aucun chien inscrit pour le moment</p>
+  <% end %>
+</div>

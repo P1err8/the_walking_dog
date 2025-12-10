@@ -63,11 +63,23 @@ export default class extends Controller {
 
 		// Use stored location from geolocateControl
 		if (this.mapController.userLocation) {
+			// Calculer la hauteur du panel pour ajuster le centre
+			const panelElement = document.querySelector('.navigation-panel')
+			let panelHeight = 0
+			if (panelElement) {
+				panelHeight = panelElement.offsetHeight
+			}
+
+			// Calculer l'offset vertical pour centrer au-dessus du panel
+			const mapHeight = this.mapController.map.getContainer().offsetHeight
+			const offsetY = panelHeight / 2
+
 			this.mapController.map.flyTo({
 				center: this.mapController.userLocation,
 				zoom: 17,
 				speed: 1.2,
-				curve: 1.4
+				curve: 1.4,
+				offset: [0, -offsetY] // Décalage vers le haut pour tenir compte du panel
 			})
 		} else {
 			// Fallback: trigger geolocation if position not yet available
