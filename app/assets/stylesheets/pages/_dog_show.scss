@@ -6,7 +6,7 @@
 
 .dog-show-container {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,6 +14,7 @@
   padding: 1.5rem 1rem;
   padding-bottom: 80px; // Espace pour la navbar
   background-color: $bg-page;
+  overflow: hidden; // Pas de scroll
 }
 
 .dog-card {
@@ -53,13 +54,16 @@
 
 .dog-info-group {
   width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba($secondary, 0.3);
 
   .dog-info-label {
-    display: block;
-    margin-bottom: 0.4rem;
     font-weight: 600;
     color: $taupe;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -69,16 +73,26 @@
     font-size: 1.1rem;
     font-weight: 700;
     color: $text-main;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid rgba($secondary, 0.3);
+    text-align: right;
+  }
+
+  // Style spécifique pour les tags (Personnalité)
+  &:has(.dog-tags-container) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    .dog-info-label {
+      margin-bottom: 0.25rem;
+    }
   }
 
   .dog-tags-container {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 0.5rem;
-    justify-content: center;
+    justify-content: flex-start;
+    width: 100%;
 
     .dog-tag {
       display: inline-flex;
@@ -93,7 +107,56 @@
   }
 }
 
-// Bouton de déconnexion
+// Boutons d'action du profil
+.dog-profile-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.dog-profile-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.5rem;
+  background: $primary;
+  color: $white;
+  border: none;
+  border-radius: $radius-pill;
+  font-family: $font-family;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba($primary, 0.3);
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &--logout {
+    background: transparent;
+    color: $danger;
+    border: 2px solid $danger;
+    box-shadow: none;
+
+    &:active {
+      background: $danger;
+      color: $white;
+    }
+  }
+}
+
+// Bouton de déconnexion (ancien style, conservé pour compatibilité)
 .dog-logout {
   width: 100%;
   margin-top: 0.5rem;
