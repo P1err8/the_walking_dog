@@ -26,51 +26,65 @@
 
     .error-container {
       text-align: center;
-      max-width: 400px;
+      max-width: 500px;
       width: 100%;
       background: #FFFFFF;
       border-radius: 20px;
-      padding: 2.5rem 2rem;
+      padding: 2rem 1.5rem;
       box-shadow: 0 10px 40px rgba(163, 181, 217, 0.3);
     }
 
-    .error-icon {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 1.5rem;
-      background: #A3B5D9;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .error-icon svg {
-      width: 50px;
-      height: 50px;
-      color: #1E3A5F;
-    }
-
     .error-code {
-      font-size: 4rem;
+      font-size: 5rem;
       font-weight: 700;
       color: #1E3A5F;
       line-height: 1;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
     }
 
     .error-title {
       font-size: 1.25rem;
       font-weight: 600;
       color: #1E3A5F;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
     }
 
     .error-message {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: #8B8377;
       line-height: 1.5;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .game-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 75%, #90EE90 75%, #228B22 100%);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      border: 2px solid #A3B5D9;
+      touch-action: none;
+    }
+
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .game-instructions {
+      font-size: 0.8rem;
+      color: #A3B5D9;
+      margin-bottom: 1rem;
+    }
+
+    .score-display {
+      font-size: 0.9rem;
+      color: #1E3A5F;
+      font-weight: 600;
+      margin-bottom: 1rem;
     }
 
     .error-btn {
@@ -90,23 +104,352 @@
       transform: translateY(-2px);
     }
 
-    .error-btn:active {
-      transform: scale(0.98);
+    .game-over-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1E3A5F;
+      background: rgba(255,255,255,0.95);
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      display: none;
+      text-align: center;
+    }
+
+    .lives-display {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 
 <body>
   <div class="error-container">
-    <div class="error-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-      </svg>
-    </div>
     <div class="error-code">422</div>
-    <h1 class="error-title">Action non autorisée</h1>
-    <p class="error-message">Oups ! Cette action n'est pas permise. Votre toutou n'a pas les droits pour faire ça.</p>
-    <a href="/" class="error-btn">Retour à l'accueil</a>
+    <h1 class="error-title">Oups ! Acces interdit</h1>
+    <p class="error-message">Ce toutou n'a pas le droit d'aller la... Mais il peut attraper des friandises !</p>
+
+    <div class="game-container" id="gameContainer">
+      <canvas id="gameCanvas"></canvas>
+      <div class="game-over-text" id="gameOverText">Partie terminee !<br>Clique pour rejouer</div>
+    </div>
+
+    <p class="game-instructions">Utilise les fleches ou glisse pour deplacer le chien</p>
+    <p class="score-display">Friandises: <span id="score">0</span> | Record: <span id="highScore">0</span> | Vies: <span id="lives">3</span></p>
+
+    <a href="/" class="error-btn">Retour a l'accueil</a>
   </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const gameContainer = document.getElementById('gameContainer');
+    const scoreElement = document.getElementById('score');
+    const highScoreElement = document.getElementById('highScore');
+    const livesElement = document.getElementById('lives');
+    const gameOverText = document.getElementById('gameOverText');
+
+    function resizeCanvas() {
+      canvas.width = gameContainer.offsetWidth;
+      canvas.height = gameContainer.offsetHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Game state
+    let gameRunning = true;
+    let score = 0;
+    let lives = 3;
+    let highScore = localStorage.getItem('treatGameHighScore') || 0;
+    highScoreElement.textContent = highScore;
+
+    const groundY = canvas.height - 25;
+
+    // Dog (bowl/catcher)
+    const dog = {
+      x: canvas.width / 2 - 30,
+      y: groundY - 35,
+      width: 60,
+      height: 40,
+      speed: 8
+    };
+
+    // Treats falling
+    let treats = [];
+    let badItems = [];
+    let spawnTimer = 0;
+    let difficultyTimer = 0;
+    let spawnRate = 60;
+
+    // Controls
+    let moveLeft = false;
+    let moveRight = false;
+    let touchStartX = 0;
+
+    // Draw dog with bowl
+    function drawDog() {
+      // Body
+      ctx.fillStyle = '#8B4513';
+      ctx.fillRect(dog.x + 15, dog.y + 5, 30, 25);
+
+      // Head
+      ctx.fillRect(dog.x + 40, dog.y - 5, 18, 20);
+
+      // Ear
+      ctx.fillStyle = '#654321';
+      ctx.fillRect(dog.x + 52, dog.y - 10, 6, 10);
+
+      // Eye
+      ctx.fillStyle = '#000';
+      ctx.fillRect(dog.x + 50, dog.y, 3, 3);
+
+      // Tongue (happy!)
+      ctx.fillStyle = '#FF69B4';
+      ctx.fillRect(dog.x + 55, dog.y + 10, 4, 6);
+
+      // Tail wagging
+      ctx.fillStyle = '#8B4513';
+      const tailWag = Math.sin(Date.now() / 80) * 8;
+      ctx.fillRect(dog.x + 5, dog.y + tailWag, 12, 5);
+
+      // Legs
+      ctx.fillStyle = '#654321';
+      ctx.fillRect(dog.x + 18, dog.y + 28, 6, 12);
+      ctx.fillRect(dog.x + 36, dog.y + 28, 6, 12);
+
+      // Bowl in mouth
+      ctx.fillStyle = '#C0C0C0';
+      ctx.beginPath();
+      ctx.ellipse(dog.x + 30, dog.y + 2, 18, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#A0A0A0';
+      ctx.beginPath();
+      ctx.ellipse(dog.x + 30, dog.y + 2, 14, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Draw treat (bone)
+    function drawTreat(t) {
+      ctx.fillStyle = '#F5DEB3';
+      // Bone shape
+      ctx.fillRect(t.x + 5, t.y + 8, 15, 6);
+      ctx.beginPath();
+      ctx.arc(t.x + 5, t.y + 11, 5, 0, Math.PI * 2);
+      ctx.arc(t.x + 20, t.y + 11, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Draw bad item (shoe)
+    function drawBadItem(b) {
+      ctx.fillStyle = '#4A4A4A';
+      // Shoe shape
+      ctx.fillRect(b.x, b.y + 5, 20, 12);
+      ctx.fillRect(b.x + 15, b.y + 10, 10, 7);
+      ctx.fillStyle = '#2A2A2A';
+      ctx.fillRect(b.x, b.y, 8, 8);
+    }
+
+    // Draw sun
+    function drawSun() {
+      ctx.fillStyle = '#FFD700';
+      ctx.beginPath();
+      ctx.arc(canvas.width - 40, 35, 20, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Rays
+      ctx.strokeStyle = '#FFD700';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width - 40 + Math.cos(angle) * 25, 35 + Math.sin(angle) * 25);
+        ctx.lineTo(canvas.width - 40 + Math.cos(angle) * 35, 35 + Math.sin(angle) * 35);
+        ctx.stroke();
+      }
+    }
+
+    // Draw ground
+    function drawGround() {
+      ctx.fillStyle = '#228B22';
+      ctx.fillRect(0, groundY, canvas.width, 30);
+      ctx.fillStyle = '#32CD32';
+      for (let i = 0; i < canvas.width; i += 12) {
+        ctx.fillRect(i, groundY - 3, 2, 6);
+      }
+    }
+
+    // Spawn items
+    function spawnItems() {
+      spawnTimer++;
+      if (spawnTimer >= spawnRate) {
+        const x = Math.random() * (canvas.width - 30);
+        if (Math.random() > 0.25) {
+          treats.push({ x, y: -20, speed: 2 + Math.random() * 2 });
+        } else {
+          badItems.push({ x, y: -20, speed: 2.5 + Math.random() * 1.5 });
+        }
+        spawnTimer = 0;
+      }
+
+      // Increase difficulty
+      difficultyTimer++;
+      if (difficultyTimer >= 500 && spawnRate > 30) {
+        spawnRate -= 5;
+        difficultyTimer = 0;
+      }
+    }
+
+    // Check collision
+    function checkCollision(item) {
+      return item.x < dog.x + dog.width - 10 &&
+             item.x + 25 > dog.x + 10 &&
+             item.y + 20 > dog.y &&
+             item.y < dog.y + 15;
+    }
+
+    // Game loop
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Sky
+      ctx.fillStyle = '#87CEEB';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      drawSun();
+      drawGround();
+
+      if (gameRunning) {
+        // Move dog
+        if (moveLeft && dog.x > 0) dog.x -= dog.speed;
+        if (moveRight && dog.x < canvas.width - dog.width) dog.x += dog.speed;
+
+        spawnItems();
+
+        // Update treats
+        for (let i = treats.length - 1; i >= 0; i--) {
+          treats[i].y += treats[i].speed;
+
+          if (checkCollision(treats[i])) {
+            treats.splice(i, 1);
+            score++;
+            scoreElement.textContent = score;
+            continue;
+          }
+
+          if (treats[i].y > canvas.height) {
+            treats.splice(i, 1);
+          }
+        }
+
+        // Update bad items
+        for (let i = badItems.length - 1; i >= 0; i--) {
+          badItems[i].y += badItems[i].speed;
+
+          if (checkCollision(badItems[i])) {
+            badItems.splice(i, 1);
+            lives--;
+            livesElement.textContent = lives;
+            if (lives <= 0) {
+              gameRunning = false;
+              gameOverText.style.display = 'block';
+              if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('treatGameHighScore', highScore);
+                highScoreElement.textContent = highScore;
+              }
+            }
+            continue;
+          }
+
+          if (badItems[i].y > canvas.height) {
+            badItems.splice(i, 1);
+          }
+        }
+      }
+
+      // Draw items
+      treats.forEach(t => drawTreat(t));
+      badItems.forEach(b => drawBadItem(b));
+
+      drawDog();
+
+      // Start message
+      if (!gameRunning && lives > 0) {
+        ctx.fillStyle = 'rgba(30, 58, 95, 0.9)';
+        ctx.font = 'bold 14px Bitter';
+        ctx.textAlign = 'center';
+        ctx.fillText('Utilise les fleches pour commencer', canvas.width / 2, canvas.height / 2);
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Reset game
+    function resetGame() {
+      treats = [];
+      badItems = [];
+      score = 0;
+      lives = 3;
+      spawnRate = 60;
+      spawnTimer = 0;
+      difficultyTimer = 0;
+      dog.x = canvas.width / 2 - 30;
+      scoreElement.textContent = score;
+      livesElement.textContent = lives;
+      gameRunning = true;
+      gameOverText.style.display = 'none';
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'ArrowLeft') moveLeft = true;
+      if (e.code === 'ArrowRight') moveRight = true;
+      if (!gameRunning && lives <= 0) resetGame();
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.code === 'ArrowLeft') moveLeft = false;
+      if (e.code === 'ArrowRight') moveRight = false;
+    });
+
+    // Touch controls
+    gameContainer.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (!gameRunning && lives <= 0) {
+        resetGame();
+        return;
+      }
+      touchStartX = e.touches[0].clientX;
+    });
+
+    gameContainer.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const touchX = e.touches[0].clientX;
+      const diff = touchX - touchStartX;
+      if (diff > 10) {
+        moveRight = true;
+        moveLeft = false;
+      } else if (diff < -10) {
+        moveLeft = true;
+        moveRight = false;
+      }
+    });
+
+    gameContainer.addEventListener('touchend', () => {
+      moveLeft = false;
+      moveRight = false;
+    });
+
+    gameContainer.addEventListener('click', () => {
+      if (!gameRunning && lives <= 0) resetGame();
+    });
+
+    gameLoop();
+  </script>
 </body>
 </html>
