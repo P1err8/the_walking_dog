@@ -4,25 +4,138 @@
 $navbar-height: 52px; // Hauteur de la navbar (légèrement moins pour couvrir le border-radius)
 
 // ========================================
+// Navigation Panel Wrapper
+// ========================================
+.navigation-panel-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  pointer-events: none; // Le wrapper ne capture pas les événements
+
+  > * {
+    pointer-events: auto; // Les enfants capturent les événements
+  }
+}
+
+// Bouton recentrer flottant
+.navigation-panel__floating-recenter-btn {
+  position: absolute;
+  bottom: calc(100% + 16px); // Au-dessus du panel avec un espace
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  background: #fff;
+  color: #1e3a5f;
+  border: none;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, opacity 0.3s ease, background 0.2s ease;
+  z-index: 1101;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover {
+    background: #f5f5f5;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// ========================================
 // Navigation Panel
 // ========================================
 .navigation-panel {
-  position: fixed;
-  bottom: $navbar-height;
-  left: 0;
-  right: 0;
+  position: relative;
   width: 100%;
   background: #fff;
-  z-index: 950;
-  padding: 1.75rem 1.25rem 1.25rem;
+  padding: 0.5rem 1.25rem 1.25rem;
   border-radius: 20px 20px 0 0;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   animation: slideUp 0.25s ease-out;
-  max-height: 45vh; // Réduit à 45% de la hauteur de l'écran
+  max-height: 45vh;
   display: flex;
   flex-direction: column;
-  overflow-y: auto; // Permettre le scroll vertical
-  overflow-x: hidden; // Empêcher le scroll horizontal
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+
+  &.navigation-panel--hidden {
+    transform: translateY(calc(100% - 60px));
+    opacity: 0.95;
+  }
+}
+
+// Drag Handle
+.navigation-panel__drag-handle {
+  width: 100%;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.navigation-panel__drag-indicator {
+  width: 40px;
+  height: 4px;
+  background: #ccc;
+  border-radius: 999px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.navigation-panel__drag-handle:hover .navigation-panel__drag-indicator {
+  opacity: 0.8;
+}
+
+.navigation-panel__toggle-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #8b8377;
+  transition: all 0.2s ease;
+  padding: 0;
+
+  svg {
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    background: rgba(#ccc, 0.3);
+    color: #1e3a5f;
+  }
+
+  &:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+}
+
+.navigation-panel--hidden .navigation-panel__toggle-btn svg {
+  transform: rotate(180deg);
 }
 
 .navigation-panel__handle-wrapper {
@@ -57,6 +170,7 @@ $navbar-height: 52px; // Hauteur de la navbar (légèrement moins pour couvrir l
   font-size: 1.3rem;
   font-weight: 700;
   color: #1e3a5f;
+  text-align: center;
 }
 
 .navigation-panel__instruction-row {
@@ -148,22 +262,23 @@ $navbar-height: 52px; // Hauteur de la navbar (légèrement moins pour couvrir l
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
-  align-self: flex-end;
-  padding: 0.5rem 0.85rem;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
   background: #e74c3c;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  margin-top: 0.5rem;
 
   svg {
-    width: 14px;
-    height: 14px;
+    width: 18px;
+    height: 18px;
   }
 
   &:hover {

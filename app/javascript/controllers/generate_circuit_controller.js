@@ -107,6 +107,45 @@ export default class extends Controller {
     if (this.map.getSource(this.ROUTE_SOURCE_ID)) { this.map.removeSource(this.ROUTE_SOURCE_ID) }
   }
 
+  // Nettoyer TOUS les éléments de la prévisualisation précédente
+  clearAllPreviousElements() {
+    // Supprimer tous les POI markers stockés dans ce controller
+    if (this.poiMarkers && this.poiMarkers.length > 0) {
+      this.poiMarkers.forEach(marker => marker.remove())
+      this.poiMarkers = []
+    }
+
+    // Supprimer le marker de départ
+    if (this.marker) {
+      this.marker.remove()
+      this.marker = null
+    }
+
+    // IMPORTANT: Supprimer TOUS les markers Mapbox du DOM (pour le cas où un nouveau controller est créé)
+    // Cela nettoie les markers des sessions précédentes
+    const mapContainer = this.map?.getContainer()
+    if (mapContainer) {
+      const allMarkers = mapContainer.querySelectorAll('.mapboxgl-marker')
+      allMarkers.forEach(marker => marker.remove())
+    }
+
+    // Nettoyer les isochrones et la route
+    this.clearAllIsochrones()
+
+    // Reset les variables d'état
+    this.lastIsochrone = null
+    this.currentPoiCount = 0
+    this.initialStartCoords = null
+    this.currentStartCoords = null
+
+    // Cacher le bouton submit
+    if (this.hasSubmitButtonTarget) {
+      this.submitButtonTarget.style.display = "none"
+    }
+
+    console.log("Tous les éléments précédents ont été nettoyés")
+  }
+
   async verifyPoiLocation(coords) {
     const [lon, lat] = coords
     const geocodeUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?types=poi,address,place,locality&access_token=${mapboxgl.accessToken}`
@@ -215,6 +254,9 @@ export default class extends Controller {
   async initializeWalk() {
     console.log("Initializing walk...")
 
+    // Nettoyer tous les anciens éléments AVANT de commencer
+    this.clearAllPreviousElements()
+
     // Show loading indicator
     if (this.hasPreviewButtonTarget) {
       this.previewButtonTarget.style.display = "none"
@@ -266,10 +308,6 @@ export default class extends Controller {
       const totalSides = this.maxPoiCount + 1
       this.rotationAngle = 360 / totalSides
       this.currentBearing = Math.random() * 360
-
-      this.poiMarkers.forEach(marker => marker.remove())
-      this.poiMarkers = []
-      this.clearAllIsochrones()
 
       this.calculateIsochrone(this.currentStartCoords, 0)
         .then(() => {

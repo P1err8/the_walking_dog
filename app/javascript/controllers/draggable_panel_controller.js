@@ -7,9 +7,23 @@ export default class extends Controller {
     this.isDragging = false
     this.startY = 0
     this.startHeight = 0
+    this.currentTranslateY = 0 // Pour suivre le translateY pendant le drag
+
+    // Détecter si c'est un navigation-panel-wrapper (pas de hauteur fixe)
+    this.isNavigationPanel = this.element.classList.contains('navigation-panel-wrapper')
+
+    // Si c'est un wrapper, cibler le panel interne pour les transformations
+    if (this.isNavigationPanel) {
+      this.panelElement = this.element.querySelector('.navigation-panel') || this.element
+      this.floatingButton = this.element.querySelector('.navigation-panel__floating-recenter-btn')
+    } else {
+      this.panelElement = this.element
+      this.floatingButton = null
+    }
+
     this.minHeight = 150 // Hauteur minimale (juste le titre visible)
-    this.maxHeight = window.innerHeight * 0.70 // 70% de la hauteur de l'écran
-    this.defaultHeight = window.innerHeight * 0.52 // 52% par défaut
+    this.maxHeight = window.innerHeight * 0.55 // 55% de la hauteur de l'écran
+    this.defaultHeight = window.innerHeight * 0.44 // 44% par défaut
 
     // Pour la détection de swipe rapide
     this.dragStartTime = 0
@@ -20,17 +34,17 @@ export default class extends Controller {
     this.isHidden = false
     this.scrollThreshold = 10 // Seuil minimum de scroll pour déclencher
 
-    // Définir la hauteur initiale
-    this.element.style.height = `${this.defaultHeight}px`
-
-    // Désactiver le scroll dans le panel
-    this.element.style.overflow = 'hidden'
+    // Ne définir la hauteur initiale que pour les panels qui ne sont pas navigation-panel
+    if (!this.isNavigationPanel) {
+      this.element.style.height = `${this.defaultHeight}px`
+      this.element.style.overflow = 'hidden'
+    }
 
     // Ajouter la transition pour le hide/show au scroll
     this.element.style.transition = 'transform 0.3s ease, opacity 0.3s ease, height 0.3s ease'
 
     // Créer la poignée de drag si elle n'existe pas
-    if (!this.hasHandleTarget) {
+    if (!this.hasHandleTarget && !this.isNavigationPanel) {
       this.createHandle()
     }
 
@@ -95,14 +109,101 @@ export default class extends Controller {
 
   hidePanel() {
     this.isHidden = true
-    this.element.style.transform = 'translateY(calc(100% - 60px))'
-    this.element.style.opacity = '0.95'
+
+    // Utiliser panelElement pour navigation-panel, sinon element
+    const targetElement = this.isNavigationPanel ? this.panelElement : this.element
+    targetElement.style.transform = 'translateY(100%)'
+    targetElement.style.opacity = '0'
+
+    // Cacher aussi le bouton flottant
+    if (this.floatingButton) {
+      this.floatingButton.style.transform = 'translateY(100%)'
+      this.floatingButton.style.opacity = '0'
+    }
+
+    // Inverser le chevron (pointer vers le haut)
+    this.updateChevronDirection('up')
+
+    // Afficher la navbar et le FAB quand le panel est caché
+    const navbar = document.querySelector('.navbar')
+    if (navbar) {
+      navbar.style.transform = 'translateY(0)'
+      navbar.style.opacity = '1'
+      navbar.style.pointerEvents = 'auto'
+    }
+    const fabButton = document.querySelector('.fab-button')
+    if (fabButton) {
+      fabButton.style.transform = 'translateX(-50%) translateY(0)'
+      fabButton.style.opacity = '1'
+      fabButton.style.pointerEvents = 'auto'
+    }
+
+    // Permettre de voir et cliquer sur la navbar quand le panel est caché
+    const modalFrame = document.querySelector('turbo-frame#modal.modal-frame')
+    if (modalFrame) {
+      modalFrame.style.bottom = '70px' // Laisser 70px pour la navbar
+      modalFrame.style.height = 'auto'
+    }
   }
 
   showPanel() {
     this.isHidden = false
-    this.element.style.transform = 'translateY(0)'
-    this.element.style.opacity = '1'
+
+    // Utiliser panelElement pour navigation-panel, sinon element
+    const targetElement = this.isNavigationPanel ? this.panelElement : this.element
+    targetElement.style.transform = 'translateY(0)'
+    targetElement.style.opacity = '1'
+
+    // Afficher aussi le bouton flottant
+    if (this.floatingButton) {
+      this.floatingButton.style.transform = 'translateY(0)'
+      this.floatingButton.style.opacity = '1'
+    }
+
+    // Inverser le chevron (pointer vers le bas)
+    this.updateChevronDirection('down')
+
+    // Cacher la navbar et le FAB quand le panel est affiché
+    const navbar = document.querySelector('.navbar')
+    if (navbar) {
+      navbar.style.transform = 'translateY(100%)'
+      navbar.style.opacity = '0'
+      navbar.style.pointerEvents = 'none'
+    }
+    const fabButton = document.querySelector('.fab-button')
+    if (fabButton) {
+      fabButton.style.transform = 'translateX(-50%) translateY(100%)'
+      fabButton.style.opacity = '0'
+      fabButton.style.pointerEvents = 'none'
+    }
+
+    // Remettre le modal en plein écran
+    const modalFrame = document.querySelector('turbo-frame#modal.modal-frame')
+    if (modalFrame) {
+      modalFrame.style.bottom = '0'
+      modalFrame.style.height = '100vh'
+    }
+  }
+
+  updateChevronDirection(direction) {
+    const closeBtn = this.element.querySelector('.drag-close-btn')
+    if (closeBtn) {
+      const svg = closeBtn.querySelector('svg')
+      if (svg) {
+        // Rotation: 0deg = pointe vers le bas, 180deg = pointe vers le haut
+        svg.style.transition = 'transform 0.3s ease'
+        svg.style.transform = direction === 'up' ? 'rotate(180deg)' : 'rotate(0deg)'
+      }
+    }
+  }
+
+  // Toggle le panel (pour le bouton chevron)
+  togglePanel() {
+    if (this.isHidden) {
+      this.showPanel()
+    } else {
+      this.hidePanel()
+    }
   }
 
   createHandle() {
@@ -114,15 +215,15 @@ export default class extends Controller {
   }
 
   startDrag(event) {
+    // Ignorer si on clique sur le bouton fermer ou sur des éléments interactifs
+    if (event.target.closest('.drag-close-btn')) return
+    if (event.target.closest('input, select, button, a, textarea')) return
+
     // Si le panel est caché, le montrer au clic
     if (this.isHidden) {
       this.showPanel()
       return
     }
-
-    // Ne démarrer le drag que si on clique sur la poignée
-    const isHandle = event.target.closest('.drag-handle')
-    if (!isHandle) return
 
     this.isDragging = true
     this.startY = event.type.includes('touch') ? event.touches[0].clientY : event.clientY
@@ -142,10 +243,44 @@ export default class extends Controller {
     event.preventDefault()
 
     const currentY = event.type.includes('touch') ? event.touches[0].clientY : event.clientY
-    const deltaY = this.startY - currentY // Inversé : drag vers le haut = augmente la hauteur
-    const newHeight = Math.max(this.minHeight, Math.min(this.maxHeight, this.startHeight + deltaY))
+    const deltaY = currentY - this.startY // positif = drag vers le bas
 
-    this.element.style.height = `${newHeight}px`
+    // Pour navigation-panel: glisser directement vers le bas avec translateY
+    if (this.isNavigationPanel) {
+      const translateAmount = Math.max(0, deltaY) // Ne permettre que de descendre
+      this.currentTranslateY = translateAmount
+      this.panelElement.style.transform = `translateY(${translateAmount}px)`
+      // Réduire l'opacité progressivement
+      const opacity = Math.max(0, 1 - (translateAmount / 200))
+      this.panelElement.style.opacity = opacity.toString()
+      // Animer aussi le bouton flottant
+      if (this.floatingButton) {
+        this.floatingButton.style.transform = `translateY(${translateAmount}px)`
+        this.floatingButton.style.opacity = opacity.toString()
+      }
+      return
+    }
+
+    // Pour les autres panels: comportement original avec modification de hauteur
+    const theoreticalHeight = this.startHeight - deltaY
+
+    // Si on tire en dessous de minHeight, on commence à translater vers le bas
+    if (theoreticalHeight < this.minHeight) {
+      this.element.style.height = `${this.minHeight}px`
+      const translateAmount = this.minHeight - theoreticalHeight
+      this.currentTranslateY = translateAmount
+      this.element.style.transform = `translateY(${translateAmount}px)`
+      // Réduire l'opacité progressivement
+      const opacity = Math.max(0, 1 - (translateAmount / 200))
+      this.element.style.opacity = opacity.toString()
+    } else {
+      // Comportement normal : ajuster la hauteur
+      const newHeight = Math.min(this.maxHeight, theoreticalHeight)
+      this.element.style.height = `${newHeight}px`
+      this.element.style.transform = 'translateY(0)'
+      this.element.style.opacity = '1'
+      this.currentTranslateY = 0
+    }
   }
 
   endDrag() {
@@ -153,9 +288,38 @@ export default class extends Controller {
 
     this.isDragging = false
     document.body.style.userSelect = ''
-    this.element.style.transition = 'transform 0.3s ease, opacity 0.3s ease, height 0.3s ease'
 
-    // === APRÈS === Détecter le swipe rapide vers le bas pour fermer
+    // Utiliser panelElement pour navigation-panel, sinon element
+    const targetElement = this.isNavigationPanel ? this.panelElement : this.element
+    targetElement.style.transition = 'transform 0.3s ease, opacity 0.3s ease, height 0.3s ease'
+    if (this.floatingButton) {
+      this.floatingButton.style.transition = 'transform 0.3s ease, opacity 0.3s ease'
+    }
+
+    // Si le panel a été tiré de plus de 100px vers le bas, le cacher
+    if (this.currentTranslateY > 100) {
+      this.hidePanel()
+      this.currentTranslateY = 0
+      return
+    }
+
+    // Si légèrement tiré vers le bas, revenir à la position normale
+    if (this.currentTranslateY > 0) {
+      targetElement.style.transform = 'translateY(0)'
+      targetElement.style.opacity = '1'
+      if (this.floatingButton) {
+        this.floatingButton.style.transform = 'translateY(0)'
+        this.floatingButton.style.opacity = '1'
+      }
+      this.currentTranslateY = 0
+    }
+
+    // Pour navigation-panel, pas besoin de snap à des hauteurs
+    if (this.isNavigationPanel) {
+      return
+    }
+
+    // Détecter le swipe rapide vers le bas pour fermer
     const dragDuration = Date.now() - this.dragStartTime
     const currentHeight = this.element.offsetHeight
     const dragDistance = this.dragStartHeight - currentHeight // positif = swipe vers le bas
@@ -165,16 +329,8 @@ export default class extends Controller {
       this.dismiss()
       return
     }
-    // === FIN APRÈS ===
 
-    // Snap à des positions prédéfinies
-    // === AVANT ===
-    // const snapPositions = [
-    //   this.minHeight,
-    //   this.defaultHeight,
-    //   this.maxHeight
-    // ]
-    // === APRÈS === (seulement 2 positions maintenant)
+    // Snap à des positions prédéfinies (seulement 2 positions)
     const snapPositions = [
       this.minHeight,
       this.defaultHeight

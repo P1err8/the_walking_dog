@@ -9,6 +9,7 @@ export default class extends Controller {
 		this.currentIndex = 0
 		this.currentStepIndex = 0
 		this.userPosition = null
+		this.isHidden = false
 
 		const coords = this.coordinatesValue || []
 
@@ -90,6 +91,25 @@ export default class extends Controller {
 		if (this.handleGeolocateBound && this.mapController && this.mapController.geolocateControl) {
 			this.mapController.geolocateControl.off('geolocate', this.handleGeolocateBound)
 		}
+	}
+
+	// Toggle le panel (pour le bouton chevron)
+	togglePanel() {
+		if (this.isHidden) {
+			this.showPanel()
+		} else {
+			this.hidePanel()
+		}
+	}
+
+	hidePanel() {
+		this.isHidden = true
+		this.element.classList.add('navigation-panel--hidden')
+	}
+
+	showPanel() {
+		this.isHidden = false
+		this.element.classList.remove('navigation-panel--hidden')
 	}
 
 	// Recenter the map to the user's location
