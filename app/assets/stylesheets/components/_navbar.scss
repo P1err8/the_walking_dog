@@ -9,7 +9,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 8.5svh;
+  height: 9svh;
   z-index: 1000; // Au-dessus de la modal (950)
   background: rgba($surface, 0.98);
   backdrop-filter: blur(20px);
@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 0 1.3rem;
+  padding: 0 0 1.1rem 0;
   transition: transform 0.3s ease, opacity 0.3s ease;
   // Effet curved au centre pour le bouton FAB
 
@@ -77,8 +77,8 @@
 
 // Avatar pour le profil
 .nav-avatar {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid $primary;
