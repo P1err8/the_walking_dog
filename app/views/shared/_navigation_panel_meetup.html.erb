@@ -18,6 +18,6 @@
 			              touchmove@window->draggable-panel#drag:!passive
 			              mouseup@window->draggable-panel#endDrag
 			              touchend@window->draggable-panel#endDrag">
-		<%= render "shared/navigation_panel" %>
+		<%= render "shared/navigation_panel", meet_up: destination[:meet_up] if destination[:meet_up] %>
 	</div>
 </div>

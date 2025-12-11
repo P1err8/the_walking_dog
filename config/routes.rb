@@ -3,7 +3,11 @@ Rails.application.routes.draw do
   root to: "pages#home"
   resources :walkings, only: %i[index show new create]
   resources :meet_ups, only: %i[show create] do
-    resources :participations, only: %i[create]
+    resources :participations, only: %i[create] do
+      collection do
+        post :arrive
+      end
+    end
   end
   resources :dogs, only: %i[index show new create edit update]
 
