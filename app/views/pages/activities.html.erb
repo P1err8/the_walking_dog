@@ -16,7 +16,7 @@
                 <% end %>
               </div>
               <div class="user-info">
-                <strong><%= current_user.email.split('@').first.capitalize %></strong>
+                <strong><%= current_user.dogs.any? ? current_user.dogs.first.name : current_user.email.split('@').first.capitalize %></strong>
                 <span class="date"><%= activity.created_at.in_time_zone('Paris').strftime("%d %b à %H:%M") %></span>
               </div>
             </div>
@@ -51,7 +51,7 @@
                 <% end %>
               </div>
               <div class="user-info">
-                <strong><%= current_user.email.split('@').first.capitalize %></strong>
+                <strong><%= current_user.dogs.any? ? current_user.dogs.first.name : current_user.email.split('@').first.capitalize %></strong>
                 <span class="date"><%= activity.created_at.in_time_zone('Paris').strftime("%d %b à %H:%M") %></span>
               </div>
             </div>
