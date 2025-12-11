@@ -36,7 +36,7 @@
       <% if dogs.any? %>
         <div class="bulle-meetup__dogs">
           <div class="bulle-meetup__dogs-avatars">
-            <% dogs.first(3).each do |dog| %>
+            <% dogs.each do |dog| %>
               <%= link_to dog_path(dog), class: "bulle-meetup__dog-link" do %>
                 <% if dog.url_picture.present? %>
                   <%= image_tag dog.url_picture, alt: dog.name, class: "bulle-meetup__dog-avatar-small" %>
@@ -44,9 +44,6 @@
                   <div class="bulle-meetup__dog-avatar-small placeholder">🐕</div>
                 <% end %>
               <% end %>
-            <% end %>
-            <% if dogs.count > 3 %>
-              <div class="bulle-meetup__dog-avatar-small more">+<%= dogs.count - 3 %></div>
             <% end %>
           </div>
           <div class="bulle-meetup__dogs-races">

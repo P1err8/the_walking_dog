@@ -373,12 +373,64 @@ export default class extends Controller {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
 
-      const popup = new mapboxgl.Popup({ offset: 25, maxWidth: '300px' })
+      // Créer d'abord la popup cachée pour mesurer sa hauteur réelle
+      const tempPopup = new mapboxgl.Popup({
+        offset: 25,
+        maxWidth: '300px',
+        className: 'temp-popup-measure'
+      })
         .setLngLat(coordinates)
         .setHTML(infoWindow)
         .addTo(this.map);
 
-      this.updatePopupDistanceAndDuration(popup, [markerLng, markerLat]);
+      // Attendre le prochain frame pour que le DOM soit rendu
+      await new Promise(resolve => requestAnimationFrame(resolve));
+
+      // Mesurer la hauteur réelle de la popup
+      const popupElement = tempPopup._content;
+      const popupHeight = popupElement ? popupElement.offsetHeight : 350;
+
+      // Retirer la popup temporaire
+      tempPopup.remove();
+
+      // Calculer l'offset dynamique basé sur la position du panneau de navigation
+      const mapContainer = this.map.getContainer();
+      const mapHeight = mapContainer.offsetHeight;
+      const navigationPanel = document.querySelector('.navigation-panel');
+
+      let availableHeight = mapHeight;
+      if (navigationPanel) {
+        // Calculer la distance du haut du panneau par rapport au haut de la carte
+        const mapRect = mapContainer.getBoundingClientRect();
+        const panelRect = navigationPanel.getBoundingClientRect();
+        const panelTopRelativeToMap = panelRect.top - mapRect.top;
+        availableHeight = panelTopRelativeToMap;
+      }
+
+      // Centrer la popup dans l'espace disponible au-dessus du panneau
+      const offsetY = (availableHeight / 2) - (popupHeight / 2) - (mapHeight / 2);
+
+      // Centrer la carte avec l'offset calculé
+      this.map.easeTo({
+        center: coordinates,
+        offset: [0, offsetY],
+        duration: 200
+      });
+
+      // Attendre que l'animation soit terminée avant d'afficher la vraie popup
+      this.map.once('moveend', () => {
+        // Créer la popup finale
+        const popup = new mapboxgl.Popup({
+          offset: 25,
+          maxWidth: '300px'
+        })
+          .setLngLat(coordinates)
+          .setHTML(infoWindow)
+          .addTo(this.map);
+
+        // Calculer et mettre à jour la distance et la durée
+        this.updatePopupDistanceAndDuration(popup, [markerLng, markerLat]);
+      });
     });
 
     // Changement de curseur (main) au survol
