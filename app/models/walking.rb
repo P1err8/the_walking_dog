@@ -6,6 +6,8 @@ class Walking < ApplicationRecord
 
   belongs_to :user
 
+  # TODO: Envisager d'ajouter des validations (coordinates presence, minimum 2 points)
+
   # Calcule la distance totale à partir des coordonnées (en km)
   def calculated_distance
     return distance if distance.present?

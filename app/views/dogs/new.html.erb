@@ -8,10 +8,13 @@
         <div class="dog-profile-image-wrapper dog-profile-editable">
           <%= f.label :photo do %>
             <div class="dog-profile-placeholder" id="photo-placeholder">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
             </div>
             <img id="profile-preview" class="dog-profile-image" src="" alt="" style="display: none;">
-            <%= f.file_field :photo, accept: "image/*", class: "dog-photo-input" %>
+            <%= f.file_field :photo, accept: "image/*", class: "dog-photo-input", id: "photo-input" %>
           <% end %>
         </div>
       </div>
@@ -23,14 +26,14 @@
 
       <div class="dog-info-group">
         <span class="dog-info-label">Âge</span>
-        <%= f.input :age, label: false, placeholder: "Âge en années", wrapper: false, input_html: { class: "dog-edit-input" } %>
+        <%= f.input :age, label: false, placeholder: "Âge", wrapper: false, input_html: { class: "dog-edit-input", type: "number", min: 0 } %>
       </div>
 
       <div class="dog-info-group">
         <span class="dog-info-label">Race</span>
-        <div data-controller="breed-list" style="position: relative; width: 100%;">
+        <div data-controller="breed-list" class="dog-breed-wrapper">
           <input type="hidden" name="dog[race]" id="dog_breed" data-breed-list-target="hiddenInput">
-          <input type="text" data-action="input->breed-list#filter focus->breed-list#showList" data-breed-list-target="queryInput" id="breed-input" placeholder="Rechercher une race..." autocomplete="off" class="dog-edit-input">
+          <input type="text" data-action="input->breed-list#filter focus->breed-list#showList" data-breed-list-target="queryInput" id="breed-input" placeholder="Rechercher..." autocomplete="off" class="dog-edit-input">
           <div class="breed-list d-none" data-breed-list-target="list">
             <% Dog::BREEDS.each do |breed| %>
               <a class="breed-suggestion" data-action="click->breed-list#select" data-breed="<%= breed %>"><%= breed %></a>
@@ -50,18 +53,41 @@
 
       <div class="dog-info-group">
         <span class="dog-info-label">Personnalité & Traits</span>
-        <div class="dog-tags-edit">
+        <div class="dog-tags-container">
           <%= f.collection_check_boxes :tag_ids, Tag.all, :id, :name do |b| %>
             <%= b.check_box(class: "d-none") %>
-            <%= b.label(class: "dog-tag-btn") { b.object.name } %>
+            <%= b.label(class: "dog-tag dog-tag--selectable") { b.object.name.capitalize } %>
           <% end %>
         </div>
       </div>
 
-      <div class="dog-edit-actions">
-        <%= f.submit "Créer le profil", class: "dog-save-btn" %>
+      <div class="dog-profile-actions">
+        <%= f.submit "Créer le profil", class: "dog-profile-btn" %>
       </div>
 
     <% end %>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('photo-input');
+    const preview = document.getElementById('profile-preview');
+    const placeholder = document.getElementById('photo-placeholder');
+
+    if (input) {
+      input.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  });
+</script>

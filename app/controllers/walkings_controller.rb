@@ -29,7 +29,7 @@ class WalkingsController < ApplicationController
       @walking.user = current_user
     if @walking.save
       # Get coordinates from the hidden field if available, otherwise fallback to default
-      redirect_to walking_path(@walking), notice: 'Walking was successfully created.'
+      redirect_to walking_path(@walking), notice: 'Balade créée avec succès.'
     else
       render :new, status: :unprocessable_entity
     end
@@ -37,6 +37,16 @@ class WalkingsController < ApplicationController
 
   def show
     @walking = Walking.find(params[:id])
+  end
+
+  def destroy
+    @walking = current_user.walkings.find_by(id: params[:id])
+    if @walking
+      @walking.destroy
+      redirect_to my_activities_path, notice: "Balade supprimée."
+    else
+      redirect_to my_activities_path, alert: "Impossible de supprimer cette balade."
+    end
   end
 
   private

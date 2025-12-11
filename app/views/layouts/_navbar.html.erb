@@ -8,31 +8,43 @@
     </svg>
     <span class="nav-label">Réglages</span>
   <% end %>
-  <%# Stats %>
+  <%# Historique %>
   <%= link_to (current_page?(my_activities_path) ? root_path : my_activities_path), class: "nav-link #{'active' if current_page?(walkings_path)}" do %>
     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M3 21C3.82843 19.1652 5.02816 17.5986 6.48426 16.4635C7.94036 15.3283 9.67392 14.6667 11.4286 14.5556" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M16 21V15M13 18H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <span class="nav-label">Stats</span>
+    <span class="nav-label">Historique</span>
   <% end %>
   <%# Espace vide pour le bouton FAB central %>
   <div class="nav-spacer"></div>
   <%# Carte / Accueil %>
-  <%= link_to root_path, class: "nav-link #{'active' if current_page?(root_path)}", data: { turbo: false, action: "click->active-walking#goToActiveWalking" } do %>
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" stroke-width="2" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"/>
-    </svg>
-    <span class="nav-label">Votre parcours</span>
+  <% if current_page?(root_path) %>
+    <span class="nav-link active">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" stroke-width="2" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"/>
+      </svg>
+      <span class="nav-label">Carte</span>
+    </span>
+  <% else %>
+    <%= link_to root_path, class: "nav-link", data: { turbo: false, action: "click->active-walking#goToActiveWalking" } do %>
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" stroke-width="2" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"/>
+      </svg>
+      <span class="nav-label">Carte</span>
+    <% end %>
   <% end %>
   <%# Profil avec avatar %>
   <% if user_signed_in? %>
-    <% profile_path = current_user.dogs.any? ? dog_path(current_user) : new_dog_path %>
+    <% profile_path = current_user.dogs.any? ? dog_path(current_user.dogs.first) : new_dog_path %>
     <%= link_to (current_page?(profile_path) ? root_path : profile_path), class: "nav-link #{'active' if controller_name == 'dogs'}" do %>
       <div class="nav-avatar">
-        <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
-          <%= image_tag current_user.dogs.first.url_picture, alt: "Profil", class: "avatar-img" %>
+        <% dog = current_user.dogs.first %>
+        <% if dog&.photo&.attached? %>
+          <%= image_tag dog.photo, alt: "Profil", class: "avatar-img" %>
+        <% elsif dog&.url_picture.present? %>
+          <%= image_tag dog.url_picture, alt: "Profil", class: "avatar-img" %>
         <% else %>
           <img src="https://i.pravatar.cc/150?img=12" alt="Profil" class="avatar-img">
         <% end %>

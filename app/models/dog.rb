@@ -3,6 +3,14 @@ class Dog < ApplicationRecord
   has_many :dogs_tags, dependent: :destroy
   has_many :tags, through: :dogs_tags
 
+  has_one_attached :photo
+
+  validates :name, presence: { message: "Obligatoire" }
+  validates :age, presence: { message: "Obligatoire" },
+                  numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 30, message: "" }
+  validates :race, presence: { message: "Obligatoire" }
+  validates :size, presence: { message: "Obligatoire" },
+                   inclusion: { in: %w[Petit Moyen Grand], message: "doit être Petit, Moyen ou Grand" }
 
   BREEDS = [
     "Labrador",

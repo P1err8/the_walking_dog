@@ -16,15 +16,213 @@
   margin: 0 auto;
 }
 
-.activity-card {
+// ========================================
+// ACTIVITY CARD V2 - Map collée aux bords
+// ========================================
+.activity-card-v2 {
   background: $surface;
-  padding: 1.25rem;
-  margin-bottom: 1rem;
   border-radius: $radius;
   box-shadow: $shadow;
-  .border-bottom {
-    border-bottom-left-radius: $radius-md;
-    border-bottom-right-radius: $radius-md;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+
+  &__content {
+    padding: 1rem;
+
+    .activity-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+
+      .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 0.75rem;
+        border: 2px solid $primary;
+
+        .avatar-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .user-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+
+        strong {
+          color: $text-main;
+          font-size: 0.95rem;
+          font-weight: 600;
+        }
+
+        .date {
+          color: $text-muted;
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      margin: 0 0 0.5rem 0;
+      font-weight: 700;
+      color: $accent;
+    }
+
+    .activity-stats-top {
+      display: flex;
+      justify-content: space-around;
+      padding: 0.5rem;
+      background: $bg-page;
+      border-radius: $radius-md;
+
+      .stat {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+
+        i {
+          font-size: 0.95rem;
+          color: $primary;
+        }
+
+        .value {
+          font-size: 0.95rem;
+          color: $accent;
+          font-weight: 700;
+        }
+      }
+    }
+
+    .meetup-participants {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .meetup-location {
+      color: $text-main;
+      font-size: 0.95rem;
+      margin: 0;
+
+      strong {
+        color: $accent;
+      }
+    }
+
+    .no-participants {
+      color: $text-muted;
+      font-size: 0.9rem;
+      font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  &__map {
+    position: relative;
+    height: 180px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  &__delete {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #999;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+
+    i {
+      font-size: 0.9rem;
+    }
+
+    &:hover {
+      background: #dc3545;
+      color: white;
+    }
+  }
+}
+
+.activity-card {
+  position: relative;
+  background: $surface;
+  margin-bottom: 0.75rem;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  overflow: hidden !important;
+  padding: 0 !important;
+
+  // Contenu texte avec padding
+  .activity-content {
+    padding: 1rem;
+    padding-bottom: 0.5rem;
+  }
+
+  // Map wrapper sans padding, full width, collé aux bords
+  .activity-map-wrapper,
+  > div[style*="position: relative"] {
+    position: relative;
+    width: 100% !important;
+    height: 180px;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover;
+      display: block;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    .delete-overlay-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #999;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+      i {
+        font-size: 0.9rem;
+      }
+
+      &:hover {
+        background: #dc3545;
+        color: white;
+      }
+    }
   }
   .activity-header {
     display: flex;
@@ -50,6 +248,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.15rem;
+      flex: 1;
 
       strong {
         color: $text-main;
@@ -62,6 +261,37 @@
         font-size: 0.8rem;
       }
     }
+
+  }
+
+  .activity-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.75rem;
+  }
+
+  .activity-delete-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: none;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    color: $text-muted;
+    border-radius: $radius-md;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    font-size: 0.8rem;
+
+    i {
+      font-size: 0.85rem;
+    }
+
+    &:hover {
+      color: #dc3545;
+      background: rgba(#dc3545, 0.1);
+    }
   }
 
   h3 {
@@ -71,15 +301,14 @@
     color: $accent;
   }
 
-  // Stats fusionnés avec la map
-  .activity-stats {
+  // Stats au-dessus de la map
+  .activity-stats-top {
     display: flex;
     justify-content: space-around;
-    padding: 0.75rem 0.5rem;
-    background: lighten($bg-page, 2%);
-    border-radius: 0 0 $radius-md $radius-md;
-    border: 1px solid $border-color;
-    border-top: none;
+    padding: 0.5rem;
+    margin-bottom: 0;
+    background: $bg-page;
+    border-radius: $radius-md;
 
     .stat {
       display: flex;
@@ -103,19 +332,133 @@
     }
   }
 
-  // Map et stats fusionnés
-  .activity-map {
-    width: 100%;
+  // Map container en bas de la card
+  .activity-map-container {
+    position: relative;
+    width: calc(100% + 2rem);
+    margin-left: -1rem;
+    margin-right: -1rem;
     height: 180px;
-    border-radius: $radius-md $radius-md 0 0;
     overflow: hidden;
-    background-color: $surface;
 
     .static-map-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
+
+    .delete-overlay-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #999;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+      i {
+        font-size: 0.9rem;
+      }
+
+      &:hover {
+        background: #dc3545;
+        color: white;
+      }
+    }
+  }
+}
+
+// Meetup participants
+.meetup-participants {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.participant-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-decoration: none;
+  gap: 0.4rem;
+  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  background: $bg-page;
+  border-radius: $radius-pill;
+  transition: all 0.2s ease;
+
+  .participant-avatar {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    max-width: 28px;
+    max-height: 28px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid $primary;
+    flex-shrink: 0;
+
+    img,
+    .avatar-img {
+      width: 28px !important;
+      height: 28px !important;
+      max-width: 28px !important;
+      max-height: 28px !important;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+  }
+
+  .participant-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $text-main;
+  }
+
+  &:hover {
+    background: rgba($primary, 0.1);
+
+    .participant-avatar {
+      border-color: $secondary;
+    }
+  }
+}
+
+.participant-avatar-link {
+  display: inline-block;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.no-participants {
+  color: $text-muted;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.meetup-location {
+  color: $text-main;
+  font-size: 0.95rem;
+  margin-bottom: 0;
+
+  strong {
+    color: $accent;
   }
 }
 
@@ -128,4 +471,79 @@
   color: $text-muted;
   font-size: 1rem;
   font-style: italic;
+}
+
+// ========================================
+// EMPTY STATE - Aucune activité
+// ========================================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: calc(100vh - 200px);
+  padding: 2rem 1.5rem;
+
+  &__icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba($secondary, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+
+    i {
+      font-size: 3rem;
+      color: $secondary;
+    }
+  }
+
+  &__title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: $text-main;
+    margin: 0 0 0.75rem 0;
+  }
+
+  &__text {
+    font-size: 1rem;
+    color: $text-muted;
+    margin: 0 0 1.5rem 0;
+    max-width: 280px;
+    line-height: 1.5;
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.5rem;
+    background: $primary;
+    color: $white;
+    border: none;
+    border-radius: $radius-pill;
+    font-family: $font-family;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba($primary, 0.3);
+
+    i {
+      font-size: 0.9rem;
+    }
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba($primary, 0.4);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
 }

@@ -443,6 +443,10 @@ export default class extends Controller {
 
         console.log(`Itinéraire en boucle calculé: ${distanceKm} km en ${durationMinutes} minutes.`)
 
+        // Supprimer les markers POI intermédiaires (orange) - on garde juste la route
+        this.poiMarkers.forEach(marker => marker.remove())
+        this.poiMarkers = []
+
         // Adapter le zoom pour voir tout l'itinéraire
         this.fitMapToRoute(routeGeoJSON.coordinates)
 

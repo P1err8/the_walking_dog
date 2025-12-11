@@ -170,7 +170,7 @@ turbo-frame#modal {
     padding: 0.65rem 1rem;
     font-family: $font-family;
     font-size: 0.95rem;
-    border: 2px solid $border-color;
+    border: none;
     border-radius: $radius-md;
     background: $bg-page;
     color: $text-main;
@@ -182,9 +182,8 @@ turbo-frame#modal {
 
     &:focus {
       outline: none;
-      border-color: $primary;
       background: $surface;
-      box-shadow: 0 0 0 4px rgba($primary, 0.1);
+      box-shadow: 0 0 0 3px rgba($primary, 0.15);
     }
   }
 
@@ -270,16 +269,18 @@ turbo-frame#modal {
   z-index: 1000;
   width: 100%;
   background: $surface;
-  border: 1px solid $border-color;
+  border: none;
   border-radius: $radius-md;
   max-height: 200px;
   overflow-y: auto;
   box-shadow: $shadow-lg;
   margin-top: 0.25rem;
+  display: none;
 
-  // Cacher quand vide
-  &:empty {
-    display: none;
+  // Afficher seulement quand il y a du contenu
+  &:not(:empty) {
+    display: block;
+    border: 1px solid $border-color;
   }
 
   .autocomplete-item {

@@ -1,3 +1,8 @@
+# =============================================================================
+# TODO: Ce fichier peut être supprimé - Fonctionnalité non utilisée
+# Contrôleur pour gérer les positions utilisateurs en temps réel (non activé)
+# Aucune route ne pointe vers ce contrôleur.
+# =============================================================================
 class UserPositionsController < ApplicationController
   before_action :authenticate_user!
 

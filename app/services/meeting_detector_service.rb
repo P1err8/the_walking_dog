@@ -1,3 +1,8 @@
+# =============================================================================
+# TODO: Ce fichier peut être supprimé - Fonctionnalité non utilisée
+# Système de détection automatique de rencontres entre promeneurs (non activé)
+# Aucune route ne pointe vers ce service. Nécessite aussi la colonne 'sociable' sur walkings.
+# =============================================================================
 class MeetingDetectorService
   PROXIMITY_THRESHOLD_METERS = 100
   POSITION_FRESHNESS_MINUTES = 5
