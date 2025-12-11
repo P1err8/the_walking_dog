@@ -46,7 +46,7 @@
         <% elsif dog&.url_picture.present? %>
           <%= image_tag dog.url_picture, alt: "Profil", class: "avatar-img" %>
         <% else %>
-          <img src="https://i.pravatar.cc/150?img=12" alt="Profil" class="avatar-img">
+          <img src="favicon.png" alt="Profil" class="avatar-img">
         <% end %>
       </div>
       <span class="nav-label">Profil</span>
@@ -54,7 +54,7 @@
   <% else %>
     <%= link_to new_user_session_path, class: "nav-link" do %>
       <div class="nav-avatar">
-        <img src="https://i.pravatar.cc/150?img=12" alt="Profil" class="avatar-img">
+        <img src="favicon.png" alt="Profil" class="avatar-img">
       </div>
       <span class="nav-label">Profil</span>
     <% end %>
