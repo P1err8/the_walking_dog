@@ -80,7 +80,7 @@ $navbar-height: 52px; // Hauteur de la navbar (légèrement moins pour couvrir l
 // Drag Handle
 .navigation-panel__drag-handle {
   width: 100%;
-  height: 30px;
+  height: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -154,7 +154,7 @@ $navbar-height: 52px; // Hauteur de la navbar (légèrement moins pour couvrir l
 .navigation-panel__header {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 1rem;
   margin-bottom: 1.25rem;
 }
 
@@ -171,6 +171,7 @@ $navbar-height: 52px; // Hauteur de la navbar (légèrement moins pour couvrir l
   font-weight: 700;
   color: #1e3a5f;
   text-align: center;
+  margin-top: 1rem;
 }
 
 .navigation-panel__instruction-row {

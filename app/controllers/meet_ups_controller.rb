@@ -15,7 +15,15 @@ class MeetUpsController < ApplicationController
         name: @point.name,
         image_url: @point.url_picture,
         type: "Point de rencontre",
-        location: "Lyon, France"
+        location: "Lyon, France",
+        rating: "4.8",
+        reviews_count: "12",
+        distance: "Calcul...",
+        duration: "Calcul...",
+        price: "Gratuit",
+        nights: "",
+        dates: "",
+        marker_id: "#{@point.latitude}-#{@point.longitude}"
        })
     }
   end
