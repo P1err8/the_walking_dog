@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   resources :dogs, only: %i[index show new create edit update]
 
   get "my_activities", to: "pages#activities", as: "my_activities"
+  get "api/markers", to: "pages#markers", as: "api_markers"
 
   # ==============================================================================
   # STYLEGUIDE - Charte graphique (ajouté par Julien)
