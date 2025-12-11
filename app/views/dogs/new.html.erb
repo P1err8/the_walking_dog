@@ -70,12 +70,13 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  function initPhotoPreview() {
     const input = document.getElementById('photo-input');
     const preview = document.getElementById('profile-preview');
     const placeholder = document.getElementById('photo-placeholder');
 
-    if (input) {
+    if (input && !input.dataset.initialized) {
+      input.dataset.initialized = 'true';
       input.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -89,5 +90,15 @@
         }
       });
     }
-  });
+  }
+
+  // Support pour Turbo et chargement classique
+  document.addEventListener('DOMContentLoaded', initPhotoPreview);
+  document.addEventListener('turbo:load', initPhotoPreview);
+  document.addEventListener('turbo:render', initPhotoPreview);
+
+  // Exécution immédiate si le DOM est déjà prêt
+  if (document.readyState !== 'loading') {
+    initPhotoPreview();
+  }
 </script>
