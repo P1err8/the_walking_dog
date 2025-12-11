@@ -9,7 +9,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 8.5svh;
   z-index: 1000; // Au-dessus de la modal (950)
   background: rgba($surface, 0.98);
   backdrop-filter: blur(20px);
@@ -20,9 +20,8 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 0 1rem;
+  padding: 0 1.3rem;
   transition: transform 0.3s ease, opacity 0.3s ease;
-
   // Effet curved au centre pour le bouton FAB
 
   &::after {
@@ -53,8 +52,8 @@
     width: 60px;
 
     .nav-icon {
-      width: 28px;
-      height: 28px;
+      width: 22px;
+      height: 22px;
       stroke: currentColor;
     }
 
@@ -97,12 +96,12 @@
 // ========================================
 .fab-button {
   position: fixed;
-  bottom: 20px;
+  bottom: 35px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1001; // Au-dessus de la navbar (1000)
-  width: 74px;
-  height: 74px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   background: linear-gradient(135deg, $primary 0%, $secondary 100%);
   color: $accent;
