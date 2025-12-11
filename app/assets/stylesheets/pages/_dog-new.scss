@@ -161,7 +161,6 @@
     background: $bg-page;
     color: $text-main;
     transition: all 0.3s ease;
-    -webkit-appearance: none;
 
     &::placeholder {
       color: $text-muted;
@@ -369,8 +368,6 @@ input[type="checkbox"]:checked + .tag-option span {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 6px 20px rgba($primary, 0.4);
-    -webkit-appearance: none;
-
     &:hover,
     &:active {
       transform: translateY(-2px);
@@ -382,4 +379,3 @@ input[type="checkbox"]:checked + .tag-option span {
     }
   }
 }
-
