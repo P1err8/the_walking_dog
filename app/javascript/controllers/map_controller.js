@@ -212,53 +212,6 @@ export default class extends Controller {
       }
     });
 
-    // 5. Layer : Animation radar - cercle externe (pulse 1) - Source séparée sans clustering
-    this.map.addLayer({
-      id: 'active-meetup-radar-1',
-      type: 'circle',
-      source: 'active-meetups',
-      paint: {
-        'circle-color': '#ef4444',
-        'circle-radius': 20,
-        'circle-opacity': 0.4,
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#ef4444',
-        'circle-stroke-opacity': 0.6
-      }
-    });
-
-    // 5b. Layer : Animation radar - cercle externe (pulse 2)
-    this.map.addLayer({
-      id: 'active-meetup-radar-2',
-      type: 'circle',
-      source: 'active-meetups',
-      paint: {
-        'circle-color': 'transparent',
-        'circle-radius': 20,
-        'circle-opacity': 0,
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#ef4444',
-        'circle-stroke-opacity': 0.4
-      }
-    });
-
-    // 5c. Layer : Point central actif (toujours visible, jamais clusterisé)
-    this.map.addLayer({
-      id: 'active-meetup-point',
-      type: 'circle',
-      source: 'active-meetups',
-      paint: {
-        'circle-color': '#ef4444',
-        'circle-radius': 14,
-        'circle-stroke-width': 4,
-        'circle-stroke-color': '#ffffff',
-        'circle-opacity': 1
-      }
-    });
-
-    // Démarrer l'animation radar
-    this.startRadarAnimation();
-
     // 6. Layer : Les points individuels inactifs (non clusterisés)
     this.map.addLayer({
       id: 'unclustered-point',
@@ -275,10 +228,81 @@ export default class extends Controller {
       }
     });
 
-    // --- Événements ---
+    // 7. Layer : Animation radar - cercle externe (pulse 1) - AU DESSUS des clusters
+    this.map.addLayer({
+      id: 'active-meetup-radar-1',
+      type: 'circle',
+      source: 'active-meetups',
+      paint: {
+        'circle-color': '#ef4444',
+        'circle-radius': 20,
+        'circle-opacity': 0.4,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#ef4444',
+        'circle-stroke-opacity': 0.6
+      }
+    });
 
-    // Clic sur un cluster -> Zoom dessus
+    // 7b. Layer : Animation radar - cercle externe (pulse 2)
+    this.map.addLayer({
+      id: 'active-meetup-radar-2',
+      type: 'circle',
+      source: 'active-meetups',
+      paint: {
+        'circle-color': 'transparent',
+        'circle-radius': 20,
+        'circle-opacity': 0,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#ef4444',
+        'circle-stroke-opacity': 0.4
+      }
+    });
+
+    // 7c. Layer : Point central actif (EN HAUT pour être cliquable en priorité)
+    this.map.addLayer({
+      id: 'active-meetup-point',
+      type: 'circle',
+      source: 'active-meetups',
+      paint: {
+        'circle-color': '#ef4444',
+        'circle-radius': 14,
+        'circle-stroke-width': 4,
+        'circle-stroke-color': '#ffffff',
+        'circle-opacity': 1
+      }
+    });
+
+    // Démarrer l'animation radar
+    this.startRadarAnimation();
+
+    // --- Événements ---
+    // ORDRE IMPORTANT : Les événements des points actifs AVANT les clusters
+    // pour qu'ils soient traités en priorité
+
+    // Clic sur un point actif -> Popup (PRIORITÉ MAXIMALE)
+    this.map.on('click', 'active-meetup-point', async (e) => {
+      e.preventDefault();
+      await this.showPopupForMarker(e);
+    });
+
+    // Clic sur un point individuel -> Popup
+    this.map.on('click', 'unclustered-point', async (e) => {
+      e.preventDefault();
+      await this.showPopupForMarker(e);
+    });
+
+    // Clic sur un cluster -> Zoom dessus (en dernier)
     this.map.on('click', 'clusters', (e) => {
+      // Vérifier qu'on n'a pas cliqué sur un point actif au même endroit
+      const activeFeaturesAtPoint = this.map.queryRenderedFeatures(e.point, {
+        layers: ['active-meetup-point']
+      });
+
+      // Si un point actif est présent, ne pas zoomer sur le cluster
+      if (activeFeaturesAtPoint.length > 0) {
+        return;
+      }
+
       const features = this.map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
       const clusterId = features[0].properties.cluster_id;
       this.map.getSource('meetups').getClusterExpansionZoom(clusterId, (err, zoom) => {
@@ -290,97 +314,6 @@ export default class extends Controller {
       });
     });
 
-    // Clic sur un point individuel -> Popup
-    this.map.on('click', 'unclustered-point', async (e) => {
-      const coordinates = e.features[0].geometry.coordinates.slice();
-      const infoWindow = e.features[0].properties.info_window;
-      const markerLat = e.features[0].properties.lat;
-      const markerLng = e.features[0].properties.lng;
-
-      // Correction pour les mondes répétés à bas niveau de zoom
-      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      }
-
-      // Créer d'abord la popup cachée pour mesurer sa hauteur réelle
-      const tempPopup = new mapboxgl.Popup({
-        offset: 25,
-        maxWidth: '300px',
-        className: 'temp-popup-measure'
-      })
-        .setLngLat(coordinates)
-        .setHTML(infoWindow)
-        .addTo(this.map);
-
-      // Attendre le prochain frame pour que le DOM soit rendu
-      await new Promise(resolve => requestAnimationFrame(resolve));
-
-      // Mesurer la hauteur réelle de la popup
-      const popupElement = tempPopup._content;
-      const popupHeight = popupElement ? popupElement.offsetHeight : 350;
-
-      // Retirer la popup temporaire
-      tempPopup.remove();
-
-      // Calculer l'offset dynamique basé sur la position du panneau de navigation
-      const mapContainer = this.map.getContainer();
-      const mapHeight = mapContainer.offsetHeight;
-      const navigationPanel = document.querySelector('.navigation-panel');
-
-      let availableHeight = mapHeight;
-      if (navigationPanel) {
-        // Calculer la distance du haut du panneau par rapport au haut de la carte
-        const mapRect = mapContainer.getBoundingClientRect();
-        const panelRect = navigationPanel.getBoundingClientRect();
-        const panelTopRelativeToMap = panelRect.top - mapRect.top;
-        availableHeight = panelTopRelativeToMap;
-      }
-
-      // Centrer la popup dans l'espace disponible au-dessus du panneau
-      const offsetY = (availableHeight / 2) - (popupHeight / 2) - (mapHeight / 2);
-
-      // Centrer la carte avec l'offset calculé
-      this.map.easeTo({
-        center: coordinates,
-        offset: [0, offsetY],
-        duration: 200
-      });
-
-      // Attendre que l'animation soit terminée avant d'afficher la vraie popup
-      this.map.once('moveend', () => {
-        // Créer la popup finale
-        const popup = new mapboxgl.Popup({
-          offset: 25,
-          maxWidth: '300px'
-        })
-          .setLngLat(coordinates)
-          .setHTML(infoWindow)
-          .addTo(this.map);
-
-        // Calculer et mettre à jour la distance et la durée
-        this.updatePopupDistanceAndDuration(popup, [markerLng, markerLat]);
-      });
-    });
-
-    // Clic sur un point actif -> Popup (même comportement que unclustered-point)
-    this.map.on('click', 'active-meetup-point', async (e) => {
-      const coordinates = e.features[0].geometry.coordinates.slice();
-      const infoWindow = e.features[0].properties.info_window;
-      const markerLat = e.features[0].properties.lat;
-      const markerLng = e.features[0].properties.lng;
-
-      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      }
-
-      const popup = new mapboxgl.Popup({ offset: 25, maxWidth: '300px' })
-        .setLngLat(coordinates)
-        .setHTML(infoWindow)
-        .addTo(this.map);
-
-      this.updatePopupDistanceAndDuration(popup, [markerLng, markerLat]);
-    });
-
     // Changement de curseur (main) au survol
     this.map.on('mouseenter', 'clusters', () => { this.map.getCanvas().style.cursor = 'pointer'; });
     this.map.on('mouseleave', 'clusters', () => { this.map.getCanvas().style.cursor = ''; });
@@ -390,6 +323,125 @@ export default class extends Controller {
     this.map.on('mouseleave', 'active-meetup-point', () => { this.map.getCanvas().style.cursor = ''; });
   }
 
+  // Fonction réutilisable pour afficher une popup avec centrage optimal
+  async showPopupForMarker(e) {
+    const coordinates = e.features[0].geometry.coordinates.slice();
+    const infoWindow = e.features[0].properties.info_window;
+    const markerLat = e.features[0].properties.lat;
+    const markerLng = e.features[0].properties.lng;
+
+    // Correction pour les mondes répétés à bas niveau de zoom
+    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+      coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+    }
+
+    // Créer d'abord la popup cachée pour mesurer sa hauteur réelle
+    const tempPopup = new mapboxgl.Popup({
+      offset: 25,
+      maxWidth: '300px',
+      className: 'temp-popup-measure'
+    })
+      .setLngLat(coordinates)
+      .setHTML(infoWindow)
+      .addTo(this.map);
+
+    // Attendre le prochain frame pour que le DOM soit rendu
+    await new Promise(resolve => requestAnimationFrame(resolve));
+
+    // Mesurer la hauteur réelle de la popup
+    const popupElement = tempPopup._content;
+    const popupHeight = popupElement ? popupElement.offsetHeight : 350;
+
+    // Retirer la popup temporaire
+    tempPopup.remove();
+
+    // Calculer l'offset dynamique basé sur la position du panneau de navigation
+    const mapContainer = this.map.getContainer();
+    const mapHeight = mapContainer.offsetHeight;
+    const mapWidth = mapContainer.offsetWidth;
+
+    // Chercher le panneau de navigation (présent dans meet_up/show et walkings/show)
+    const navigationPanel = document.querySelector('.navigation-panel');
+    const mapRect = mapContainer.getBoundingClientRect();
+
+    let availableHeight = mapHeight;
+    let bottomMargin = 20;
+    let topMargin = 20;
+
+    if (navigationPanel) {
+      const panelRect = navigationPanel.getBoundingClientRect();
+
+      // Le panneau est en position fixed/absolute, sa position getBoundingClientRect est déjà la vraie
+      const panelTopRelativeToMap = panelRect.top - mapRect.top;
+
+      // Si le panneau est visible dans la carte
+      if (panelTopRelativeToMap > 0 && panelTopRelativeToMap < mapHeight) {
+        // L'espace disponible va du haut de la carte jusqu'au haut du panneau
+        availableHeight = panelTopRelativeToMap;
+
+        // Marges adaptatives basées sur l'espace disponible
+        const minMargin = 20;
+        const maxMargin = 60;
+
+        // Si on a assez d'espace, utiliser de grandes marges
+        if (availableHeight > popupHeight + (maxMargin * 2)) {
+          topMargin = maxMargin;
+          bottomMargin = maxMargin;
+        } else if (availableHeight > popupHeight + (minMargin * 2)) {
+          // Sinon utiliser des marges minimales
+          topMargin = minMargin;
+          bottomMargin = minMargin;
+        } else {
+          // Si vraiment trop serré, marges minimales de 10px
+          topMargin = 10;
+          bottomMargin = 10;
+        }
+      }
+    } else {
+      // Pas de panneau, utiliser des marges standards
+      topMargin = 60;
+      bottomMargin = 60;
+    }
+
+    const sideMargin = 20;
+
+    // Vérifier l'espace disponible
+    const availableSpaceForPopup = availableHeight - topMargin - bottomMargin;
+
+    // Centrer la popup dans l'espace disponible
+    let offsetY = (availableHeight / 2) - (popupHeight / 2) - (mapHeight / 2);
+
+    // Si la popup est trop haute pour l'espace disponible, la coller en haut avec marge minimale
+    if (popupHeight > availableSpaceForPopup) {
+      offsetY = topMargin - (mapHeight / 2);
+    }
+
+    // Centrer la carte avec l'offset calculé et des marges de sécurité
+    this.map.easeTo({
+      center: coordinates,
+      offset: [0, offsetY],
+      duration: 200,
+      padding: {
+        top: topMargin,
+        bottom: bottomMargin,
+        left: sideMargin,
+        right: sideMargin
+      }
+    });
+
+    // Attendre que l'animation soit terminée avant d'afficher la vraie popup
+    this.map.once('moveend', () => {
+      const popup = new mapboxgl.Popup({
+        offset: 25,
+        maxWidth: '300px'
+      })
+        .setLngLat(coordinates)
+        .setHTML(infoWindow)
+        .addTo(this.map);
+
+      this.updatePopupDistanceAndDuration(popup, [markerLng, markerLat]);
+    });
+  }
 
 
   fitMapToMarkers() {

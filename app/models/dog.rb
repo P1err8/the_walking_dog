@@ -20,6 +20,7 @@ class Dog < ApplicationRecord
     "Cairn Terrier",
     "Cocker Spaniel",
     "Bouledogue Français",
+    "Saint Bernard",
     "Chihuahua",
     "Shih Tzu",
     "Dalmatien",
