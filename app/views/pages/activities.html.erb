@@ -2,7 +2,7 @@
 
 <div class="activities-container">
   <div class="activities-list">
-    <% activities = (@walkings.to_a + @meetups.to_a).sort_by(&:created_at).reverse %>
+    <% activities = (@walkings.to_a + @participations.to_a).sort_by(&:created_at).reverse %>
     <% activities.each do |activity| %>
       <% if activity.is_a?(Walking) && activity.coordinates.present? %>
         <div class="activity-card">
@@ -39,7 +39,7 @@
             <% end %>
           </div>
         </div>
-      <% elsif activity.is_a?(MeetUp) %>
+      <% elsif activity.is_a?(Participation) %>
         <div class="activity-card">
           <div class="activity-content">
             <div class="activity-header">
@@ -56,7 +56,7 @@
               </div>
             </div>
             <h3 style="margin-bottom: 0.25rem;">Rencontre avec</h3>
-            <% other_participants = activity.users.where.not(id: current_user.id) %>
+            <% other_participants = activity.meet_up.users.where.not(id: current_user.id) %>
             <% if other_participants.any? %>
               <div class="meetup-participants">
                 <% other_participants.each do |participant| %>
@@ -77,11 +77,11 @@
             <% else %>
               <p class="no-participants">Aucun autre participant</p>
             <% end %>
-            <p class="meetup-location">à <strong><%= activity.point.name %></strong></p>
+            <p class="meetup-location">à <strong><%= activity.meet_up.point.name %></strong></p>
           </div>
           <div class="activity-map-wrapper">
-            <%= image_tag static_marker_map_url(activity.point), alt: "Lieu de rencontre" %>
-            <%= link_to meet_up_path(activity), class: "delete-overlay-btn", data: { turbo_method: :delete, turbo_confirm: "Supprimer cette rencontre ?" } do %>
+            <%= image_tag static_marker_map_url(activity.meet_up.point), alt: "Lieu de rencontre" %>
+            <%= link_to meet_up_path(activity.meet_up), class: "delete-overlay-btn", data: { turbo_method: :delete, turbo_confirm: "Supprimer cette rencontre ?" } do %>
               <i class="fa-solid fa-trash-can"></i>
             <% end %>
           </div>

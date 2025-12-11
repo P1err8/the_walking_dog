@@ -79,6 +79,11 @@ export default class extends Controller {
       }
     })
 
+    // Start auto-refresh for markers every 5 minutes (only on home page)
+    if (this.hasMarkersValue && this.markersValue.length > 0) {
+      this.startAutoRefresh()
+    }
+
     //  this.map.on("load", () => {
     //   this.addMarkersToMap() // Appel de la fonction
     //   this.fitMapToMarkers() // Optionnel : centrer sur les points
@@ -396,6 +401,9 @@ export default class extends Controller {
   }
 
   disconnect() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval)
+    }
     window.removeEventListener("resize", this.handleResize)
     // Arrêter l'animation radar
     if (this.radarAnimationId) {
@@ -439,6 +447,61 @@ export default class extends Controller {
     }
 
     animate()
+  }
+
+  startAutoRefresh() {
+    // Refresh markers every 5 minutes (300000 ms)
+    this.refreshInterval = setInterval(() => {
+      this.refreshMarkers()
+    }, 300000) // 5 minutes
+  }
+
+  async refreshMarkers() {
+    try {
+      const response = await fetch('/api/markers')
+      const newMarkers = await response.json()
+
+      // Vérifier s'il y a des changements
+      if (JSON.stringify(this.markersValue) === JSON.stringify(newMarkers)) {
+        console.log('No changes in markers, skipping update')
+        return
+      }
+
+      // Update the markers value
+      this.markersValue = newMarkers
+
+      // Optimisation : mettre à jour uniquement la source de données sans recréer les couches
+      const source = this.map.getSource('meetups')
+      if (source) {
+        // Convertir les nouveaux markers en GeoJSON
+        const features = this.markersValue.map(marker => ({
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [marker.lng, marker.lat]
+          },
+          properties: {
+            marker_name: marker.marker_name,
+            point_id: marker.point_id,
+            has_active_meetup: marker.has_active_meetup,
+            info_window_html: marker.info_window_html
+          }
+        }))
+
+        // Mettre à jour la source sans recréer les couches
+        source.setData({
+          type: 'FeatureCollection',
+          features: features
+        })
+
+        console.log(`Markers updated: ${newMarkers.length} active meetups at`, new Date().toLocaleTimeString())
+      } else {
+        // Si la source n'existe pas encore, la créer
+        this.addClustersToMap()
+      }
+    } catch (error) {
+      console.error('Error refreshing markers:', error)
+    }
   }
 
   async addRoute() {

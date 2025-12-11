@@ -43,7 +43,7 @@ puts "Creating tags for dogs' personalities..."
 
 croket = Dog.create!(
   name: "Croket",
-  size: "petit",
+  size: "Petit",
   age: 3,
   race: "Chihuahua",
   url_picture: "chihuahua.jpeg",
@@ -54,7 +54,7 @@ croket = Dog.create!(
 
 luna = Dog.create!(
   name: "Luna",
-  size: "grand",
+  size: "Grand",
   age: 6,
   race: "saint-bernard",
   url_picture: "saint-bernard.png",
@@ -65,7 +65,7 @@ luna = Dog.create!(
 
     pilou = Dog.create!(
       name: "Pilou",
-      size: "petit",
+      size: "Petit",
       age: 5,
       race: "Cairn Terrier",
       url_picture: "cairn-terrier.png",
@@ -76,7 +76,7 @@ puts "#{pilou.name} has been created!"
 
 viktor = Dog.create!(
   name: "Viktor",
-  size: "moyen",
+  size: "Moyen",
   age: 1,
   race: "Cocker Spaniel",
   url_picture: "cocker-spaniel.jpg",

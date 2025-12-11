@@ -8,6 +8,7 @@ class MeetUpsController < ApplicationController
     @destination = {
       lat: @point.latitude,
       lng: @point.longitude,
+      meet_up: @meet_up,
       info_window_html: render_to_string(partial: "shared/bulle_meetup", locals: {
         point: @point,
         point_id: @point.id,
