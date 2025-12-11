@@ -1,6 +1,14 @@
 <div class="bulle-meetup">
   <div class="bulle-meetup__image">
-    <img src="<%= image_url.presence || asset_path('meetup-placeholder.svg') %>"
+    <%
+      # S'assurer que l'URL de l'image est absolue (commence par / ou http)
+      img_src = if image_url.present?
+                  image_url.start_with?('/', 'http') ? image_url : "/#{image_url}"
+                else
+                  asset_path('meetup-placeholder.svg')
+                end
+    %>
+    <img src="<%= img_src %>"
          alt="<%= name %>"
          class="bulle-meetup__img"
           onerror="this.onerror=null;this.src='<%= asset_path('meetup-placeholder.svg') %>'" />

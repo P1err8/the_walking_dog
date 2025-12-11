@@ -357,12 +357,24 @@ export default class extends Controller {
 
     // Calculer l'offset dynamique basé sur la position du panneau de navigation
     const mapContainer = this.map.getContainer();
-    const mapHeight = mapContainer.offsetHeight;
-    const mapWidth = mapContainer.offsetWidth;
+
+    // Utiliser le viewport réel et getBoundingClientRect pour plus de précision
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+    const mapRect = mapContainer.getBoundingClientRect();
+    const mapHeight = mapRect.height;
+    const mapWidth = mapRect.width;
+
+    // Debug détaillé pour tests multi-écrans
+    console.log('📱 === POPUP CENTERING DEBUG ===');
+    console.log('Screen:', `${window.screen.width}x${window.screen.height}`);
+    console.log('Viewport:', `${viewportWidth}x${viewportHeight}`);
+    console.log('Map size:', `${mapWidth}x${mapHeight}`);
+    console.log('Map position:', `top: ${mapRect.top}, left: ${mapRect.left}`);
+    console.log('Popup height:', popupHeight);
 
     // Chercher le panneau de navigation (présent dans meet_up/show et walkings/show)
     const navigationPanel = document.querySelector('.navigation-panel');
-    const mapRect = mapContainer.getBoundingClientRect();
 
     let availableHeight = mapHeight;
     let bottomMargin = 20;
@@ -370,51 +382,89 @@ export default class extends Controller {
 
     if (navigationPanel) {
       const panelRect = navigationPanel.getBoundingClientRect();
+      const panelHeight = panelRect.height;
 
-      // Le panneau est en position fixed/absolute, sa position getBoundingClientRect est déjà la vraie
-      const panelTopRelativeToMap = panelRect.top - mapRect.top;
+      console.log('🔵 Navigation panel found');
+      console.log('Panel position:', `top: ${panelRect.top}, height: ${panelHeight}`);
+
+      // Calculer la position réelle du panneau par rapport au viewport
+      const panelTopInViewport = panelRect.top;
+      const mapTopInViewport = mapRect.top;
+
+      // Position du panneau relative à la carte
+      const panelTopRelativeToMap = panelTopInViewport - mapTopInViewport;
+
+      console.log('Panel top relative to map:', panelTopRelativeToMap);
 
       // Si le panneau est visible dans la carte
       if (panelTopRelativeToMap > 0 && panelTopRelativeToMap < mapHeight) {
         // L'espace disponible va du haut de la carte jusqu'au haut du panneau
         availableHeight = panelTopRelativeToMap;
 
-        // Marges adaptatives basées sur l'espace disponible
-        const minMargin = 20;
-        const maxMargin = 60;
+        console.log('✅ Panel is visible in map');
+        console.log('Available height:', availableHeight);
 
-        // Si on a assez d'espace, utiliser de grandes marges
-        if (availableHeight > popupHeight + (maxMargin * 2)) {
+        // Marges adaptatives basées sur l'espace disponible et la taille d'écran
+        const isSmallScreen = viewportHeight < 700;
+        const minMargin = isSmallScreen ? 10 : 15;
+        const maxMargin = isSmallScreen ? 30 : 50;
+
+        console.log('Screen type:', isSmallScreen ? 'SMALL' : 'NORMAL');
+        console.log('Margin range:', `${minMargin}-${maxMargin}px`);
+
+        // Calculer les marges en fonction de l'espace disponible
+        const spaceForMargins = availableHeight - popupHeight;
+
+        if (spaceForMargins >= maxMargin * 2) {
           topMargin = maxMargin;
           bottomMargin = maxMargin;
-        } else if (availableHeight > popupHeight + (minMargin * 2)) {
-          // Sinon utiliser des marges minimales
+          console.log('→ Using MAX margins');
+        } else if (spaceForMargins >= minMargin * 2) {
           topMargin = minMargin;
           bottomMargin = minMargin;
+          console.log('→ Using MIN margins');
         } else {
-          // Si vraiment trop serré, marges minimales de 10px
-          topMargin = 10;
-          bottomMargin = 10;
+          // Répartir l'espace disponible équitablement
+          const halfSpace = Math.max(5, Math.floor(spaceForMargins / 2));
+          topMargin = halfSpace;
+          bottomMargin = halfSpace;
+          console.log('→ Using TIGHT margins (space limited)');
         }
+      } else {
+        console.log('⚠️ Panel outside map bounds');
       }
     } else {
-      // Pas de panneau, utiliser des marges standards
-      topMargin = 60;
-      bottomMargin = 60;
+      console.log('🔴 No navigation panel found');
+      // Pas de panneau, utiliser des marges standards adaptées à l'écran
+      const isSmallScreen = viewportHeight < 700;
+      topMargin = isSmallScreen ? 30 : 50;
+      bottomMargin = isSmallScreen ? 30 : 50;
     }
 
-    const sideMargin = 20;
+    const sideMargin = viewportWidth < 400 ? 10 : 15;
+
+    console.log('Final margins:', `top: ${topMargin}, bottom: ${bottomMargin}, side: ${sideMargin}`);
 
     // Vérifier l'espace disponible
     const availableSpaceForPopup = availableHeight - topMargin - bottomMargin;
 
+    console.log('Available space for popup:', availableSpaceForPopup);
+    console.log('Available height:', availableHeight);
+
     // Centrer la popup dans l'espace disponible
     let offsetY = (availableHeight / 2) - (popupHeight / 2) - (mapHeight / 2);
 
-    // Si la popup est trop haute pour l'espace disponible, la coller en haut avec marge minimale
+    console.log('Initial offsetY (centered):', offsetY);
+
+    // Si la popup est trop haute pour l'espace disponible, la positionner en haut
     if (popupHeight > availableSpaceForPopup) {
       offsetY = topMargin - (mapHeight / 2);
+      console.log('⚠️ Popup too tall! Adjusted offsetY:', offsetY);
     }
+
+    console.log('✨ Final offsetY:', offsetY);
+    console.log('📐 Padding:', { top: topMargin, bottom: bottomMargin, left: sideMargin, right: sideMargin });
+    console.log('=== END DEBUG ===\n');
 
     // Centrer la carte avec l'offset calculé et des marges de sécurité
     this.map.easeTo({
