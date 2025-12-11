@@ -147,7 +147,7 @@ tetedor.update(latitude: 45.777356001313436)
 puts "#{tetedor.name} updated"
 
 grandecote = Point.find_by(name: "Jardin de la Grande Côte")
-grandecote.update(url_picture: "grandecote.jfif")
+grandecote.update(url_picture: "jardin-de-la-grande-cote.jpg")
 puts "#{grandecote.name} updated"
 
 breti = Point.find_by(name: "Parc du Brétillod")
