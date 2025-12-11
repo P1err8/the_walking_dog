@@ -1,5 +1,4 @@
 <% content_for :title, @dog.name %>
-
 <div class="dog-show-container">
   <div class="dog-card">
     <div class="dog-profile-header">
@@ -9,7 +8,7 @@
         <% elsif @dog.url_picture.present? %>
           <%= image_tag @dog.url_picture, class: "dog-profile-image", alt: @dog.name %>
         <% else %>
-          <img src="favicon.png" alt="Default Dog" class="dog-profile-image">
+          <img src="/favicon.png" alt="Default Dog" class="dog-profile-image">
         <% end %>
       </div>
     </div>
@@ -40,7 +39,6 @@
         <% end %>
       </div>
     </div>
-
     <% if @is_owner %>
       <div class="dog-profile-actions">
         <%= link_to edit_dog_path(@dog), class: "dog-profile-btn" do %>
@@ -50,7 +48,6 @@
           </svg>
           Modifier le profil
         <% end %>
-
         <%= button_to destroy_user_session_path, method: :delete, class: "dog-profile-btn dog-profile-btn--logout" do %>
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -71,6 +68,5 @@
         <% end %>
       </div>
     <% end %>
-
   </div>
 </div>

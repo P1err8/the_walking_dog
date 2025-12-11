@@ -1,5 +1,4 @@
 <% content_for :title, "Mes activités" %>
-
 <div class="activities-container">
   <div class="activities-list">
     <% activities = (@walkings.to_a + @participations.to_a).sort_by(&:created_at).reverse %>
@@ -12,7 +11,7 @@
                 <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
                   <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
                 <% else %>
-                  <img src="favicon.png" class="avatar-img">
+                  <img src="/favicon.png" class="avatar-img">
                 <% end %>
               </div>
               <div class="user-info">
@@ -47,7 +46,7 @@
                 <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
                   <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
                 <% else %>
-                  <img src="favicon.png" class="avatar-img">
+                  <img src="/favicon.png" class="avatar-img">
                 <% end %>
               </div>
               <div class="user-info">
@@ -68,7 +67,7 @@
                       <% elsif dog.url_picture.present? %>
                         <%= image_tag dog.url_picture, class: "bulle-meetup__dog-avatar-small" %>
                       <% else %>
-                        <img src="favicon.png" class="bulle-meetup__dog-avatar-small">
+                        <img src="/favicon.png" class="bulle-meetup__dog-avatar-small">
                       <% end %>
                     <% end %>
                   <% end %>

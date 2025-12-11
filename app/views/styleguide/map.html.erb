@@ -1,6 +1,5 @@
 <!-- Mapbox GL CSS -->
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
-
 <style>
   /* LAYOUT FULLSCREEN POUR WEBAPP MOBILE */
   body {
@@ -412,23 +411,19 @@
     gap: 0.5rem;
   }
 </style>
-
 <div class="sg-page">
   <!-- Carte en plein écran -->
   <div class="map-container">
     <div id="map"></div>
   </div>
-
   <!-- Bouton flottant pour ouvrir le formulaire -->
   <button class="fab-button" onclick="openWalkModal()" title="Nouvelle balade">
     +
   </button>
-
   <!-- Bouton pour démarrer la navigation (apparaît après génération) -->
   <button id="start-nav-button" class="start-nav-button" onclick="startNavigation()" title="Démarrer la navigation">
     🧭 Démarrer la navigation
   </button>
-
   <!-- Modal formulaire (slide depuis le bas) -->
   <div class="modal-overlay" id="walk-modal" onclick="closeWalkModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
@@ -438,51 +433,46 @@
         <h2 class="modal-title">Nouvelle balade</h2>
         <p class="modal-subtitle">Générez un itinéraire personnalisé pour votre chien</p>
       </div>
-
       <div class="modal-body">
         <form class="walk-form">
-      <div class="form-group">
-        <label for="dog-name">Nom du chien</label>
-        <input type="text" id="dog-name" class="form-input" placeholder="Rex" value="<%= @default_dog_name %>" autocomplete="off">
-      </div>
-
-      <div class="form-group">
-        <label for="walk-duration">Durée de la balade</label>
-        <div class="slider-container">
-          <input type="range" id="walk-duration" class="form-slider" min="5" max="120" value="30" step="5" autocomplete="off">
-          <div class="slider-value">
-            <span id="duration-display">30</span> minutes
+          <div class="form-group">
+            <label for="dog-name">Nom du chien</label>
+            <input type="text" id="dog-name" class="form-input" placeholder="Rex" value="<%= @default_dog_name %>" autocomplete="off">
           </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Type de balade</label>
-        <div class="button-group">
-          <button type="button" class="btn btn-toggle">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 14l9-5-9-5-9 5 9 5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Balade privée
-          </button>
-          <button type="button" class="btn btn-toggle active">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Balade publique
-          </button>
-        </div>
-      </div>
-
+          <div class="form-group">
+            <label for="walk-duration">Durée de la balade</label>
+            <div class="slider-container">
+              <input type="range" id="walk-duration" class="form-slider" min="5" max="120" value="30" step="5" autocomplete="off">
+              <div class="slider-value">
+                <span id="duration-display">30</span> minutes
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Type de balade</label>
+            <div class="button-group">
+              <button type="button" class="btn btn-toggle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 14l9-5-9-5-9 5 9 5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Balade privée
+              </button>
+              <button type="button" class="btn btn-toggle active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Balade publique
+              </button>
+            </div>
+          </div>
           <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
             🐕 Générer la balade
           </button>
         </form>
-
         <!-- Bouton de navigation (apparaît après génération) -->
         <div id="navigation-section" style="display: none;">
           <div style="padding: 0.6rem; background: #dcfce7; border-radius: 6px; border: 1px solid #22c55e; margin-bottom: 0.6rem;">
@@ -503,7 +493,6 @@
       </div>
     </div>
   </div>
-
   <!-- Bottom Navigation -->
   <nav class="bottom-nav">
     <a href="#" class="bottom-nav-item">
@@ -513,7 +502,6 @@
       </svg>
       <span class="bottom-nav-label">Réglages</span>
     </a>
-
     <a href="#" class="bottom-nav-item">
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -522,26 +510,22 @@
       </svg>
       <span class="bottom-nav-label">Stats</span>
     </a>
-
     <!-- Espace vide pour le bouton FAB central -->
     <div style="width: 60px;"></div>
-
     <%= link_to styleguide_map_path, class: "bottom-nav-item active" do %>
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" stroke-width="2" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"/>
       </svg>
       <span class="bottom-nav-label">Carte</span>
     <% end %>
-
     <%= link_to styleguide_path, class: "bottom-nav-item" do %>
       <div class="nav-avatar">
-        <img src="favicon.png" alt="Profil" class="avatar-img">
+        <img src="/favicon.png" alt="Profil" class="avatar-img">
       </div>
       <span class="bottom-nav-label">Profil</span>
     <% end %>
   </nav>
 </div>
-
 <!-- Panneau de navigation GPS -->
 <div id="navigation-panel" class="navigation-panel">
   <div class="nav-header">
@@ -553,13 +537,11 @@
       ❌ Arrêter
     </button>
   </div>
-
   <div class="nav-instruction">
     <div class="nav-instruction-icon" id="nav-icon">🧭</div>
     <div class="nav-instruction-text" id="nav-instruction">Démarrage de la navigation...</div>
     <div class="nav-distance" id="nav-distance">Calcul en cours...</div>
   </div>
-
   <div class="nav-progress">
     <div class="nav-stat">
       <div class="nav-stat-value" id="nav-distance-total">-</div>
@@ -574,7 +556,6 @@
       <div class="nav-stat-label">Étape</div>
     </div>
   </div>
-
   <div class="nav-actions">
     <button class="btn btn-secondary" onclick="toggleVoiceGuidance()" style="flex: 1;">
       <span id="voice-icon">🔇</span> Instructions vocales
@@ -584,7 +565,6 @@
     </button>
   </div>
 </div>
-
 <script type="module">
   // Import du module JavaScript de la carte Mapbox
   import "styleguide/map";
