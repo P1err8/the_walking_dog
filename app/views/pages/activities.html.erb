@@ -12,7 +12,7 @@
                 <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
                   <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
                 <% else %>
-                  <img src="https://i.pravatar.cc/150?img=12" class="avatar-img">
+                  <img src="favicon.png" class="avatar-img">
                 <% end %>
               </div>
               <div class="user-info">
@@ -47,7 +47,7 @@
                 <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
                   <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
                 <% else %>
-                  <img src="https://i.pravatar.cc/150?img=12" class="avatar-img">
+                  <img src="favicon.png" class="avatar-img">
                 <% end %>
               </div>
               <div class="user-info">
@@ -68,7 +68,7 @@
                       <% elsif dog.url_picture.present? %>
                         <%= image_tag dog.url_picture, class: "bulle-meetup__dog-avatar-small" %>
                       <% else %>
-                        <img src="https://i.pravatar.cc/150?img=12" class="bulle-meetup__dog-avatar-small">
+                        <img src="favicon.png" class="bulle-meetup__dog-avatar-small">
                       <% end %>
                     <% end %>
                   <% end %>
