@@ -1,17 +1,18 @@
 {
 "background_color": "white",
-"description": "description test",
+"description": "Site de rencontre pour rencontrer des doggos",
 "display": "fullscreen",
 "name": "The Walking Dog",
+"start_url":"/",
 "icons": [
-    <% files = Dir.entries(Rails.root.join("app/assets/images/icons/")).select {|f| !File.directory? f} %>
-    <% files.each_with_index do |file, index| %>
-      <% match = file.match(/.+-(?<size>\d{2,3}x\d{2,3}).png/) %>
-      {
-        "src": "<%= image_path "icons/#{file}" %>",
-        "sizes": "<%= match && match[:size] %>",
-        "type": "image/png"
-      }<%= "," unless (files.size - 1) == index %>
-    <% end %>
-  ]
+<% files = Dir.entries(Rails.root.join("app/assets/images/icons/")).select {|f| !File.directory? f} %>
+<% files.each_with_index do |file, index| %>
+  <% match = file.match(/.+-(?<size>\d{2,3}x\d{2,3}).png/) %>
+  {
+  "src": "<%= image_path "icons/#{file}" %>",
+  "sizes": "<%= match && match[:size] %>",
+  "type": "image/png"
+  }<%= "," unless (files.size - 1) == index %>
+<% end %>
+]
 }
