@@ -1,11 +1,11 @@
 Rails.application.routes.draw do
   devise_for :users
   root to: "pages#home"
-  resources :walkings, only: %i[index show new create]
-  resources :meet_ups, only: %i[show create] do
+  resources :walkings, only: %i[index show new create destroy]
+  resources :meet_ups, only: %i[show create destroy] do
     resources :participations, only: %i[create]
   end
-  resources :dogs, only: %i[index show new create edit update]
+  resources :dogs, only: %i[index show new create edit update] # TODO: index non utilisé, peut être supprimé
 
   get "my_activities", to: "pages#activities", as: "my_activities"
 

@@ -6,65 +6,100 @@
     <% activities.each do |activity| %>
       <% if activity.is_a?(Walking) && activity.coordinates.present? %>
         <div class="activity-card">
-          <!-- Header: User & Date -->
-          <div class="activity-header">
-            <div class="user-avatar">
-              <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
-                <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
-              <% else %>
-                <img src="https://i.pravatar.cc/150?img=12" class="avatar-img">
-              <% end %>
+          <div class="activity-content">
+            <div class="activity-header">
+              <div class="user-avatar">
+                <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
+                  <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
+                <% else %>
+                  <img src="https://i.pravatar.cc/150?img=12" class="avatar-img">
+                <% end %>
+              </div>
+              <div class="user-info">
+                <strong><%= current_user.email.split('@').first.capitalize %></strong>
+                <span class="date"><%= activity.created_at.in_time_zone('Paris').strftime("%d %b à %H:%M") %></span>
+              </div>
             </div>
-            <div class="user-info">
-              <strong><%= current_user.email.split('@').first.capitalize %></strong>
-              <span class="date"><%= activity.created_at.in_time_zone('Paris').strftime("%d %b à %H:%M") %></span>
+            <h3>Promenade</h3>
+            <div class="activity-stats-top">
+              <div class="stat">
+                <i class="fa-solid fa-route"></i>
+                <span class="value"><strong><%= activity.calculated_distance ? "#{activity.calculated_distance} km" : "- km" %></strong></span>
+              </div>
+              <div class="stat">
+                <i class="fa-regular fa-clock"></i>
+                <span class="value"><strong><%= activity.calculated_duration ? "#{activity.calculated_duration} min" : "- min" %></strong></span>
+              </div>
             </div>
           </div>
-          <!-- Title -->
-          <h3>Promenade</h3>
-          <!-- The Static Map -->
-          <div class="activity-map">
-            <%= image_tag static_map_url(activity), alt: "Itinéraire de la balade", class: "static-map-img" %>
-          </div>
-          <!-- Stats Grid -->
-          <div class="activity-stats">
-            <div class="stat">
-              <i class="fa-solid fa-route"></i>
-              <span class="value"><strong><%= activity.calculated_distance ? "#{activity.calculated_distance} km" : "- km" %></strong></span>
-            </div>
-            <div class="stat">
-              <i class="fa-regular fa-clock"></i>
-              <span class="value"><strong><%= activity.calculated_duration ? "#{activity.calculated_duration} min" : "- min" %></strong></span>
-            </div>
+          <div class="activity-map-wrapper">
+            <%= image_tag static_map_url(activity), alt: "Itinéraire de la balade" %>
+            <%= link_to walking_path(activity), class: "delete-overlay-btn", data: { turbo_method: :delete, turbo_confirm: "Supprimer cette balade ?" } do %>
+              <i class="fa-solid fa-trash-can"></i>
+            <% end %>
           </div>
         </div>
       <% elsif activity.is_a?(MeetUp) %>
         <div class="activity-card">
-          <!-- Header: User & Date -->
-          <div class="activity-header">
-            <div class="user-avatar">
-              <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
-                <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
-              <% else %>
-                <img src="https://i.pravatar.cc/150?img=12" class="avatar-img">
-              <% end %>
+          <div class="activity-content">
+            <div class="activity-header">
+              <div class="user-avatar">
+                <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
+                  <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
+                <% else %>
+                  <img src="https://i.pravatar.cc/150?img=12" class="avatar-img">
+                <% end %>
+              </div>
+              <div class="user-info">
+                <strong><%= current_user.email.split('@').first.capitalize %></strong>
+                <span class="date"><%= activity.created_at.in_time_zone('Paris').strftime("%d %b à %H:%M") %></span>
+              </div>
             </div>
-            <div class="user-info">
-              <strong><%= current_user.email.split('@').first.capitalize %></strong>
-              <span class="date"><%= activity.created_at.in_time_zone('Paris').strftime("%d %b à %H:%M") %></span>
-            </div>
+            <h3 style="margin-bottom: 0.25rem;">Rencontre avec</h3>
+            <% other_participants = activity.users.where.not(id: current_user.id) %>
+            <% if other_participants.any? %>
+              <div class="meetup-participants">
+                <% other_participants.each do |participant| %>
+                  <% dog = participant.dogs.first %>
+                  <% if dog %>
+                    <%= link_to dog_path(dog), class: "participant-avatar-link" do %>
+                      <% if dog.photo.attached? %>
+                        <%= image_tag dog.photo, class: "bulle-meetup__dog-avatar-small" %>
+                      <% elsif dog.url_picture.present? %>
+                        <%= image_tag dog.url_picture, class: "bulle-meetup__dog-avatar-small" %>
+                      <% else %>
+                        <img src="https://i.pravatar.cc/150?img=12" class="bulle-meetup__dog-avatar-small">
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="no-participants">Aucun autre participant</p>
+            <% end %>
+            <p class="meetup-location">à <strong><%= activity.point.name %></strong></p>
           </div>
-          <!-- Title -->
-          <h3>Rencontre : <%= activity.point.name %></h3>
-          <!-- The Static Map -->
-          <div class="activity-map">
-            <%= image_tag static_marker_map_url(activity.point), alt: "Lieu de rencontre", class: "static-map-img border-bottom" %>
+          <div class="activity-map-wrapper">
+            <%= image_tag static_marker_map_url(activity.point), alt: "Lieu de rencontre" %>
+            <%= link_to meet_up_path(activity), class: "delete-overlay-btn", data: { turbo_method: :delete, turbo_confirm: "Supprimer cette rencontre ?" } do %>
+              <i class="fa-solid fa-trash-can"></i>
+            <% end %>
           </div>
         </div>
       <% end %>
     <% end %>
     <% if activities.empty? %>
-      <p class="no-activities">Aucune activité enregistrée pour le moment.</p>
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <i class="fa-solid fa-paw"></i>
+        </div>
+        <h2 class="empty-state__title">C'est encore très calme...</h2>
+        <p class="empty-state__text">Lancez votre première balade pour remplir votre historique !</p>
+        <%= link_to root_path, class: "empty-state__cta" do %>
+          <i class="fa-solid fa-play"></i>
+          Commencer une balade
+        <% end %>
+      </div>
     <% end %>
   </div>
 </div>

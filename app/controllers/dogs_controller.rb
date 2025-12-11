@@ -1,8 +1,9 @@
 class DogsController < ApplicationController
   def show
-    return redirect_to new_dog_path if current_user.dogs.empty?
+    @dog = Dog.find_by(id: params[:id])
+    return redirect_to root_path unless @dog
 
-    @dog = Dog.find(current_user.dogs.first.id)
+    @is_owner = @dog.user_id == current_user.id
   end
 
   def new
@@ -54,7 +55,7 @@ class DogsController < ApplicationController
   private
 
   def dog_params
-    params.require(:dog).permit(:name, :age, :race, :size, tag_ids: [])
+    params.require(:dog).permit(:name, :age, :race, :size, :photo, tag_ids: [])
   end
 
 end

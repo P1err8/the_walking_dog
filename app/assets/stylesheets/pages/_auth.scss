@@ -461,6 +461,7 @@
 }
 
 .settings-actions {
+  width: 100%;
   display: flex;
   gap: 0.6rem;
   margin-bottom: 0.85rem;
@@ -487,6 +488,7 @@
 }
 
 .settings-btn-light {
+  width: 100%;
   padding: 0.7rem 0.85rem;
   font-family: $font-family;
   font-size: 0.85rem;
@@ -548,5 +550,67 @@
   &:hover {
     background: $danger;
     color: $white;
+  }
+}
+
+// Photo de profil
+.settings-photo-section {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.settings-photo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.settings-photo-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid $primary;
+}
+
+.settings-photo-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: $bg-page;
+  border: 3px dashed $border-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 40px;
+    height: 40px;
+    color: $text-muted;
+  }
+}
+
+.settings-photo-input {
+  font-size: 0.85rem;
+  color: $text-muted;
+
+  &::file-selector-button {
+    padding: 0.5rem 1rem;
+    font-family: $font-family;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $primary;
+    background: rgba($primary, 0.1);
+    border: 2px solid $primary;
+    border-radius: $radius-md;
+    cursor: pointer;
+    margin-right: 0.75rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $primary;
+      color: $white;
+    }
   }
 }

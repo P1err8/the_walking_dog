@@ -1,6 +1,8 @@
 class MeetUp < ApplicationRecord
   belongs_to :point
   has_many :participations, dependent: :destroy
+
+  # TODO: Envisager d'ajouter une validation explicite pour point (validates :point, presence: true)
   has_many :users, through: :participations
   has_many :dogs, through: :users
 

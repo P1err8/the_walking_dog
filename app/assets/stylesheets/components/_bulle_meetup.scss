@@ -156,6 +156,18 @@
     margin-left: -8px; // Pour créer l'effet de chevauchement
   }
 
+  &__dog-link {
+    display: inline-block;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+    border-radius: 50%;
+
+    &:hover {
+      transform: scale(1.15);
+      z-index: 10;
+    }
+  }
+
   &__dog-avatar-small {
     width: 32px;
     height: 32px;

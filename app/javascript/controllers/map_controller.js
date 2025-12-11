@@ -88,7 +88,7 @@ export default class extends Controller {
 
   addClustersToMap() {
     // 1. Conversion de l'Array Rails en GeoJSON valide pour Mapbox
-    const features = this.markersValue.map(marker => {
+    const allFeatures = this.markersValue.map(marker => {
       return {
         type: 'Feature',
         geometry: {
@@ -105,18 +105,33 @@ export default class extends Controller {
       }
     })
 
-    const geojsonData = {
+    // Séparer les points actifs des points inactifs
+    const inactiveFeatures = allFeatures.filter(f => !f.properties.has_active_meetup)
+    const activeFeatures = allFeatures.filter(f => f.properties.has_active_meetup)
+
+    const inactiveGeojsonData = {
       type: 'FeatureCollection',
-      features: features
+      features: inactiveFeatures
     }
 
-    // 2. Ajout de la source avec clustering activé
+    const activeGeojsonData = {
+      type: 'FeatureCollection',
+      features: activeFeatures
+    }
+
+    // 2. Ajout de la source avec clustering activé (seulement pour les points inactifs)
     this.map.addSource('meetups', {
       type: 'geojson',
-      data: geojsonData,
+      data: inactiveGeojsonData,
       cluster: true,
       clusterMaxZoom: 14, // Zoom au-delà duquel les points ne sont plus groupés
       clusterRadius: 50   // Rayon du cluster
+    });
+
+    // 2b. Source séparée pour les points actifs (SANS clustering)
+    this.map.addSource('active-meetups', {
+      type: 'geojson',
+      data: activeGeojsonData
     });
 
     // 3. Layer : Halo externe des clusters (effet glow)
@@ -192,34 +207,61 @@ export default class extends Controller {
       }
     });
 
-    // 5. Layer : Zone active (cercle rouge autour des points actifs)
+    // 5. Layer : Animation radar - cercle externe (pulse 1) - Source séparée sans clustering
     this.map.addLayer({
-      id: 'active-meetup-zone',
+      id: 'active-meetup-radar-1',
       type: 'circle',
-      source: 'meetups',
-      filter: ['all', ['!', ['has', 'point_count']], ['get', 'has_active_meetup']],
+      source: 'active-meetups',
       paint: {
-        'circle-color': '#ef4444', // Rouge
-        'circle-radius': 40,
-        'circle-opacity': 0.3,
-        'circle-stroke-width': 0,
-        'circle-opacity-transition': { duration: 300 },
-        'circle-radius-transition': { duration: 300 }
+        'circle-color': '#ef4444',
+        'circle-radius': 20,
+        'circle-opacity': 0.4,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#ef4444',
+        'circle-stroke-opacity': 0.6
       }
     });
-    // 6. Layer : Les points individuels (non clusterisés)
+
+    // 5b. Layer : Animation radar - cercle externe (pulse 2)
+    this.map.addLayer({
+      id: 'active-meetup-radar-2',
+      type: 'circle',
+      source: 'active-meetups',
+      paint: {
+        'circle-color': 'transparent',
+        'circle-radius': 20,
+        'circle-opacity': 0,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#ef4444',
+        'circle-stroke-opacity': 0.4
+      }
+    });
+
+    // 5c. Layer : Point central actif (toujours visible, jamais clusterisé)
+    this.map.addLayer({
+      id: 'active-meetup-point',
+      type: 'circle',
+      source: 'active-meetups',
+      paint: {
+        'circle-color': '#ef4444',
+        'circle-radius': 14,
+        'circle-stroke-width': 4,
+        'circle-stroke-color': '#ffffff',
+        'circle-opacity': 1
+      }
+    });
+
+    // Démarrer l'animation radar
+    this.startRadarAnimation();
+
+    // 6. Layer : Les points individuels inactifs (non clusterisés)
     this.map.addLayer({
       id: 'unclustered-point',
       type: 'circle',
       source: 'meetups',
       filter: ['!', ['has', 'point_count']],
       paint: {
-        'circle-color': [
-          'case',
-          ['get', 'has_active_meetup'],
-          '#ef4444', // Rouge si actif
-          '#C9B5A0'  // Beige par défaut
-        ],
+        'circle-color': '#C9B5A0',
         'circle-radius': 10,
         'circle-stroke-width': 3,
         'circle-stroke-color': '#ffffff',
@@ -315,11 +357,32 @@ export default class extends Controller {
       });
     });
 
+    // Clic sur un point actif -> Popup (même comportement que unclustered-point)
+    this.map.on('click', 'active-meetup-point', async (e) => {
+      const coordinates = e.features[0].geometry.coordinates.slice();
+      const infoWindow = e.features[0].properties.info_window;
+      const markerLat = e.features[0].properties.lat;
+      const markerLng = e.features[0].properties.lng;
+
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+      const popup = new mapboxgl.Popup({ offset: 25, maxWidth: '300px' })
+        .setLngLat(coordinates)
+        .setHTML(infoWindow)
+        .addTo(this.map);
+
+      this.updatePopupDistanceAndDuration(popup, [markerLng, markerLat]);
+    });
+
     // Changement de curseur (main) au survol
     this.map.on('mouseenter', 'clusters', () => { this.map.getCanvas().style.cursor = 'pointer'; });
     this.map.on('mouseleave', 'clusters', () => { this.map.getCanvas().style.cursor = ''; });
     this.map.on('mouseenter', 'unclustered-point', () => { this.map.getCanvas().style.cursor = 'pointer'; });
     this.map.on('mouseleave', 'unclustered-point', () => { this.map.getCanvas().style.cursor = ''; });
+    this.map.on('mouseenter', 'active-meetup-point', () => { this.map.getCanvas().style.cursor = 'pointer'; });
+    this.map.on('mouseleave', 'active-meetup-point', () => { this.map.getCanvas().style.cursor = ''; });
   }
 
 
@@ -334,7 +397,48 @@ export default class extends Controller {
 
   disconnect() {
     window.removeEventListener("resize", this.handleResize)
+    // Arrêter l'animation radar
+    if (this.radarAnimationId) {
+      cancelAnimationFrame(this.radarAnimationId)
+    }
     if (this.map) this.map.remove()
+  }
+
+  // Animation radar pour les points de rencontre actifs
+  startRadarAnimation() {
+    const animationDuration = 2000 // 2 secondes pour un cycle complet
+    const maxRadius = 50
+    const minRadius = 20
+
+    const animate = () => {
+      const timestamp = Date.now()
+
+      // Pulse 1 - décalé de 0ms
+      const progress1 = (timestamp % animationDuration) / animationDuration
+      const radius1 = minRadius + (maxRadius - minRadius) * progress1
+      const opacity1 = 0.5 * (1 - progress1)
+
+      // Pulse 2 - décalé de 1000ms (la moitié du cycle)
+      const progress2 = ((timestamp + animationDuration / 2) % animationDuration) / animationDuration
+      const radius2 = minRadius + (maxRadius - minRadius) * progress2
+      const opacity2 = 0.5 * (1 - progress2)
+
+      // Mettre à jour les layers si ils existent
+      if (this.map.getLayer('active-meetup-radar-1')) {
+        this.map.setPaintProperty('active-meetup-radar-1', 'circle-radius', radius1)
+        this.map.setPaintProperty('active-meetup-radar-1', 'circle-opacity', opacity1 * 0.3)
+        this.map.setPaintProperty('active-meetup-radar-1', 'circle-stroke-opacity', opacity1)
+      }
+
+      if (this.map.getLayer('active-meetup-radar-2')) {
+        this.map.setPaintProperty('active-meetup-radar-2', 'circle-radius', radius2)
+        this.map.setPaintProperty('active-meetup-radar-2', 'circle-stroke-opacity', opacity2)
+      }
+
+      this.radarAnimationId = requestAnimationFrame(animate)
+    }
+
+    animate()
   }
 
   async addRoute() {

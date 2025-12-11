@@ -186,7 +186,8 @@ export default class extends Controller {
   }
 
   updateChevronDirection(direction) {
-    const closeBtn = this.element.querySelector('.drag-close-btn')
+    // Chercher le bouton toggle avec les deux classes possibles
+    const closeBtn = this.element.querySelector('.drag-close-btn') || this.element.querySelector('.navigation-panel__toggle-btn')
     if (closeBtn) {
       const svg = closeBtn.querySelector('svg')
       if (svg) {

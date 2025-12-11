@@ -36,6 +36,18 @@ class MeetUpsController < ApplicationController
     end
   end
 
+  def destroy
+    @meet_up = MeetUp.joins(:participations)
+                     .where(participations: { user_id: current_user.id })
+                     .find_by(id: params[:id])
+    if @meet_up
+      @meet_up.destroy
+      redirect_to my_activities_path, notice: "Rencontre supprimée."
+    else
+      redirect_to my_activities_path, alert: "Impossible de supprimer cette rencontre."
+    end
+  end
+
   private
 
   def meet_up_params

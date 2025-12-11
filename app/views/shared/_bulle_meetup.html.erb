@@ -36,10 +36,12 @@
         <div class="bulle-meetup__dogs">
           <div class="bulle-meetup__dogs-avatars">
             <% dogs.first(3).each do |dog| %>
-              <% if dog.url_picture.present? %>
-                <%= image_tag dog.url_picture, alt: dog.name, class: "bulle-meetup__dog-avatar-small" %>
-              <% else %>
-                <div class="bulle-meetup__dog-avatar-small placeholder">🐕</div>
+              <%= link_to dog_path(dog), class: "bulle-meetup__dog-link" do %>
+                <% if dog.url_picture.present? %>
+                  <%= image_tag dog.url_picture, alt: dog.name, class: "bulle-meetup__dog-avatar-small" %>
+                <% else %>
+                  <div class="bulle-meetup__dog-avatar-small placeholder">🐕</div>
+                <% end %>
               <% end %>
             <% end %>
           </div>

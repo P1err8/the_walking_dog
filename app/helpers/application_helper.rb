@@ -56,12 +56,12 @@ module ApplicationHelper
 
     encoded_geojson = CGI.escape(geojson.to_json)
 
-    "https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/geojson(#{encoded_geojson})/auto/600x300?padding=60&access_token=#{ENV['MAPBOX_API_KEY']}"
+    "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/geojson(#{encoded_geojson})/auto/600x300?padding=60&access_token=#{ENV['MAPBOX_API_KEY']}"
   end
 
   def static_marker_map_url(point)
     return "" unless point.latitude.present? && point.longitude.present?
 
-    "https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/pin-m+ff4500(#{point.longitude},#{point.latitude})/#{point.longitude},#{point.latitude},14/600x300?access_token=#{ENV['MAPBOX_API_KEY']}"
+    "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-m+ff4500(#{point.longitude},#{point.latitude})/#{point.longitude},#{point.latitude},14/600x300?access_token=#{ENV['MAPBOX_API_KEY']}"
   end
 end

@@ -1,3 +1,8 @@
+# =============================================================================
+# TODO: Ce fichier peut être supprimé - Fonctionnalité non utilisée
+# Contrôleur pour monitorer les rencontres automatiques (non activé)
+# Aucune route ne pointe vers ce contrôleur.
+# =============================================================================
 class MeetingsMonitorController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index, :positions, :detect]
 

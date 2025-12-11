@@ -1,3 +1,8 @@
+# =============================================================================
+# TODO: Ce fichier peut être supprimé - Fonctionnalité non utilisée
+# Modèle pour les rencontres automatiques entre promeneurs (non activé)
+# Aucune route ne pointe vers ce modèle. Fait partie du système de rencontres automatiques.
+# =============================================================================
 class WalkingMeeting < ApplicationRecord
   belongs_to :user_a, class_name: 'User'
   belongs_to :user_b, class_name: 'User'

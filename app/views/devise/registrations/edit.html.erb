@@ -2,7 +2,7 @@
 
 <div class="settings-container">
   <div class="settings-card">
-    <h1 class="settings-title">Parametres</h1>
+    <h1 class="settings-title">Paramètres</h1>
 
     <%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "settings-form" }) do |f| %>
       <%= f.error_notification message: "Erreur :" %>
@@ -30,28 +30,14 @@
 
       <div class="settings-toggle">
         <%= f.input :geolocation_enabled, as: :boolean, label: false, wrapper: false, input_html: { class: "settings-checkbox" } %>
-        <span class="settings-toggle-label">Geolocalisation activee</span>
+        <span class="settings-toggle-label">Localisation activée</span>
       </div>
 
       <%= f.button :submit, "Enregistrer", class: "settings-save-btn" %>
     <% end %>
 
     <div class="settings-actions">
-      <% if current_user.dogs.any? %>
-        <%= link_to edit_dog_path(current_user.dogs.first), class: "settings-btn" do %>
-          Modifier profil chien
-        <% end %>
-      <% else %>
-        <%= link_to new_dog_path, class: "settings-btn" do %>
-          Ajouter mon chien
-        <% end %>
-      <% end %>
-
       <%= link_to "Retour", root_path, class: "settings-btn-light", data: { turbo: false } %>
-    </div>
-
-    <div class="settings-logout">
-      <%= button_to "Se déconnecter", destroy_user_session_path, method: :delete, class: "settings-logout-btn" %>
     </div>
 
     <div class="settings-danger">

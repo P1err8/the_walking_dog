@@ -1,3 +1,8 @@
+# =============================================================================
+# TODO: Ce fichier peut être supprimé - Fonctionnalité non utilisée
+# Modèle pour tracker les positions des utilisateurs en temps réel (non activé)
+# Aucune route ne pointe vers ce modèle. Fait partie du système de rencontres automatiques.
+# =============================================================================
 class UserPosition < ApplicationRecord
   belongs_to :user
   belongs_to :walking
