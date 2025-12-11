@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= page_title %></title>
+    <title>The Walking Dog</title>
     <meta name="description" content="<%= page_description %>">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
-
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="<%= asset_path 'manifest.json' %>">
     <%# Open Graph meta tags %>
-    <meta property="og:title" content="<%= page_title %>">
+    <meta property="og:title" content="The Walking Dog">
     <meta property="og:description" content="<%= page_description %>">
     <meta property="og:type" content="website">
     <meta property="og:url" content="<%= request.original_url %>">
     <meta property="og:image" content="<%= page_image.start_with?('http') ? page_image : "#{request.base_url}#{page_image}" %>">
-
     <meta name="mapbox-api-key" content="<%= ENV['MAPBOX_API_KEY'] %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
