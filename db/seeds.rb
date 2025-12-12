@@ -156,6 +156,20 @@ saone = Point.find_by(name: "Parc du Brétillod")
 saone.update(longitude: 4.822366503103803)
 saone.update(latitude: 45.76813221059604)
 
+
+croipakeet = Point.find_by(name: "Jardin Croix Paquet")
+croipakeet.update(url_picture: "croix-paquet.png")
+puts "#{croipakeet.name} updated"
+
+pjohn = Point.find_by(name: "Jardin Marsha P. Johnson")
+pjohn.update(url_picture: "Marsha-P-Johnson.png")
+puts "#{pjohn.name} updated"
+
+pjohn = Point.find_by(name: "Jardin Dalle Rozier")
+pjohn.delete
+puts "#{pjohn.name} updated"
+
+
 puts "Created #{Point.count} meet-up points."
 
 # meetups = MeetUp.all

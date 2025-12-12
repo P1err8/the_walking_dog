@@ -11,7 +11,6 @@ export default class extends Controller {
   }
 
   connect() {
-    // console.log("Map controller connected")
     mapboxgl.accessToken = this.apiKeyValue
 
     // Get map container - prefer target if present
