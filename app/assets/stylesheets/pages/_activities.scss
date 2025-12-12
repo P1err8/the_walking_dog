@@ -77,6 +77,7 @@
     .activity-stats-top {
       display: flex;
       justify-content: space-around;
+      width: 100%;
       padding: 0.5rem;
       background: $bg-page;
       border-radius: $radius-md;
@@ -169,6 +170,7 @@
   box-shadow: $shadow;
   overflow: hidden !important;
   padding: 0 !important;
+  padding-top: 10px !important;
   border-bottom: 2px solid rgb(204, 203, 203);
 
   // Contenu texte avec padding
@@ -295,7 +297,7 @@
 
   h3 {
     font-size: 1.15rem;
-    margin: 0 0 1rem 0;
+    margin: 0 0 0.7rem 0;
     font-weight: 700;
     color: $accent;
   }
