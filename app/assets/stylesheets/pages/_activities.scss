@@ -6,12 +6,13 @@
 .activities-container {
   min-height: 100vh;
   width: 100%;
-  background: $bg-page;
+  background-color: #ffffff;
 }
 
 .activities-list {
   max-width: 500px;
   margin: 0 auto;
+  margin-bottom: 75px;
 }
 
 // ========================================
@@ -23,6 +24,7 @@
   box-shadow: $shadow;
   margin-bottom: 0.75rem;
   overflow: hidden;
+
 
   &__content {
     padding: 1rem;
@@ -167,6 +169,7 @@
   box-shadow: $shadow;
   overflow: hidden !important;
   padding: 0 !important;
+  border-bottom: 2px solid rgb(204, 203, 203);
 
   // Contenu texte avec padding
   .activity-content {

@@ -27,7 +27,7 @@ export function initSlider(sliderId = 'walk-duration', displayId = 'duration-dis
 
     // Initialisation au chargement de la page
     display.textContent = slider.value;
-    console.log(`[Composant: Slider] Initialisé sur #${sliderId}`);
+    // console.log(`[Composant: Slider] Initialisé sur #${sliderId}`);
   } else {
     // Ce log n'est pas une erreur, juste une info si le composant n'est pas présent sur la page
     // console.log(`[Composant: Slider] Éléments #${sliderId} ou #${displayId} introuvables.`);

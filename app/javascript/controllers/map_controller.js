@@ -11,7 +11,7 @@ export default class extends Controller {
   }
 
   connect() {
-    // console.log("Map controller connected")
+    console.log("Map controller connected")
     mapboxgl.accessToken = this.apiKeyValue
 
     // Get map container - prefer target if present
@@ -366,12 +366,12 @@ export default class extends Controller {
     const mapWidth = mapRect.width;
 
     // Debug détaillé pour tests multi-écrans
-    console.log('📱 === POPUP CENTERING DEBUG ===');
-    console.log('Screen:', `${window.screen.width}x${window.screen.height}`);
-    console.log('Viewport:', `${viewportWidth}x${viewportHeight}`);
-    console.log('Map size:', `${mapWidth}x${mapHeight}`);
-    console.log('Map position:', `top: ${mapRect.top}, left: ${mapRect.left}`);
-    console.log('Popup height:', popupHeight);
+    // console.log('📱 === POPUP CENTERING DEBUG ===');
+    // console.log('Screen:', `${window.screen.width}x${window.screen.height}`);
+    // console.log('Viewport:', `${viewportWidth}x${viewportHeight}`);
+    // console.log('Map size:', `${mapWidth}x${mapHeight}`);
+    // console.log('Map position:', `top: ${mapRect.top}, left: ${mapRect.left}`);
+    // console.log('Popup height:', popupHeight);
 
     // Chercher le panneau de navigation (présent dans meet_up/show et walkings/show)
     const navigationPanel = document.querySelector('.navigation-panel');
@@ -384,8 +384,8 @@ export default class extends Controller {
       const panelRect = navigationPanel.getBoundingClientRect();
       const panelHeight = panelRect.height;
 
-      console.log('🔵 Navigation panel found');
-      console.log('Panel position:', `top: ${panelRect.top}, height: ${panelHeight}`);
+      // console.log('🔵 Navigation panel found');
+      // console.log('Panel position:', `top: ${panelRect.top}, height: ${panelHeight}`);
 
       // Calculer la position réelle du panneau par rapport au viewport
       const panelTopInViewport = panelRect.top;
@@ -394,23 +394,23 @@ export default class extends Controller {
       // Position du panneau relative à la carte
       const panelTopRelativeToMap = panelTopInViewport - mapTopInViewport;
 
-      console.log('Panel top relative to map:', panelTopRelativeToMap);
+      // console.log('Panel top relative to map:', panelTopRelativeToMap);
 
       // Si le panneau est visible dans la carte
       if (panelTopRelativeToMap > 0 && panelTopRelativeToMap < mapHeight) {
         // L'espace disponible va du haut de la carte jusqu'au haut du panneau
         availableHeight = panelTopRelativeToMap;
 
-        console.log('✅ Panel is visible in map');
-        console.log('Available height:', availableHeight);
+        // console.log('✅ Panel is visible in map');
+        // console.log('Available height:', availableHeight);
 
         // Marges adaptatives basées sur l'espace disponible et la taille d'écran
         const isSmallScreen = viewportHeight < 700;
         const minMargin = isSmallScreen ? 10 : 15;
         const maxMargin = isSmallScreen ? 30 : 50;
 
-        console.log('Screen type:', isSmallScreen ? 'SMALL' : 'NORMAL');
-        console.log('Margin range:', `${minMargin}-${maxMargin}px`);
+        // console.log('Screen type:', isSmallScreen ? 'SMALL' : 'NORMAL');
+        // console.log('Margin range:', `${minMargin}-${maxMargin}px`);
 
         // Calculer les marges en fonction de l'espace disponible
         const spaceForMargins = availableHeight - popupHeight;
@@ -418,23 +418,23 @@ export default class extends Controller {
         if (spaceForMargins >= maxMargin * 2) {
           topMargin = maxMargin;
           bottomMargin = maxMargin;
-          console.log('→ Using MAX margins');
+          // console.log('→ Using MAX margins');
         } else if (spaceForMargins >= minMargin * 2) {
           topMargin = minMargin;
           bottomMargin = minMargin;
-          console.log('→ Using MIN margins');
+          // console.log('→ Using MIN margins');
         } else {
           // Répartir l'espace disponible équitablement
           const halfSpace = Math.max(5, Math.floor(spaceForMargins / 2));
           topMargin = halfSpace;
           bottomMargin = halfSpace;
-          console.log('→ Using TIGHT margins (space limited)');
+          // console.log('→ Using TIGHT margins (space limited)');
         }
       } else {
-        console.log('⚠️ Panel outside map bounds');
+        // console.log('⚠️ Panel outside map bounds');
       }
     } else {
-      console.log('🔴 No navigation panel found');
+      // console.log('🔴 No navigation panel found');
       // Pas de panneau, utiliser des marges standards adaptées à l'écran
       const isSmallScreen = viewportHeight < 700;
       topMargin = isSmallScreen ? 30 : 50;
@@ -443,28 +443,28 @@ export default class extends Controller {
 
     const sideMargin = viewportWidth < 400 ? 10 : 15;
 
-    console.log('Final margins:', `top: ${topMargin}, bottom: ${bottomMargin}, side: ${sideMargin}`);
+    // console.log('Final margins:', `top: ${topMargin}, bottom: ${bottomMargin}, side: ${sideMargin}`);
 
     // Vérifier l'espace disponible
     const availableSpaceForPopup = availableHeight - topMargin - bottomMargin;
 
-    console.log('Available space for popup:', availableSpaceForPopup);
-    console.log('Available height:', availableHeight);
+    // console.log('Available space for popup:', availableSpaceForPopup);
+    // console.log('Available height:', availableHeight);
 
     // Centrer la popup dans l'espace disponible
     let offsetY = (availableHeight / 2) - (popupHeight / 2) - (mapHeight / 2);
 
-    console.log('Initial offsetY (centered):', offsetY);
+    // console.log('Initial offsetY (centered):', offsetY);
 
     // Si la popup est trop haute pour l'espace disponible, la positionner en haut
     if (popupHeight > availableSpaceForPopup) {
       offsetY = topMargin - (mapHeight / 2);
-      console.log('⚠️ Popup too tall! Adjusted offsetY:', offsetY);
+      // console.log('⚠️ Popup too tall! Adjusted offsetY:', offsetY);
     }
 
-    console.log('✨ Final offsetY:', offsetY);
-    console.log('📐 Padding:', { top: topMargin, bottom: bottomMargin, left: sideMargin, right: sideMargin });
-    console.log('=== END DEBUG ===\n');
+    // console.log('✨ Final offsetY:', offsetY);
+    // console.log('📐 Padding:', { top: topMargin, bottom: bottomMargin, left: sideMargin, right: sideMargin });
+    // console.log('=== END DEBUG ===\n');
 
     // Centrer la carte avec l'offset calculé et des marges de sécurité
     this.map.easeTo({
@@ -565,7 +565,7 @@ export default class extends Controller {
 
       // Vérifier s'il y a des changements
       if (JSON.stringify(this.markersValue) === JSON.stringify(newMarkers)) {
-        console.log('No changes in markers, skipping update')
+        // console.log('No changes in markers, skipping update')
         return
       }
 
@@ -596,7 +596,7 @@ export default class extends Controller {
           features: features
         })
 
-        console.log(`Markers updated: ${newMarkers.length} active meetups at`, new Date().toLocaleTimeString())
+        // console.log(`Markers updated: ${newMarkers.length} active meetups at`, new Date().toLocaleTimeString())
       } else {
         // Si la source n'existe pas encore, la créer
         this.addClustersToMap()
@@ -651,8 +651,8 @@ export default class extends Controller {
         this.currentRouteData = data.routes[0] // Inclut distance, duration, etc.
 
         // Log pour debug (vous pouvez le récupérer dans la console)
-        console.log("Route GeoJSON:", JSON.stringify(this.currentRouteGeoJSON, null, 2))
-        console.log("Route Data:", {
+        // console.log("Route GeoJSON:", JSON.stringify(this.currentRouteGeoJSON, null, 2))
+        // console.log("Route Data:", {
           distance: `${(data.routes[0].distance / 1000).toFixed(2)} km`,
           duration: `${Math.round(data.routes[0].duration / 60)} min`,
           geometry: this.currentRouteGeoJSON

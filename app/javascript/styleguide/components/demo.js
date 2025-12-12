@@ -15,7 +15,7 @@ export function initDemoButtons() {
     button.addEventListener("click", () => {
       // On ignore les boutons toggle qui ont leur propre logique
       if (!button.classList.contains('btn-toggle') && !button.closest('.button-group')) {
-        console.log(`[Démo] Click sur le bouton : "${button.textContent.trim()}"`);
+        // console.log(`[Démo] Click sur le bouton : "${button.textContent.trim()}"`);
       }
     });
   });

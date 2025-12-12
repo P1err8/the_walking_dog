@@ -30,7 +30,7 @@ function initMap() {
 
   // Attendre que la carte soit complètement chargée avant d'ajouter les éléments
   map.on('load', () => {
-    console.log('✅ Carte Mapbox chargée');
+    // console.log('✅ Carte Mapbox chargée');
 
     // Ajouter les contrôles de navigation
     map.addControl(new mapboxgl.NavigationControl());
@@ -74,7 +74,7 @@ function initMap() {
       const lng = position.coords.longitude;
       const accuracy = position.coords.accuracy;
 
-      console.log(`📍 Position GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)} (précision: ${accuracy.toFixed(0)}m)`);
+      // console.log(`📍 Position GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)} (précision: ${accuracy.toFixed(0)}m)`);
 
       setStartPoint(lng, lat);
 
@@ -93,7 +93,7 @@ function initMap() {
       if (navigator.permissions) {
         navigator.permissions.query({ name: 'geolocation' }).then((result) => {
           if (result.state === 'granted') {
-            console.log('🔓 Géolocalisation déjà autorisée, lancement auto...');
+            // console.log('🔓 Géolocalisation déjà autorisée, lancement auto...');
             geolocateControl.trigger();
           }
         });
@@ -116,7 +116,7 @@ function initMap() {
     // Mettre à jour la position quand l'utilisateur déplace le marqueur
     startPointMarker.on('dragend', () => {
       const lngLat = startPointMarker.getLngLat();
-      console.log('📍 Nouveau point de départ:', lngLat);
+      // console.log('📍 Nouveau point de départ:', lngLat);
     });
 
     // CLIC SUR LA CARTE : Déplacer le point de départ
@@ -130,7 +130,7 @@ function initMap() {
 function setStartPoint(lng, lat) {
   if (startPointMarker) {
     startPointMarker.setLngLat([lng, lat]);
-    console.log('📍 Point de départ mis à jour:', { lat, lng });
+    // console.log('📍 Point de départ mis à jour:', { lat, lng });
   }
 }
 
@@ -158,7 +158,7 @@ async function generateWaypoints(startLat, startLng, durationMinutes) {
 
     const isochroneUrl = `https://api.mapbox.com/isochrone/v1/mapbox/walking/${startLng},${startLat}?contours_minutes=${isochroneMinutes}&polygons=true&access_token=${mapboxgl.accessToken}`;
 
-    console.log(`🔍 Récupération de la zone isochrone (${isochroneMinutes} min)...`);
+    // console.log(`🔍 Récupération de la zone isochrone (${isochroneMinutes} min)...`);
 
     const response = await fetch(isochroneUrl);
     const data = await response.json();
@@ -171,7 +171,7 @@ async function generateWaypoints(startLat, startLng, durationMinutes) {
     const isochronePolygon = data.features[0];
     const coordinates = isochronePolygon.geometry.coordinates[0]; // Premier polygone (extérieur)
 
-    console.log(`✅ Zone isochrone récupérée : ${coordinates.length} points sur le contour`);
+    // console.log(`✅ Zone isochrone récupérée : ${coordinates.length} points sur le contour`);
 
     // ÉTAPE 3 : Sélectionner des waypoints sur le contour
     // Moins de waypoints = moins de risque de demi-tour
@@ -227,7 +227,7 @@ async function generateWaypoints(startLat, startLng, durationMinutes) {
     // Cela garantit qu'on tourne autour du point de départ sans croiser notre chemin
     waypoints.sort((a, b) => a.angle - b.angle);
 
-    console.log(`✅ ${waypoints.length} waypoints triés en boucle (sens horaire)`);
+    // console.log(`✅ ${waypoints.length} waypoints triés en boucle (sens horaire)`);
 
     // Calculer la distance estimée
     const walkingSpeedKmh = 4.5;
@@ -237,7 +237,7 @@ async function generateWaypoints(startLat, startLng, durationMinutes) {
     // =============================================================================
     // SNAP & VALIDATION : Vérifier et corriger les waypoints problématiques
     // =============================================================================
-    console.log('🔍 Validation des waypoints (détection d\'impasses)...');
+    // console.log('🔍 Validation des waypoints (détection d\'impasses)...');
 
     const validatedWaypoints = await validateAndSnapWaypoints(
       waypoints,
@@ -246,8 +246,8 @@ async function generateWaypoints(startLat, startLng, durationMinutes) {
       radiusDegrees
     );
 
-    console.log(`✅ ${validatedWaypoints.length} waypoints validés`);
-    console.log(`📍 ${validatedWaypoints.length} waypoints finaux`);
+    // console.log(`✅ ${validatedWaypoints.length} waypoints validés`);
+    // console.log(`📍 ${validatedWaypoints.length} waypoints finaux`);
 
     return {
       estimated_distance_km: totalDistanceKm,
@@ -261,7 +261,7 @@ async function generateWaypoints(startLat, startLng, durationMinutes) {
     console.error('❌ Erreur lors de la génération isochrone:', error);
 
     // FALLBACK : Si l'API Isochrone échoue, on revient à l'ancien algorithme
-    console.log('⚠️ Fallback sur algorithme géométrique simple');
+    // console.log('⚠️ Fallback sur algorithme géométrique simple');
     return generateWaypointsFallback(startLat, startLng, durationMinutes);
   }
 }
@@ -409,7 +409,7 @@ function generateAlternativePoint(lat, lng, startLat, startLng, angle, radiusDeg
 // Teste chaque séquence de 3 points pour détecter les impasses
 // =============================================================================
 async function validateAndSnapWaypoints(waypoints, startLat, startLng, radiusDegrees) {
-  console.log('🔍 Validation des waypoints par test de routing...');
+  // console.log('🔍 Validation des waypoints par test de routing...');
 
   const validatedWaypoints = [];
 
@@ -430,7 +430,7 @@ async function validateAndSnapWaypoints(waypoints, startLat, startLng, radiusDeg
     );
 
     if (isDeadEnd) {
-      console.log(`⚠️ Waypoint ${i + 1} détecté comme impasse, recherche d'alternative...`);
+      // console.log(`⚠️ Waypoint ${i + 1} détecté comme impasse, recherche d'alternative...`);
 
       // Essayer de trouver un point alternatif
       const alternative = await findAlternativeWaypoint(
@@ -438,11 +438,11 @@ async function validateAndSnapWaypoints(waypoints, startLat, startLng, radiusDeg
       );
 
       if (alternative) {
-        console.log(`✅ Alternative trouvée pour waypoint ${i + 1}`);
+        // console.log(`✅ Alternative trouvée pour waypoint ${i + 1}`);
         validatedWaypoints.push(alternative);
       } else {
         // Si pas d'alternative, on saute ce waypoint
-        console.log(`❌ Pas d'alternative, waypoint ${i + 1} ignoré`);
+        // console.log(`❌ Pas d'alternative, waypoint ${i + 1} ignoré`);
       }
     } else {
       validatedWaypoints.push(wp);
@@ -454,7 +454,7 @@ async function validateAndSnapWaypoints(waypoints, startLat, startLng, radiusDeg
 
   // S'assurer qu'on a au moins 3 waypoints
   if (validatedWaypoints.length < 3) {
-    console.log('⚠️ Pas assez de waypoints valides, on garde les originaux');
+    // console.log('⚠️ Pas assez de waypoints valides, on garde les originaux');
     return waypoints;
   }
 
@@ -501,7 +501,7 @@ async function testWaypointCausesDeadEnd(prevLng, prevLat, wpLng, wpLat, nextLng
       const backtrackRatio = backtrackCount / coords.length;
 
       if (backtrackRatio > 0.2) {
-        console.log(`  📊 Waypoint: backtrack ratio = ${(backtrackRatio * 100).toFixed(1)}%`);
+        // console.log(`  📊 Waypoint: backtrack ratio = ${(backtrackRatio * 100).toFixed(1)}%`);
         return true;
       }
 
@@ -510,7 +510,7 @@ async function testWaypointCausesDeadEnd(prevLng, prevLat, wpLng, wpLat, nextLng
       const routeDistance = route.distance / 1000; // km
 
       if (routeDistance > directDistance * 2.5 && directDistance > 0.05) {
-        console.log(`  📊 Waypoint: route ${routeDistance.toFixed(2)}km vs direct ${directDistance.toFixed(2)}km`);
+        // console.log(`  📊 Waypoint: route ${routeDistance.toFixed(2)}km vs direct ${directDistance.toFixed(2)}km`);
         return true;
       }
     }
@@ -556,7 +556,7 @@ async function findAlternativeWaypoint(wp, prevPoint, nextPoint, startLat, start
 
 // Enrichir les waypoints avec des vrais noms de lieux via Mapbox Geocoding API
 async function enrichWaypointsWithRealPOI(waypoints) {
-  console.log('🔍 Enrichissement des POI avec vrais noms de lieux...');
+  // console.log('🔍 Enrichissement des POI avec vrais noms de lieux...');
 
   for (let i = 0; i < waypoints.length; i++) {
     const wp = waypoints[i];
@@ -591,10 +591,10 @@ async function enrichWaypointsWithRealPOI(waypoints) {
         // Mettre à jour la description du waypoint
         wp.description = placeName;
 
-        console.log(`✅ Point ${i + 1}: ${placeName}`);
+        // console.log(`✅ Point ${i + 1}: ${placeName}`);
       } else {
         // Pas de résultat, on garde la description générique
-        console.log(`⚠️ Point ${i + 1}: Aucun lieu trouvé, garde "${wp.description}"`);
+        // console.log(`⚠️ Point ${i + 1}: Aucun lieu trouvé, garde "${wp.description}"`);
       }
 
       // Petite pause pour respecter les limites de l'API (600 req/min)
@@ -606,7 +606,7 @@ async function enrichWaypointsWithRealPOI(waypoints) {
     }
   }
 
-  console.log('✅ Enrichissement des POI terminé');
+  // console.log('✅ Enrichissement des POI terminé');
 }
 
 /**
@@ -619,11 +619,11 @@ async function enrichWaypointsWithRealPOI(waypoints) {
 // Optimise l'itinéraire avec le LLM - repositionne les waypoints problématiques
 async function optimizeRouteWithLLM(startLat, startLng, waypoints, routeGeometry, streetNames) {
   if (!LLM_CONFIG.enabled || LLM_CONFIG.apiKey === 'VOTRE_CLE_API_OPENAI') {
-    console.log('⚠️ LLM désactivé - Utilisation de l\'optimisation locale');
+    // console.log('⚠️ LLM désactivé - Utilisation de l\'optimisation locale');
     return optimizeRouteLocally(startLat, startLng, waypoints, routeGeometry);
   }
 
-  console.log('🤖 Optimisation de l\'itinéraire par LLM...');
+  // console.log('🤖 Optimisation de l\'itinéraire par LLM...');
 
   const prompt = `Tu es un expert en optimisation d'itinéraires de promenade.
 
@@ -697,10 +697,10 @@ Si l'itinéraire est déjà optimal, réponds :
 
       try {
         const optimization = JSON.parse(content);
-        console.log('🤖 Optimisation LLM:', optimization);
+        // console.log('🤖 Optimisation LLM:', optimization);
 
         if (optimization.optimized && optimization.newWaypoints && optimization.newWaypoints.length > 0) {
-          console.log(`✅ LLM propose ${optimization.newWaypoints.length} nouveaux waypoints`);
+          // console.log(`✅ LLM propose ${optimization.newWaypoints.length} nouveaux waypoints`);
           return {
             success: true,
             waypoints: optimization.newWaypoints,
@@ -708,12 +708,12 @@ Si l'itinéraire est déjà optimal, réponds :
             confidence: optimization.confidence || 0.8
           };
         } else {
-          console.log('✅ LLM: Itinéraire déjà optimal');
+          // console.log('✅ LLM: Itinéraire déjà optimal');
           return { success: false, reason: optimization.reason };
         }
       } catch (parseError) {
         console.error('❌ Erreur parsing JSON LLM:', parseError);
-        console.log('Contenu reçu:', content);
+        // console.log('Contenu reçu:', content);
       }
     }
 
@@ -728,7 +728,7 @@ Si l'itinéraire est déjà optimal, réponds :
 
 // Optimisation locale (sans LLM) - Algorithme de lissage
 function optimizeRouteLocally(startLat, startLng, waypoints, routeGeometry) {
-  console.log('🔧 Optimisation locale de l\'itinéraire...');
+  // console.log('🔧 Optimisation locale de l\'itinéraire...');
 
   // Analyser la géométrie pour détecter les "dents" (aller-retours)
   if (!routeGeometry || !routeGeometry.coordinates) {
@@ -739,11 +739,11 @@ function optimizeRouteLocally(startLat, startLng, waypoints, routeGeometry) {
   const problems = detectBacktrackSegments(coords);
 
   if (problems.length === 0) {
-    console.log('✅ Aucun problème détecté localement');
+    // console.log('✅ Aucun problème détecté localement');
     return { success: false, reason: 'Itinéraire OK' };
   }
 
-  console.log(`⚠️ ${problems.length} segments problématiques détectés`);
+  // console.log(`⚠️ ${problems.length} segments problématiques détectés`);
 
   // Stratégie : Réorganiser les waypoints pour éviter les impasses
   // On garde seulement les waypoints qui sont sur des "vraies" intersections
@@ -754,7 +754,7 @@ function optimizeRouteLocally(startLat, startLng, waypoints, routeGeometry) {
 
   if (optimizedWaypoints.length < 3) {
     // Pas assez de points, on régénère avec un rayon plus petit
-    console.log('⚠️ Trop de points supprimés, génération de nouveaux waypoints');
+    // console.log('⚠️ Trop de points supprimés, génération de nouveaux waypoints');
     return {
       success: true,
       regenerate: true,
@@ -901,14 +901,14 @@ async function getStreetNamesAlongRoute(routeGeometry) {
     }
   }
 
-  console.log('🛣️ Rues traversées:', streetNames);
+  // console.log('🛣️ Rues traversées:', streetNames);
   return streetNames;
 }
 
 // Affiche le résultat de l'analyse à l'utilisateur
 function displayRouteAnalysis(analysis) {
   if (analysis.severity === 'none') {
-    console.log('✅ Itinéraire optimal - Aucun aller-retour détecté !');
+    // console.log('✅ Itinéraire optimal - Aucun aller-retour détecté !');
     return;
   }
 
@@ -933,7 +933,7 @@ function displayRouteAnalysis(analysis) {
   if (analysis.severity === 'major') {
     console.warn(message);
   } else {
-    console.log(message);
+    // console.log(message);
   }
 
   // Optionnel : Afficher une alerte pour les problèmes majeurs
@@ -960,7 +960,7 @@ async function drawRoute(startLat, startLng, waypoints) {
     // Échantillonner les waypoints pour en garder moins
     const step = Math.ceil(waypoints.length / 20);
     limitedWaypoints = waypoints.filter((_, index) => index % step === 0);
-    console.log(`⚠️ Waypoints réduits de ${waypoints.length} à ${limitedWaypoints.length}`);
+    // console.log(`⚠️ Waypoints réduits de ${waypoints.length} à ${limitedWaypoints.length}`);
   }
 
   // Construire la liste des coordonnées : Départ -> Points -> Retour au départ
@@ -970,7 +970,7 @@ async function drawRoute(startLat, startLng, waypoints) {
     start // Retour au point de départ (boucle fermée)
   ];
 
-  console.log(`📍 Coordonnées pour l'API: ${coordinates.length} points`);
+  // console.log(`📍 Coordonnées pour l'API: ${coordinates.length} points`);
 
   // Construction de l'URL pour l'API Mapbox Directions
   // IMPORTANT : Utiliser le profil "walking" pour éviter les autoroutes
@@ -978,14 +978,14 @@ async function drawRoute(startLat, startLng, waypoints) {
   const coordinatesString = coordinates.map(coord => coord.join(',')).join(';');
   const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${coordinatesString}?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`;
 
-  console.log('🛣️ Appel Mapbox Directions API...');
-  console.log('URL:', url);
+  // console.log('🛣️ Appel Mapbox Directions API...');
+  // console.log('URL:', url);
 
   try {
     const response = await fetch(url);
     const data = await response.json();
 
-    console.log('📦 Réponse Directions API:', data);
+    // console.log('📦 Réponse Directions API:', data);
 
     // Gérer les erreurs de l'API
     if (data.code && data.code !== 'Ok') {
@@ -996,7 +996,7 @@ async function drawRoute(startLat, startLng, waypoints) {
     if (data.routes && data.routes.length > 0) {
       const route = data.routes[0];
 
-      console.log('✅ Route trouvée:', {
+      // console.log('✅ Route trouvée:', {
         distance: route.distance,
         duration: route.duration,
         geometry: route.geometry ? 'OK' : 'MANQUANTE'
@@ -1041,10 +1041,10 @@ async function drawRoute(startLat, startLng, waypoints) {
         }
       });
 
-      console.log('✅ Route ajoutée à la carte');
+      // console.log('✅ Route ajoutée à la carte');
 
       // ANALYSE LLM : Vérifier les aller-retours
-      console.log('🤖 Lancement de l\'analyse de l\'itinéraire...');
+      // console.log('🤖 Lancement de l\'analyse de l\'itinéraire...');
       const streetNames = await getStreetNamesAlongRoute(route.geometry);
       const analysis = await analyzeRouteWithLLM(route.geometry, limitedWaypoints, streetNames);
 
@@ -1096,26 +1096,26 @@ async function handleFormSubmit(event) {
     return;
   }
 
-  console.log('🚀 Génération de la balade...');
+  // console.log('🚀 Génération de la balade...');
 
   // Point de départ : utiliser la position du marqueur rouge
   const startPosition = startPointMarker.getLngLat();
   const startLat = startPosition.lat;
   const startLng = startPosition.lng;
 
-  console.log('📍 Point de départ:', { lat: startLat, lng: startLng });
+  // console.log('📍 Point de départ:', { lat: startLat, lng: startLng });
 
   // NETTOYAGE COMPLET : Supprimer TOUS les anciens éléments SAUF le point de départ
-  console.log('🧹 Nettoyage des anciens éléments...');
+  // console.log('🧹 Nettoyage des anciens éléments...');
 
   // 1. Supprimer l'ancienne route si elle existe
   if (map.getLayer('route')) {
     map.removeLayer('route');
-    console.log('  - Layer route supprimé');
+    // console.log('  - Layer route supprimé');
   }
   if (map.getSource('route')) {
     map.removeSource('route');
-    console.log('  - Source route supprimée');
+    // console.log('  - Source route supprimée');
   }
 
   // 2. Supprimer l'ancienne zone isochrone si elle existe
@@ -1127,21 +1127,21 @@ async function handleFormSubmit(event) {
   }
   if (map.getSource('isochrone')) {
     map.removeSource('isochrone');
-    console.log('  - Source isochrone supprimée');
+    // console.log('  - Source isochrone supprimée');
   }
 
   // 3. Supprimer tous les marqueurs de waypoints (pas le marqueur de départ)
   // On stocke une référence aux marqueurs de waypoints pour les supprimer
   if (window.waypointMarkers) {
     window.waypointMarkers.forEach(marker => marker.remove());
-    console.log(`  - ${window.waypointMarkers.length} marqueurs waypoints supprimés`);
+    // console.log(`  - ${window.waypointMarkers.length} marqueurs waypoints supprimés`);
   }
   window.waypointMarkers = [];
 
   // GÉNÉRATION DE L'ITINÉRAIRE avec API Isochrone
   const routeData = await generateWaypoints(startLat, startLng, duration);
 
-  console.log('📍 Itinéraire généré:', {
+  // console.log('📍 Itinéraire généré:', {
     chien: dogName,
     duree_demandee: duration + ' min',
     distance_estimee: routeData.estimated_distance_km.toFixed(2) + ' km',
@@ -1188,7 +1188,7 @@ async function handleFormSubmit(event) {
       }
     });
 
-    console.log('✅ Zone isochrone affichée sur la carte');
+    // console.log('✅ Zone isochrone affichée sur la carte');
   }
 
   // Récupérer les vrais noms de lieux avec Mapbox Geocoding API
@@ -1213,14 +1213,14 @@ async function handleFormSubmit(event) {
     // Mettre à jour l'itinéraire quand le waypoint est déplacé
     marker.on('dragend', async () => {
       const newLngLat = marker.getLngLat();
-      console.log(`📍 Waypoint ${index + 1} déplacé vers:`, newLngLat);
+      // console.log(`📍 Waypoint ${index + 1} déplacé vers:`, newLngLat);
 
       // Mettre à jour les coordonnées du waypoint
       routeData.waypoints[index].lng = newLngLat.lng;
       routeData.waypoints[index].lat = newLngLat.lat;
 
       // Régénérer l'itinéraire avec les nouvelles positions
-      console.log('🔄 Mise à jour de l\'itinéraire...');
+      // console.log('🔄 Mise à jour de l\'itinéraire...');
       const startPosition = startPointMarker.getLngLat();
       await drawRoute(startPosition.lat, startPosition.lng, routeData.waypoints);
 
@@ -1246,14 +1246,14 @@ async function handleFormSubmit(event) {
     window.waypointMarkers.push(marker);
   });
 
-  console.log(`✅ ${routeData.waypoints.length} marqueurs de waypoints ajoutés`);
+  // console.log(`✅ ${routeData.waypoints.length} marqueurs de waypoints ajoutés`);
 
   // Stocker les données pour l'optimisation
   window.currentRouteData = routeData;
   window.currentStreetNames = routeData.waypoints.map(wp => wp.description);
 
   // Tracer l'itinéraire avec Mapbox Directions API
-  console.log('🗺️ Traçage de l\'itinéraire...');
+  // console.log('🗺️ Traçage de l\'itinéraire...');
   const routeInfo = await drawRoute(startLat, startLng, routeData.waypoints);
 
   if (routeInfo) {
@@ -1265,7 +1265,7 @@ async function handleFormSubmit(event) {
     const durationDiffPercent = (durationDiff / duration) * 100;
 
     // Log pour debug
-    console.log('⏱️ Analyse du timing:', {
+    // console.log('⏱️ Analyse du timing:', {
       duree_demandee: duration + ' min',
       duree_reelle: routeInfo.duration + ' min',
       difference: durationDiff + ' min',
@@ -1360,7 +1360,7 @@ window.optimizeCurrentRoute = async function() {
   const startLat = startPosition.lat;
   const startLng = startPosition.lng;
 
-  console.log('🤖 Lancement de l\'optimisation IA...');
+  // console.log('🤖 Lancement de l\'optimisation IA...');
 
   // Afficher un loader
   const optimizeSection = document.getElementById('optimize-section');
@@ -1376,7 +1376,7 @@ window.optimizeCurrentRoute = async function() {
     );
 
     if (optimization.success && optimization.waypoints) {
-      console.log('✅ Nouveaux waypoints reçus de l\'IA:', optimization.waypoints);
+      // console.log('✅ Nouveaux waypoints reçus de l\'IA:', optimization.waypoints);
 
       // Nettoyer les anciens marqueurs et route
       if (window.waypointMarkers) {
@@ -1472,14 +1472,14 @@ async function getNavigationInstructions(startLng, startLat, waypoints) {
     const coordinatesString = coordinates.map(coord => coord.join(',')).join(';');
     const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${coordinatesString}?steps=true&banner_instructions=true&voice_instructions=true&geometries=geojson&access_token=${mapboxgl.accessToken}`;
 
-    console.log('🧭 Récupération des instructions de navigation...');
+    // console.log('🧭 Récupération des instructions de navigation...');
 
     const response = await fetch(url);
     const data = await response.json();
 
     if (data.routes && data.routes.length > 0) {
       const route = data.routes[0];
-      console.log('✅ Instructions récupérées:', route.legs);
+      // console.log('✅ Instructions récupérées:', route.legs);
 
       return {
         instructions: route.legs.flatMap(leg => leg.steps),
@@ -1560,7 +1560,7 @@ window.startNavigation = async function() {
     // Démarrer le suivi GPS
     startGPSTracking();
 
-    console.log('🧭 Navigation démarrée avec', navigationState.instructions.length, 'instructions');
+    // console.log('🧭 Navigation démarrée avec', navigationState.instructions.length, 'instructions');
 
   } catch (error) {
     console.error('❌ Erreur démarrage navigation:', error);
@@ -1709,7 +1709,7 @@ window.stopNavigation = function() {
   const panel = document.getElementById('navigation-panel');
   panel.classList.remove('active');
 
-  console.log('🛑 Navigation arrêtée');
+  // console.log('🛑 Navigation arrêtée');
 }
 
 // Active/désactive les instructions vocales
@@ -1756,7 +1756,7 @@ window.enableLLM = function() {
     LLM_CONFIG.enabled = true;
     statusSpan.textContent = '✅ Activé';
     statusSpan.style.color = '#22c55e';
-    console.log('✅ Analyse LLM activée');
+    // console.log('✅ Analyse LLM activée');
     alert('✅ Analyse IA activée !\n\nL\'itinéraire sera analysé et pourra être optimisé automatiquement.');
   } else {
     alert('❌ Clé API invalide.\n\nLa clé doit commencer par "sk-".\nObtenez-en une sur https://platform.openai.com/api-keys');
