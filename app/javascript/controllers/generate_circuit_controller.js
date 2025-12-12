@@ -138,9 +138,11 @@ export default class extends Controller {
     this.initialStartCoords = null
     this.currentStartCoords = null
 
-    // Cacher le bouton submit
+    // Désactiver et griser le bouton submit
     if (this.hasSubmitButtonTarget) {
-      this.submitButtonTarget.style.display = "none"
+      this.submitButtonTarget.disabled = true
+      this.submitButtonTarget.classList.remove('btn-success')
+      this.submitButtonTarget.classList.add('btn-secondary')
     }
 
     console.log("Tous les éléments précédents ont été nettoyés")
@@ -456,9 +458,11 @@ export default class extends Controller {
           // this.circuitCoordinatesTarget.value = JSON.stringify(waypoints)
         }
 
-        // Show the submit button
+        // Activer et rendre vert le bouton submit
         if (this.hasSubmitButtonTarget) {
-          this.submitButtonTarget.style.display = "block"
+          this.submitButtonTarget.disabled = false
+          this.submitButtonTarget.classList.remove('btn-secondary')
+          this.submitButtonTarget.classList.add('btn-success')
         }
 
       } else {
