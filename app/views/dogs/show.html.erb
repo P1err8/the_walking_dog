@@ -5,11 +5,11 @@
     <div class="dog-profile-header">
       <div class="dog-profile-image-wrapper">
         <% if @dog.photo.attached? %>
-          <%= image_tag @dog.photo, class: "dog-profile-image", alt: @dog.name %>
+          <%= cl_image_tag @dog.photo.key, class: "dog-profile-image", alt: @dog.name %>
         <% elsif @dog.url_picture.present? %>
           <%= image_tag @dog.url_picture, class: "dog-profile-image", alt: @dog.name %>
         <% else %>
-          <img src="favicon.png" alt="Default Dog" class="dog-profile-image">
+          <img src="/favicon.png" alt="Default Dog" class="dog-profile-image">
         <% end %>
       </div>
     </div>

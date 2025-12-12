@@ -7,9 +7,12 @@
     <div class="dogs-grid">
       <% @meet_up.dogs.each do |dog| %>
         <div class="dog-card">
-          <% if dog.url_picture.present? %>
-            <%= image_tag dog.url_picture, alt: dog.name, class: "dog-avatar" %>
-          <% else %>
+
+          <% if dog.photo.attached? %>
+          <%= cl_image_tag dog.photo.key, class: "dog-avatar", alt: dog.name %>
+        <% elsif dog.url_picture.present? %>
+          <%= image_tag dog.url_picture, class: "dog-avatar", alt: dog.name %>
+        <% else %>
             <div class="dog-avatar-placeholder">🐕</div>
           <% end %>
           <div class="dog-info">

@@ -40,41 +40,42 @@
       <% active_meetup = point.meet_ups.with_recent_activity.find(&:active?) %>
       <% if active_meetup %>
         <% dogs = active_meetup.present_dogs %>
-
-      <% if dogs.any? %>
-        <div class="bulle-meetup__dogs">
-          <div class="bulle-meetup__dogs-avatars">
-            <% dogs.each do |dog| %>
-              <%= link_to dog_path(dog), class: "bulle-meetup__dog-link" do %>
-                <% if dog.url_picture.present? %>
-                  <%= image_tag dog.url_picture, alt: dog.name, class: "bulle-meetup__dog-avatar-small" %>
-                <% else %>
-                  <div class="bulle-meetup__dog-avatar-small placeholder">🐕</div>
+        <% if dogs.any? %>
+          <div class="bulle-meetup__dogs">
+            <div class="bulle-meetup__dogs-avatars">
+              <% dogs.each do |dog| %>
+                <%= link_to dog_path(dog), class: "bulle-meetup__dog-link" do %>
+                    <% if dog.photo.attached? %>
+                      <%= cl_image_tag dog.photo.key, class: "bulle-meetup__dog-avatar-small", alt: dog.name %>
+                    <% elsif dog.url_picture.present? %>
+                      <%= image_tag dog.url_picture, class: "bulle-meetup__dog-avatar-small", alt: dog.name %>
+                    <% else %>
+                      <div class="bulle-meetup__dog-avatar-small placeholder">🐕</div>
+                    <% end %>
+                  <% end %>
                 <% end %>
+              </div>
+              <div class="bulle-meetup__dogs-races">
+                <% race_counts = dogs.group_by(&:race).transform_values(&:count) %>
+                <% race_counts.each_with_index do |(race, count), index| %>
+                  <span class="bulle-meetup__dog-race"><%= count > 1 ? "#{count} " : "" %><%= race %></span><%= index < race_counts.size - 1 ? ' - ' : '' %>
+                <% end %>
+              </div>
+            <% end %>
+            <% unless controller_name == 'meet_ups' && action_name == 'show' %>
+              <%= simple_form_for [active_meetup, Participation.new] do |f| %>
+                <%= f.submit "Rejoindre la Rencontre", class: "btn btn-primary btn-sm extend" %>
               <% end %>
             <% end %>
-          </div>
-          <div class="bulle-meetup__dogs-races">
-            <% race_counts = dogs.group_by(&:race).transform_values(&:count) %>
-            <% race_counts.each_with_index do |(race, count), index| %>
-              <span class="bulle-meetup__dog-race"><%= count > 1 ? "#{count} " : "" %><%= race %></span><%= index < race_counts.size - 1 ? ' - ' : '' %>
+          <% end %>
+        <% else %>
+          <% unless controller_name == 'meet_ups' && action_name == 'show' %>
+            <%= simple_form_for MeetUp.new do |f| %>
+              <%# Champ caché pour lier le meetup au point actuel %>
+              <%= f.input :point_id, as: :hidden, input_html: { value: point_id } %>
+              <%= f.submit "Créer une Rencontre", class: "btn btn-primary btn-sm extend" %>
             <% end %>
-          </div>
-        <% end %>
-        <% unless controller_name == 'meet_ups' && action_name == 'show' %>
-          <%= simple_form_for [active_meetup, Participation.new] do |f| %>
-            <%= f.submit "Rejoindre la Rencontre", class: "btn btn-primary btn-sm extend" %>
           <% end %>
         <% end %>
-      <% end %>
-    <% else %>
-      <% unless controller_name == 'meet_ups' && action_name == 'show' %>
-        <%= simple_form_for MeetUp.new do |f| %>
-          <%# Champ caché pour lier le meetup au point actuel %>
-          <%= f.input :point_id, as: :hidden, input_html: { value: point_id } %>
-          <%= f.submit "Créer une Rencontre", class: "btn btn-primary btn-sm extend" %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </div>
-</div>
+      </div>
+    </div>
