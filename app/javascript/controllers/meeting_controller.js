@@ -9,7 +9,7 @@ export default class extends Controller {
   }
 
   connect() {
-    // console.log("Meeting controller connected")
+    console.log("Meeting controller connected")
     this.currentMeeting = null
     this.meetingRoute = null
     this.subscription = null
@@ -31,16 +31,16 @@ export default class extends Controller {
       { channel: "MeetingChannel" },
       {
         received: (data) => {
-          // console.log("Meeting message received:", data)
+          console.log("Meeting message received:", data)
           this.handleMeetingMessage(data)
         },
 
         connected: () => {
-          // console.log("Connected to MeetingChannel")
+          console.log("Connected to MeetingChannel")
         },
 
         disconnected: () => {
-          // console.log("Disconnected from MeetingChannel")
+          console.log("Disconnected from MeetingChannel")
         }
       }
     )
@@ -141,7 +141,7 @@ export default class extends Controller {
     this.currentMeeting = data
     this.meetingRoute = data.route
 
-    // console.log("Meeting accepted, route:", data.route)
+    console.log("Meeting accepted, route:", data.route)
 
     // Met à jour la carte avec le nouvel itinéraire
     this.updateMapWithMeetingRoute(data)
@@ -163,13 +163,13 @@ export default class extends Controller {
 
   // Gère le début de la rencontre
   handleMeetingStarted(data) {
-    // console.log("Meeting started:", data)
+    console.log("Meeting started:", data)
     this.showMessage("Rencontre commencée! 🎉", "success")
   }
 
   // Gère la fin de la rencontre
   handleMeetingCompleted(data) {
-    // console.log("Meeting completed:", data)
+    console.log("Meeting completed:", data)
     this.showMessage("Rencontre terminée! Reprise de l'itinéraire original", "success")
 
     // Reprend l'itinéraire original
@@ -287,7 +287,7 @@ export default class extends Controller {
 
   showMessage(message, type = 'info') {
     // Affiche un message toast
-    // console.log(`[${type}] ${message}`)
+    console.log(`[${type}] ${message}`)
 
     // Peut être amélioré avec une librairie de notifications
     const alert = document.createElement('div')
@@ -306,7 +306,7 @@ export default class extends Controller {
       const audio = new Audio('/sounds/notification.mp3')
       audio.play()
     } catch (e) {
-      // console.log("Cannot play notification sound:", e)
+      console.log("Cannot play notification sound:", e)
     }
   }
 }

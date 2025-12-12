@@ -9,6 +9,7 @@ export default class extends Controller {
   }
 
   connect() {
+    console.log("GenerateCircuitController connected")
 
     mapboxgl.accessToken = this.apiKeyValue
 
@@ -18,7 +19,7 @@ export default class extends Controller {
       this.mapController = this.application.getControllerForElementAndIdentifier(mapElement, 'map')
       if (this.mapController) {
         this.map = this.mapController.map
-        // console.log("Map loaded from background")
+        console.log("Map loaded from background")
       }
     }
 
@@ -142,7 +143,7 @@ export default class extends Controller {
       this.submitButtonTarget.style.display = "none"
     }
 
-    // console.log("Tous les éléments précédents ont été nettoyés")
+    console.log("Tous les éléments précédents ont été nettoyés")
   }
 
   async verifyPoiLocation(coords) {
@@ -251,7 +252,7 @@ export default class extends Controller {
   }
 
   async initializeWalk() {
-    // console.log("Initializing walk...")
+    console.log("Initializing walk...")
 
     // Nettoyer tous les anciens éléments AVANT de commencer
     this.clearAllPreviousElements()
@@ -276,7 +277,7 @@ export default class extends Controller {
       const walkDurationInput = this.durationTarget.value
       const walkDuration = parseInt(walkDurationInput)
 
-      // console.log("Inputs:", { lat, lon, walkDuration })
+      console.log("Inputs:", { lat, lon, walkDuration })
 
       if (isNaN(lon) || isNaN(lat)) {
         alert('Veuillez entrer une adresse valide pour obtenir les coordonnées.')
@@ -440,7 +441,7 @@ export default class extends Controller {
         const durationMinutes = (route.duration / 60).toFixed(0)
         const distanceKm = (route.distance / 1000).toFixed(1)
 
-        // console.log(`Itinéraire en boucle calculé: ${distanceKm} km en ${durationMinutes} minutes.`)
+        console.log(`Itinéraire en boucle calculé: ${distanceKm} km en ${durationMinutes} minutes.`)
 
         // Supprimer les markers POI intermédiaires (orange) - on garde juste la route
         this.poiMarkers.forEach(marker => marker.remove())

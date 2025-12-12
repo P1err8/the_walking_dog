@@ -479,7 +479,7 @@
 
                 // Nettoyer les allers-retours automatiquement après le calcul
                 if (window.cleanMapData) {
-                    // console.log("🧹 Nettoyage des allers-retours...");
+                    console.log("🧹 Nettoyage des allers-retours...");
 
                     // Créer les données de route pour le nettoyage
                     const routeDataForCleaning = {
@@ -488,7 +488,7 @@
                     };
 
                     const result = window.cleanMapData(routeDataForCleaning, 20);
-                    // console.log("✅ Nettoyage terminé", result.stats);
+                    console.log("✅ Nettoyage terminé", result.stats);
                 }
 
             } else {

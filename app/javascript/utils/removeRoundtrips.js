@@ -73,7 +73,7 @@ function removeRoundtrips(coordinates, threshold = 20) {
         if (!isCircuitEnd) {
           // Aller-retour détecté : garder le point de départ et sauter jusqu'au retour
           result.push(coordinates[i]);
-          // console.log(`🔄 Aller-retour détecté : index ${i} → ${j} (${distance.toFixed(2)}m)`);
+          console.log(`🔄 Aller-retour détecté : index ${i} → ${j} (${distance.toFixed(2)}m)`);
           i = j + 1;
           foundRoundtrip = true;
           break;
@@ -114,8 +114,8 @@ function rebuildRouteWithCleanedCoordinates(route, cleanedCoordinates) {
  * @returns {Object} - Objet contenant les données nettoyées et les statistiques
  */
 export function cleanMapData(mapData, threshold = 20) {
-  // console.log("🚀 Démarrage du nettoyage des allers-retours...");
-  // console.log("📦 Données originales :", mapData);
+  console.log("🚀 Démarrage du nettoyage des allers-retours...");
+  console.log("📦 Données originales :", mapData);
 
   if (!mapData.routes || mapData.routes.length === 0) {
     console.warn("⚠️  Aucune route à traiter");
@@ -130,25 +130,25 @@ export function cleanMapData(mapData, threshold = 20) {
     };
   }
 
-  // console.log(`\n🔍 Analyse de ${mapData.routes.length} route(s)...`);
+  console.log(`\n🔍 Analyse de ${mapData.routes.length} route(s)...`);
 
   const cleanedData = {
     ...mapData,
     routes: mapData.routes.map((route, index) => {
-      // console.log(`\n📍 Route ${index + 1}:`);
+      console.log(`\n📍 Route ${index + 1}:`);
 
       const originalCoords = extractCoordinatesFromRoute(route);
-      // console.log(`   Points originaux : ${originalCoords.length}`);
+      console.log(`   Points originaux : ${originalCoords.length}`);
 
       const cleanedCoords = removeRoundtrips(originalCoords, threshold);
-      // console.log(`   Points après nettoyage : ${cleanedCoords.length}`);
-      // console.log(`   Points supprimés : ${originalCoords.length - cleanedCoords.length}`);
+      console.log(`   Points après nettoyage : ${cleanedCoords.length}`);
+      console.log(`   Points supprimés : ${originalCoords.length - cleanedCoords.length}`);
 
       return rebuildRouteWithCleanedCoordinates(route, cleanedCoords);
     })
   };
 
-  // console.log("\n✅ Données nettoyées :", cleanedData);
+  console.log("\n✅ Données nettoyées :", cleanedData);
 
   const stats = {
     routesOriginal: mapData.routes.length,
@@ -160,9 +160,9 @@ export function cleanMapData(mapData, threshold = 20) {
     }, 0)
   };
 
-  // console.log("\n📊 Statistiques :");
-  // console.log(`   Routes traitées : ${stats.routesOriginal}`);
-  // console.log(`   Points supprimés au total : ${stats.totalRoundtripsRemoved}`);
+  console.log("\n📊 Statistiques :");
+  console.log(`   Routes traitées : ${stats.routesOriginal}`);
+  console.log(`   Points supprimés au total : ${stats.totalRoundtripsRemoved}`);
 
   return {
     original: mapData,
@@ -202,14 +202,14 @@ export function cleanMapDataFromElement(elementId = 'map', threshold = 20) {
   const cleanedDataString = JSON.stringify(result.cleaned);
   mapElement.setAttribute('data-map-data-value', cleanedDataString);
 
-  // console.log("\n🔄 Rafraîchissement de la carte...");
+  console.log("\n🔄 Rafraîchissement de la carte...");
 
   // Déclencher le changement pour Stimulus
   const tempValue = mapElement.getAttribute('data-map-data-value');
   mapElement.removeAttribute('data-map-data-value');
   setTimeout(() => {
     mapElement.setAttribute('data-map-data-value', tempValue);
-    // console.log("✅ Carte rafraîchie avec les données nettoyées !");
+    console.log("✅ Carte rafraîchie avec les données nettoyées !");
   }, 100);
 
   return result;

@@ -40,10 +40,10 @@ export function initToggleButtons(selector = '.btn-toggle') {
         this.classList.add('active');
         this.setAttribute('aria-pressed', 'true');
 
-        // console.log(`[Composant: Toggle] Option sélectionnée : "${this.textContent.trim()}"`);
+        console.log(`[Composant: Toggle] Option sélectionnée : "${this.textContent.trim()}"`);
       }
     });
   });
 
-  // console.log(`[Composant: Toggle] ${toggleButtons.length} boutons initialisés.`);
+  console.log(`[Composant: Toggle] ${toggleButtons.length} boutons initialisés.`);
 }
