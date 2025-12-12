@@ -38,47 +38,55 @@ puts "the user with the #{user2.email} has been created!"
 Tag.destroy_all
 puts "Creating tags for dogs' personalities..."
 
-croket = Dog.create!(
+fifi_pic = URI.parse("https://res.cloudinary.com/juliencloudinary/image/upload/ugizkrf4iwxscm260hkourtb7m4h.webp?_a=BACAGSEv").open
+pilou_pic = URI.parse("https://res.cloudinary.com/juliencloudinary/image/upload/tqgei7zx3cxskq336q1rze942vnf.png?_a=BACAGSEv").open
+viktor_pic = URI.parse("https://res.cloudinary.com/juliencloudinary/image/upload/ocsbhdozbydbm7x8g0gcx8jsa2jh.jpg?_a=BACAGSEv").open
+luna_pic = URI.parse("https://res.cloudinary.com/juliencloudinary/image/upload/evyz87e15zdj4h8tls62pydz9aup.png?_a=BACAGSEv").open
+croket_pic = URI.parse("https://res.cloudinary.com/juliencloudinary/image/upload/b26k6jzqi4mae6k0ain3usgr0bnv.jpeg?_a=BACAGSEv"
+).open
+
+croket = Dog.new(
   name: "Croket",
   size: "Petit",
   age: 3,
   race: "Chihuahua",
-  url_picture: "chihuahua.jpeg",
   user: user1,
 )
-
+croket.photo.attach(io: croket_pic, filename: "chihuahua.jpeg", content_type: "image/jpeg")
+croket.save
 puts "#{croket.name} has been created!"
 
-luna = Dog.create!(
+luna = Dog.new(
   name: "Luna",
   size: "Grand",
   age: 6,
   race: "Saint Bernard",
-  url_picture: "saint-bernard.png",
   user: user2,
 )
+luna.photo.attach(io: luna_pic, filename: "luna.png", content_type: "image/png")
+luna.save
+puts "#{luna.name} has been created!"
 
-puts "#{croket.name} has been created!"
-
-viktor = Dog.create!(
+viktor = Dog.new(
   name: "Viktor",
   size: "Moyen",
   age: 1,
   race: "Cocker Spaniel",
-  url_picture: "cocker-spaniel.jpg",
   user: user3,
 )
+viktor.photo.attach(io: viktor_pic, filename: "viktor.jpeg", content_type: "image/jpeg")
+viktor.save
 puts "#{viktor.name} has been created!"
 
-pilou = Dog.create!(
+pilou = Dog.new(
   name: "Pilou",
   size: "Petit",
   age: 5,
   race: "Cairn Terrier",
-  url_picture: "cairn-terrier.png",
   user: user4,
 )
-
+pilou.photo.attach(io: pilou_pic, filename: "pilou.png", content_type: "image/png")
+pilou.save
 puts "#{pilou.name} has been created!"
 
 dogs_tags = ["Amical", "Calme", "Joueur", "Énergique", "Protecteur", "Timide"]
@@ -198,16 +206,19 @@ john = User.create!(
   password: "demodemo",
 )
 
-fifi = Dog.create!(
+fifi = Dog.new(
   name: "Fifi",
   size: "Moyen",
   age: 2,
   race: "Border Collie",
-  url_picture: "bordercollie.webp",
   user: john,
 )
+
 fifi.tags << tags[0]
 fifi.tags << tags[3]
+
+fifi.photo.attach(io: fifi_pic, filename: "fifi.webp", content_type: "image/webp")
+fifi.save
 
 puts "John and his dog Fifi have been created!"
 

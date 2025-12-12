@@ -1,5 +1,4 @@
 <% content_for :title, "Mes activités" %>
-
 <div class="activities-container">
   <div class="activities-list">
     <% activities = (@walkings.to_a + @participations.to_a).sort_by(&:created_at).reverse %>
@@ -9,10 +8,12 @@
           <div class="activity-content">
             <div class="activity-header">
               <div class="user-avatar">
-                <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
-                  <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
+                <% if current_user.dogs.any? && current_user.dogs.first.photo.attached? %>
+                  <%= cl_image_tag current_user.dogs.first.photo.key, class: "avatar-img", alt: current_user.dogs.first.name %>
+                <% elsif current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
+                  <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img", alt: current_user.dogs.first.name %>
                 <% else %>
-                  <img src="favicon.png" class="avatar-img">
+                  <img src="/favicon.png" class="avatar-img">
                 <% end %>
               </div>
               <div class="user-info">
@@ -22,16 +23,16 @@
             </div>
             <h3>Promenade</h3>
           </div>
-            <div class="activity-stats-top">
-              <div class="stat">
-                <i class="fa-solid fa-route"></i>
-                <span class="value"><strong><%= activity.calculated_distance ? "#{activity.calculated_distance} km" : "- km" %></strong></span>
-              </div>
-              <div class="stat">
-                <i class="fa-regular fa-clock"></i>
-                <span class="value"><strong><%= activity.calculated_duration ? "#{activity.calculated_duration} min" : "- min" %></strong></span>
-              </div>
+          <div class="activity-stats-top">
+            <div class="stat">
+              <i class="fa-solid fa-route"></i>
+              <span class="value"><strong><%= activity.calculated_distance ? "#{activity.calculated_distance} km" : "- km" %></strong></span>
             </div>
+            <div class="stat">
+              <i class="fa-regular fa-clock"></i>
+              <span class="value"><strong><%= activity.calculated_duration ? "#{activity.calculated_duration} min" : "- min" %></strong></span>
+            </div>
+          </div>
           <div class="activity-map-wrapper">
             <%= image_tag static_map_url(activity), alt: "Itinéraire de la balade" %>
             <%= link_to walking_path(activity), class: "delete-overlay-btn", data: { turbo_method: :delete, turbo_confirm: "Supprimer cette balade ?" } do %>
@@ -44,10 +45,12 @@
           <div class="activity-content">
             <div class="activity-header">
               <div class="user-avatar">
-                <% if current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
-                  <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img" %>
+                <% if current_user.dogs.any? && current_user.dogs.first.photo.attached? %>
+                  <%= cl_image_tag current_user.dogs.first.photo.key, class: "avatar-img", alt: current_user.dogs.first.name %>
+                <% elsif current_user.dogs.any? && current_user.dogs.first.url_picture.present? %>
+                  <%= image_tag current_user.dogs.first.url_picture, class: "avatar-img", alt: current_user.dogs.first.name %>
                 <% else %>
-                  <img src="favicon.png" class="avatar-img">
+                  <img src="/favicon.png" class="avatar-img">
                 <% end %>
               </div>
               <div class="user-info">
@@ -64,11 +67,11 @@
                   <% if dog %>
                     <%= link_to dog_path(dog), class: "participant-avatar-link" do %>
                       <% if dog.photo.attached? %>
-                        <%= image_tag dog.photo, class: "bulle-meetup__dog-avatar-small" %>
+                        <%= cl_image_tag dog.photo.key, class: "bulle-meetup__dog-avatar-small", alt: dog.name %>
                       <% elsif dog.url_picture.present? %>
                         <%= image_tag dog.url_picture, class: "bulle-meetup__dog-avatar-small" %>
                       <% else %>
-                        <img src="favicon.png" class="bulle-meetup__dog-avatar-small">
+                        <img src="/favicon.png" class="bulle-meetup__dog-avatar-small">
                       <% end %>
                     <% end %>
                   <% end %>

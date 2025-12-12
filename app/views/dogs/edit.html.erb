@@ -8,7 +8,8 @@
         <div class="dog-photo-upload">
           <label for="dog_photo" class="dog-photo-label">
             <% if @dog.photo.attached? %>
-              <%= image_tag @dog.photo, class: "dog-photo-preview", id: "edit-photo-preview", alt: @dog.name %>
+              <%# image_tag @dog.photo, class: "dog-photo-preview", id: "edit-photo-preview", alt: @dog.name %>
+              <%= cl_image_tag @dog.photo.key, class: "dog-photo-preview", id: "edit-photo-preview", alt: @dog.name %>
             <% elsif @dog.url_picture.present? %>
               <%= image_tag @dog.url_picture, class: "dog-photo-preview", id: "edit-photo-preview", alt: @dog.name %>
             <% else %>
