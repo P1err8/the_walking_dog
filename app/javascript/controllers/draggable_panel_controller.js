@@ -36,7 +36,6 @@ export default class extends Controller {
 
     // Ne définir la hauteur initiale que pour les panels qui ne sont pas navigation-panel
     if (!this.isNavigationPanel) {
-      this.element.style.height = `${this.defaultHeight}px`
       this.element.style.overflow = 'hidden'
     }
 
@@ -270,7 +269,6 @@ export default class extends Controller {
 
     // Si on tire en dessous de minHeight, on commence à translater vers le bas
     if (theoreticalHeight < this.minHeight) {
-      this.element.style.height = `${this.minHeight}px`
       const translateAmount = this.minHeight - theoreticalHeight
       this.currentTranslateY = translateAmount
       this.element.style.transform = `translateY(${translateAmount}px)`
@@ -278,9 +276,7 @@ export default class extends Controller {
       const opacity = Math.max(0, 1 - (translateAmount / 200))
       this.element.style.opacity = opacity.toString()
     } else {
-      // Comportement normal : ajuster la hauteur
-      const newHeight = Math.min(this.maxHeight, theoreticalHeight)
-      this.element.style.height = `${newHeight}px`
+      // Comportement normal : pas de modification de hauteur
       this.element.style.transform = 'translateY(0)'
       this.element.style.opacity = '1'
       this.currentTranslateY = 0
